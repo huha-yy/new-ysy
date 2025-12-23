@@ -402,10 +402,10 @@ CREATE TABLE `dict_data` (
 -- =============================================
 -- 初始数据：管理员账号
 -- 用户名：admin
--- 密码：123（BCrypt加密后）
+-- 密码：123666888ysy（BCrypt加密后）
 -- =============================================
 INSERT INTO `user` (`username`, `password`, `nickname`, `role`, `status`, `create_time`, `update_time`) VALUES
-('admin', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGM/qJ3B3V3S', '系统管理员', 2, 1, NOW(), NOW());
+('admin', '$2a$10$Hbr4de9o1K0f37SEL3Q2ZunGcHcl0UM9xzsaoRyb6UJPCHt0Cu.sq', '系统管理员', 2, 1, NOW(), NOW());
 
 -- 管理员档案
 INSERT INTO `user_profile` (`user_id`, `real_name`, `gender`, `experience_level`, `create_time`, `update_time`) VALUES

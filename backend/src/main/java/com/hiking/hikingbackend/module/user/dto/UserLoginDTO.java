@@ -29,7 +29,7 @@ public class UserLoginDTO {
      * 密码
      */
     @NotBlank(message = "密码不能为空")
-    @Size(min = 6, max = 20, message = "密码长度必须在6-20个字符之间")
+    // @Size(min = 6, max = 20, message = "密码长度必须在6-20个字符之间") // 暂时取消密码长度限制，方便测试
     private String password;
 }
 
