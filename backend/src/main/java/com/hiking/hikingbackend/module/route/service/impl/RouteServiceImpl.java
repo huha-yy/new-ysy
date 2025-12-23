@@ -1,0 +1,343 @@
+package com.hiking.hikingbackend.module.route.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hiking.hikingbackend.common.exception.BusinessException;
+import com.hiking.hikingbackend.common.result.ResultCode;
+import com.hiking.hikingbackend.module.route.dto.CheckpointCreateDTO;
+import com.hiking.hikingbackend.module.route.dto.RouteCreateDTO;
+import com.hiking.hikingbackend.module.route.dto.RouteQuery;
+import com.hiking.hikingbackend.module.route.entity.Checkpoint;
+import com.hiking.hikingbackend.module.route.entity.Route;
+import com.hiking.hikingbackend.module.route.mapper.CheckpointMapper;
+import com.hiking.hikingbackend.module.route.mapper.RouteMapper;
+import com.hiking.hikingbackend.module.route.service.RouteService;
+import com.hiking.hikingbackend.module.route.vo.CheckpointVO;
+import com.hiking.hikingbackend.module.route.vo.RouteVO;
+import com.hiking.hikingbackend.module.user.entity.User;
+import com.hiking.hikingbackend.module.user.mapper.UserMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.util.List;
+
+/**
+ * 路线服务实现类
+ *
+ * @author hiking-system
+ * @since 2024-12-23
+ */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class RouteServiceImpl implements RouteService {
+
+    private final RouteMapper routeMapper;
+
+    private final CheckpointMapper checkpointMapper;
+
+    private final UserMapper userMapper;
+
+    private static final int ROUTE_STATUS_NORMAL = 1;    // 路线正常
+    private static final int ROUTE_PUBLIC = 1;           // 路线公开
+    private static final int CHECKPOINT_RADIUS_DEFAULT = 50; // 默认签到半径（米）
+    private static final int CHECKPOINT_TYPE_WAY = 2;      // 途中点（默认）
+    private static final int CHECKPOINT_REQUIRED = 1;       // 必签（默认）
+
+    /**
+     * 创建路线（组织者）
+     *
+     * @param userId 用户ID
+     * @param createDTO 创建信息
+     * @return 路线ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long createRoute(Long userId, RouteCreateDTO createDTO) {
+        // 1. 校验用户是否存在
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+
+        // 2. 构建路线对象
+        Route route = Route.builder()
+                .name(createDTO.getName())
+                .description(createDTO.getDescription())
+                .creatorId(userId)
+                .difficultyLevel(createDTO.getDifficultyLevel())
+                .totalDistance(createDTO.getTotalDistance())
+                .elevationGain(createDTO.getElevationGain())
+                .elevationLoss(createDTO.getElevationLoss())
+                .maxElevation(createDTO.getMaxElevation())
+                .minElevation(createDTO.getMinElevation())
+                .estimatedHours(createDTO.getEstimatedHours())
+                .startPointName(createDTO.getStartPointName())
+                .startLatitude(createDTO.getStartLatitude())
+                .startLongitude(createDTO.getStartLongitude())
+                .endPointName(createDTO.getEndPointName())
+                .endLatitude(createDTO.getEndLatitude())
+                .endLongitude(createDTO.getEndLongitude())
+                .region(createDTO.getRegion())
+                .isPublic(createDTO.getIsPublic() != null ? createDTO.getIsPublic() : ROUTE_PUBLIC)
+                .useCount(0)
+                .status(ROUTE_STATUS_NORMAL)
+                .build();
+
+        routeMapper.insert(route);
+        log.info("创建路线成功，路线ID：{}，创建者ID：{}", route.getId(), userId);
+
+        return route.getId();
+    }
+
+    /**
+     * 路线列表（公开路线）
+     *
+     * @param query 查询条件
+     * @return 分页结果
+     */
+    @Override
+    public IPage<RouteVO> getRouteList(RouteQuery query) {
+        // 1. 构建查询条件（只查询公开且正常的路线）
+        LambdaQueryWrapper<Route> queryWrapper = new LambdaQueryWrapper<>();
+        
+        // 只查询公开且正常的路线
+        queryWrapper.eq(Route::getIsPublic, ROUTE_PUBLIC)
+                  .eq(Route::getStatus, ROUTE_STATUS_NORMAL);
+        
+        // 按名称模糊查询
+        if (StringUtils.hasText(query.getName())) {
+            queryWrapper.like(Route::getName, query.getName());
+        }
+        
+        // 按地区模糊查询
+        if (StringUtils.hasText(query.getRegion())) {
+            queryWrapper.like(Route::getRegion, query.getRegion());
+        }
+        
+        // 按难度等级筛选
+        if (query.getDifficultyLevel() != null) {
+            queryWrapper.eq(Route::getDifficultyLevel, query.getDifficultyLevel());
+        }
+        
+        // 按使用次数降序
+        queryWrapper.orderByDesc(Route::getUseCount);
+        
+        // 2. 分页查询
+        Page<Route> page = new Page<>(query.getPageNum(), query.getPageSize());
+        IPage<Route> routePage = routeMapper.selectPage(page, queryWrapper);
+        
+        // 3. 转换为VO（列表不包含签到点）
+        return routePage.convert(this::convertToVOBasic);
+    }
+
+    /**
+     * 路线详情（含点位信息）
+     *
+     * @param routeId 路线ID
+     * @return 路线详情
+     */
+    @Override
+    public RouteVO getRouteDetail(Long routeId) {
+        // 1. 查询路线
+        Route route = routeMapper.selectById(routeId);
+        if (route == null) {
+            throw new BusinessException(ResultCode.ROUTE_NOT_FOUND);
+        }
+        
+        // 2. 查询该路线的所有签到点
+        LambdaQueryWrapper<Checkpoint> checkpointWrapper = new LambdaQueryWrapper<>();
+        checkpointWrapper.eq(Checkpoint::getRouteId, routeId)
+                      .orderByAsc(Checkpoint::getSequence);
+        List<Checkpoint> checkpoints = checkpointMapper.selectList(checkpointWrapper);
+        
+        // 3. 转换为VO
+        return convertToVOWithCheckpoints(route, checkpoints);
+    }
+
+    /**
+     * 为路线添加签到点
+     *
+     * @param userId 用户ID
+     * @param routeId 路线ID
+     * @param createDTO 签到点信息
+     * @return 签到点ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long addCheckpoint(Long userId, Long routeId, CheckpointCreateDTO createDTO) {
+        // 1. 校验用户是否存在
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+        
+        // 2. 校验路线是否存在
+        Route route = routeMapper.selectById(routeId);
+        if (route == null) {
+            throw new BusinessException(ResultCode.ROUTE_NOT_FOUND);
+        }
+        
+        // 3. 校验权限（必须是路线创建者）
+        if (!route.getCreatorId().equals(userId)) {
+            throw new BusinessException(ResultCode.FORBIDDEN, "只有路线创建者可以添加签到点");
+        }
+        
+        // 4. 构建签到点对象
+        Checkpoint checkpoint = Checkpoint.builder()
+                .routeId(routeId)
+                .name(createDTO.getName())
+                .description(createDTO.getDescription())
+                .latitude(createDTO.getLatitude())
+                .longitude(createDTO.getLongitude())
+                .radius(createDTO.getRadius() != null ? createDTO.getRadius() : CHECKPOINT_RADIUS_DEFAULT)
+                .sequence(createDTO.getSequence())
+                .checkpointType(createDTO.getCheckpointType() != null ? createDTO.getCheckpointType() : CHECKPOINT_TYPE_WAY)
+                .isRequired(createDTO.getIsRequired() != null ? createDTO.getIsRequired() : CHECKPOINT_REQUIRED)
+                .expectedArriveMinutes(createDTO.getExpectedArriveMinutes())
+                .build();
+        
+        checkpointMapper.insert(checkpoint);
+        log.info("添加签到点成功，签到点ID：{}，路线ID：{}，创建者ID：{}", checkpoint.getId(), routeId, userId);
+        
+        return checkpoint.getId();
+    }
+
+    /**
+     * 转换为VO（基本信息，不包含签到点）
+     */
+    private RouteVO convertToVOBasic(Route route) {
+        // 查询创建者信息
+        User creator = userMapper.selectById(route.getCreatorId());
+        String creatorNickname = creator != null ? creator.getNickname() : null;
+        String creatorAvatar = creator != null ? creator.getAvatar() : null;
+        
+        return RouteVO.builder()
+                .id(route.getId())
+                .name(route.getName())
+                .description(route.getDescription())
+                .creatorId(route.getCreatorId())
+                .creatorNickname(creatorNickname)
+                .creatorAvatar(creatorAvatar)
+                .difficultyLevel(route.getDifficultyLevel())
+                .difficultyLevelText(getDifficultyLevelText(route.getDifficultyLevel()))
+                .totalDistance(route.getTotalDistance())
+                .elevationGain(route.getElevationGain())
+                .elevationLoss(route.getElevationLoss())
+                .maxElevation(route.getMaxElevation())
+                .minElevation(route.getMinElevation())
+                .estimatedHours(route.getEstimatedHours())
+                .startPointName(route.getStartPointName())
+                .startLatitude(route.getStartLatitude())
+                .startLongitude(route.getStartLongitude())
+                .endPointName(route.getEndPointName())
+                .endLatitude(route.getEndLatitude())
+                .endLongitude(route.getEndLongitude())
+                .region(route.getRegion())
+                .isPublic(route.getIsPublic())
+                .useCount(route.getUseCount())
+                .status(route.getStatus())
+                .statusText(getStatusText(route.getStatus()))
+                .checkpoints(null)
+                .createTime(route.getCreateTime())
+                .updateTime(route.getUpdateTime())
+                .build();
+    }
+
+    /**
+     * 转换为VO（含签到点）
+     */
+    private RouteVO convertToVOWithCheckpoints(Route route, List<Checkpoint> checkpoints) {
+        // 先转换基本信息
+        RouteVO routeVO = convertToVOBasic(route);
+        
+        // 转换签到点列表
+        List<CheckpointVO> checkpointVOList = checkpoints.stream()
+                .map(this::convertToVO)
+                .toList();
+        
+        routeVO.setCheckpoints(checkpointVOList);
+        
+        return routeVO;
+    }
+
+    /**
+     * 签到点转换为VO
+     */
+    private CheckpointVO convertToVO(Checkpoint checkpoint) {
+        return CheckpointVO.builder()
+                .id(checkpoint.getId())
+                .routeId(checkpoint.getRouteId())
+                .name(checkpoint.getName())
+                .description(checkpoint.getDescription())
+                .latitude(checkpoint.getLatitude())
+                .longitude(checkpoint.getLongitude())
+                .radius(checkpoint.getRadius())
+                .sequence(checkpoint.getSequence())
+                .checkpointType(checkpoint.getCheckpointType())
+                .checkpointTypeText(getCheckpointTypeText(checkpoint.getCheckpointType()))
+                .isRequired(checkpoint.getIsRequired())
+                .isRequiredText(getIsRequiredText(checkpoint.getIsRequired()))
+                .expectedArriveMinutes(checkpoint.getExpectedArriveMinutes())
+                .createTime(checkpoint.getCreateTime())
+                .updateTime(checkpoint.getUpdateTime())
+                .build();
+    }
+
+    /**
+     * 获取难度等级文本
+     */
+    private String getDifficultyLevelText(Integer difficultyLevel) {
+        if (difficultyLevel == null) return null;
+        return switch (difficultyLevel) {
+            case 1 -> "休闲";
+            case 2 -> "简单";
+            case 3 -> "中等";
+            case 4 -> "困难";
+            case 5 -> "极限";
+            default -> "未知";
+        };
+    }
+
+    /**
+     * 获取状态文本
+     */
+    private String getStatusText(Integer status) {
+        if (status == null) return null;
+        return switch (status) {
+            case 0 -> "禁用";
+            case 1 -> "正常";
+            default -> "未知";
+        };
+    }
+
+    /**
+     * 获取签到点类型文本
+     */
+    private String getCheckpointTypeText(Integer checkpointType) {
+        if (checkpointType == null) return null;
+        return switch (checkpointType) {
+            case 1 -> "集合点";
+            case 2 -> "途中点";
+            case 3 -> "终点";
+            default -> "未知";
+        };
+    }
+
+    /**
+     * 获取是否必签文本
+     */
+    private String getIsRequiredText(Integer isRequired) {
+        if (isRequired == null) return null;
+        return switch (isRequired) {
+            case 0 -> "否";
+            case 1 -> "是";
+            default -> "未知";
+        };
+    }
+}
+
