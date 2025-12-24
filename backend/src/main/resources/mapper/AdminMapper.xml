@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hiking.hikingbackend.module.admin.mapper.AdminMapper">
+
+    <!-- Dashboard统计数据 -->
+    <select id="getDashboard" resultType="com.hiking.hikingbackend.module.admin.vo.DashboardVO">
+        SELECT
+            (SELECT COUNT(*) FROM `user`) AS user_count,
+            (SELECT COUNT(*) FROM `activity`) AS activity_count,
+            (SELECT COUNT(*) FROM `registration`) AS registration_count,
+            (SELECT COUNT(*) FROM `activity` WHERE status = 1) AS pending_audit_count,
+            (SELECT COUNT(*) FROM `user` WHERE DATE(create_time) = CURDATE()) AS today_new_users,
+            (SELECT COUNT(*) FROM `activity` WHERE DATE(create_time) = CURDATE()) AS today_new_activities,
+            (SELECT COUNT(DISTINCT organizer_id) FROM `activity` 
+             WHERE create_time >= DATE_SUB(NOW(), INTERVAL 7 DAY) 
+             AND status IN (2, 3, 4, 7)) AS weekly_active_users,
+            (SELECT COUNT(*) FROM `registration` 
+             WHERE YEAR(create_time) = YEAR(NOW()) 
+             AND MONTH(create_time) = MONTH(NOW())) AS monthly_registrations
+    </select>
+
+    <!-- 分页查询用户列表（含统计数据） -->
+    <select id="getUserList" resultType="com.hiking.hikingbackend.module.admin.vo.UserListVO">
+        SELECT
+            u.id,
+            u.username,
+            u.nickname,
+            u.avatar,
+            u.phone,
+            u.email,
+            u.role,
+            u.status,
+            u.last_login_time,
+            u.create_time,
+            IFNULL(a.activity_count, 0) AS activity_count,
+            IFNULL(r.registration_count, 0) AS registration_count
+        FROM `user` u
+        LEFT JOIN (
+            SELECT organizer_id, COUNT(*) AS activity_count
+            FROM `activity`
+            GROUP BY organizer_id
+        ) a ON u.id = a.organizer_id
+        LEFT JOIN (
+            SELECT user_id, COUNT(*) AS registration_count
+            FROM `registration`
+            WHERE status = 1
+            GROUP BY user_id
+        ) r ON u.id = r.user_id
+        <where>
+            <if test="query.keyword != null and query.keyword != ''">
+                AND (
+                    u.username LIKE CONCAT('%', #{query.keyword}, '%')
+                    OR u.nickname LIKE CONCAT('%', #{query.keyword}, '%')
+                    OR u.phone LIKE CONCAT('%', #{query.keyword}, '%')
+                    OR u.email LIKE CONCAT('%', #{query.keyword}, '%')
+                )
+            </if>
+            <if test="query.role != null">
+                AND u.role = #{query.role}
+            </if>
+            <if test="query.status != null">
+                AND u.status = #{query.status}
+            </if>
+        </where>
+        ORDER BY u.create_time DESC
+    </select>
+
+    <!-- 分页查询待审核活动列表 -->
+    <select id="getPendingActivities" resultType="com.hiking.hikingbackend.module.admin.vo.ActivityAuditVO">
+        SELECT
+            a.id,
+            a.title,
+            a.cover_image AS coverImage,
+            a.description,
+            a.organizer_id AS organizerId,
+            u.nickname AS organizerName,
+            a.activity_date AS activityDate,
+            a.start_time AS startTime,
+            a.end_time AS endTime,
+            CONCAT(a.activity_date, ' ', a.start_time) AS startTimeCombined,
+            a.max_participants AS maxParticipants,
+            a.current_participants AS currentParticipants,
+            a.difficulty_level AS difficultyLevel,
+            a.fee,
+            a.equipment_requirement AS equipmentRequirement,
+            gp.gathering_address AS startLocation,
+            a.status,
+            a.reject_reason AS rejectReason,
+            a.audit_by AS auditBy,
+            a.audit_time AS auditTime,
+            a.create_time AS createTime
+        FROM `activity` a
+        INNER JOIN `user` u ON a.organizer_id = u.id
+        LEFT JOIN `gathering_plan` gp ON a.id = gp.activity_id
+        <where>
+            a.status = 1
+            <if test="query.keyword != null and query.keyword != ''">
+                AND a.title LIKE CONCAT('%', #{query.keyword}, '%')
+            </if>
+            <if test="query.difficultyLevel != null">
+                AND a.difficulty_level = #{query.difficultyLevel}
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+
+    <!-- 分页查询所有活动列表（管理员视角） -->
+    <select id="getAllActivities" resultType="com.hiking.hikingbackend.module.admin.vo.ActivityAuditVO">
+        SELECT
+            a.id,
+            a.title,
+            a.cover_image AS coverImage,
+            a.description,
+            a.organizer_id AS organizerId,
+            u.nickname AS organizerName,
+            a.activity_date AS activityDate,
+            a.start_time AS startTime,
+            a.end_time AS endTime,
+            CONCAT(a.activity_date, ' ', a.start_time) AS startTimeCombined,
+            a.max_participants AS maxParticipants,
+            a.current_participants AS currentParticipants,
+            a.difficulty_level AS difficultyLevel,
+            a.fee,
+            a.equipment_requirement AS equipmentRequirement,
+            gp.gathering_address AS startLocation,
+            a.status,
+            a.reject_reason AS rejectReason,
+            a.audit_by AS auditBy,
+            a.audit_time AS auditTime,
+            a.create_time AS createTime
+        FROM `activity` a
+        INNER JOIN `user` u ON a.organizer_id = u.id
+        LEFT JOIN `gathering_plan` gp ON a.id = gp.activity_id
+        <where>
+            1=1
+            <if test="query.keyword != null and query.keyword != ''">
+                AND a.title LIKE CONCAT('%', #{query.keyword}, '%')
+            </if>
+            <if test="query.status != null">
+                AND a.status = #{query.status}
+            </if>
+            <if test="query.difficultyLevel != null">
+                AND a.difficulty_level = #{query.difficultyLevel}
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+
+    <!-- 获取用户统计信息 -->
+    <select id="getUserStats" resultType="com.hiking.hikingbackend.module.admin.vo.UserStatsVO">
+        SELECT
+            (SELECT COUNT(*) FROM `user`) AS total,
+            (SELECT COUNT(*) FROM `user` WHERE role = 0) AS users,
+            (SELECT COUNT(*) FROM `user` WHERE role = 1) AS organizers,
+            (SELECT COUNT(*) FROM `user` WHERE role = 2) AS admins,
+            (SELECT COUNT(*) FROM `user` WHERE status = 0) AS disabled
+    </select>
+
+</mapper>
+

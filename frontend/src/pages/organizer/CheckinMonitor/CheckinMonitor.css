@@ -1,0 +1,334 @@
+/* 🌞 签到监控页面样式 */
+.checkin-monitor-page {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+  animation: fadeInUp 0.6s ease;
+}
+
+/* 页面头部 */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  background: white;
+  padding: 20px 24px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.back-btn {
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.back-btn:hover {
+  color: var(--primary-color);
+}
+
+.header-title {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.title-icon {
+  color: var(--success-color);
+  font-size: 28px;
+}
+
+.activity-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.activity-name {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.auto-refresh-tip {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* 统计卡片 */
+.stats-row {
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  border: none;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-card.overview {
+  background: linear-gradient(135deg, #FFF9E6 0%, white 100%);
+}
+
+.stat-card.overview .stat-content {
+  text-align: center;
+}
+
+.stat-card.overview .stat-label {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.stat-card .ant-statistic-title {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.stat-card .ant-statistic-content-prefix {
+  margin-right: 8px;
+}
+
+/* 签到点进度卡片 */
+.checkpoints-card {
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 24px;
+}
+
+.checkpoints-card .ant-card-head {
+  background: linear-gradient(135deg, #FFF9E6 0%, white 100%);
+  border-bottom: 2px solid #FFE8CC;
+}
+
+.checkpoints-timeline {
+  padding: 20px;
+}
+
+.timeline-label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.cp-order-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+  border-radius: 50%;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.checkpoint-progress-item {
+  background: #FFFAF5;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #FFE8CC;
+}
+
+.cp-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.cp-info .cp-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cp-info .cp-count {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+/* 参与者表格卡片 */
+.participants-card {
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+}
+
+.participants-card .ant-card-head {
+  background: linear-gradient(135deg, #FFF9E6 0%, white 100%);
+  border-bottom: 2px solid #FFE8CC;
+}
+
+.participants-card .ant-table-thead > tr > th {
+  background: #FFFAF5;
+  color: var(--text-primary);
+  font-weight: 600;
+  border-bottom: 2px solid #FFE8CC;
+  padding: 12px 8px;
+}
+
+.participants-card .ant-table-tbody > tr:hover > td {
+  background: #FFF9E6;
+}
+
+/* 用户单元格 */
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-cell .user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-cell .user-nickname {
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-cell .user-phone {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.user-cell .user-phone .anticon {
+  margin-right: 4px;
+}
+
+.warning-avatar {
+  border: 2px solid var(--danger-color);
+}
+
+.warning-icon {
+  color: var(--danger-color);
+  font-size: 14px;
+  animation: pulse 1.5s infinite;
+}
+
+/* 签到点表头 */
+.checkpoint-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.checkpoint-header .cp-order {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.checkpoint-header .cp-name {
+  font-size: 11px;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 最后签到 */
+.last-checkin {
+  text-align: center;
+}
+
+.last-checkin .checkin-time {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.last-checkin .checkin-location {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.last-checkin .no-checkin {
+  color: #999;
+  font-style: italic;
+}
+
+/* 警告行 */
+.warning-row {
+  background: #FFF5F5 !important;
+}
+
+.warning-row:hover > td {
+  background: #FFEBEB !important;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .checkin-monitor-page {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .stats-row .ant-col {
+    margin-bottom: 12px;
+  }
+
+  .stat-card {
+    height: auto;
+    padding: 16px;
+  }
+}
+
+/* 动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.stat-card:nth-child(1) { animation: fadeInUp 0.4s ease 0.1s both; }
+.stat-card:nth-child(2) { animation: fadeInUp 0.4s ease 0.15s both; }
+.stat-card:nth-child(3) { animation: fadeInUp 0.4s ease 0.2s both; }
+.stat-card:nth-child(4) { animation: fadeInUp 0.4s ease 0.25s both; }
+

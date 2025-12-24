@@ -18,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.filter.CorsFilter;
 
 /**
  * Spring Security 配置类
@@ -121,15 +122,25 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
 
                         // 放行认证相关路径
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
+
+                        // 放行活动相关公开路径（列表和详情）
+                        .requestMatchers("/activities").permitAll()
+                        .requestMatchers("/activities/**").permitAll()
+
+                        // 放行路线相关公开路径（列表和详情）
+                        .requestMatchers("/routes").permitAll()
+                        .requestMatchers("/routes/**").permitAll()
+
+                        // 放行字典数据（公开接口）
+                        .requestMatchers("/dict/data/**").permitAll()
 
                         // 其他所有请求都需要认证
                         .anyRequest().authenticated()
                 );
 
-        // 添加JWT认证过滤器
-        http.addFilterBefore(jwtAuthenticationFilter,
-                org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
+                // 添加JWT认证过滤器（放在 CORS 过滤器之前）
+        http.addFilterBefore(jwtAuthenticationFilter, CorsFilter.class);
 
         return http.build();
     }

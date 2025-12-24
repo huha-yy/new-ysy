@@ -1,0 +1,342 @@
+/* 🌞 活动表单页面样式 */
+.activity-form-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFE8CC 100%);
+  padding-bottom: 100px;
+}
+
+/* 页面头部 */
+.form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: white;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.back-btn {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.back-btn:hover {
+  color: var(--primary-color);
+}
+
+.form-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+/* 步骤条 */
+.steps-wrapper {
+  max-width: 800px;
+  margin: 24px auto;
+  padding: 0 24px;
+}
+
+.form-steps .ant-steps-item-process .ant-steps-item-icon {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #FF8B4F 100%);
+  border: none;
+}
+
+.form-steps .ant-steps-item-finish .ant-steps-item-icon {
+  background: var(--success-color);
+  border: none;
+}
+
+.form-steps .ant-steps-item-finish .ant-steps-item-icon .ant-steps-icon {
+  color: white;
+}
+
+/* 表单卡片 */
+.activity-form {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.form-card {
+  margin-bottom: 24px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.form-card.active {
+  border-color: var(--primary-color);
+  box-shadow: 0 8px 32px rgba(255, 167, 38, 0.2);
+}
+
+.form-card .ant-card-head {
+  background: linear-gradient(135deg, #FFF9E6 0%, white 100%);
+  border-bottom: 2px solid #FFE8CC;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.card-title .anticon {
+  color: var(--primary-color);
+  font-size: 18px;
+}
+
+/* 封面上传 */
+.cover-upload .ant-upload {
+  width: 100%;
+  height: 200px;
+  border: 2px dashed #FFD699;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFFAF5 100%);
+  transition: all 0.3s ease;
+}
+
+.cover-upload .ant-upload:hover {
+  border-color: var(--primary-color);
+  background: linear-gradient(135deg, #FFE8CC 0%, #FFF9E6 100%);
+}
+
+.cover-preview {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cover-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.cover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 10px;
+}
+
+.cover-preview:hover .cover-overlay {
+  opacity: 1;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-secondary);
+}
+
+.upload-placeholder .anticon {
+  color: var(--primary-color);
+  margin-bottom: 12px;
+}
+
+.upload-hint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 8px;
+}
+
+/* 输入框样式 */
+.activity-form .ant-input-lg,
+.activity-form .ant-input-number-lg,
+.activity-form .ant-select-lg .ant-select-selector,
+.activity-form .ant-picker-large {
+  border-radius: 10px;
+  border: 2px solid #FFE8CC;
+}
+
+.activity-form .ant-input-lg:focus,
+.activity-form .ant-input-lg:hover,
+.activity-form .ant-input-number-lg:hover,
+.activity-form .ant-input-number-lg:focus-within,
+.activity-form .ant-select-lg:hover .ant-select-selector,
+.activity-form .ant-picker-large:hover {
+  border-color: var(--primary-color);
+}
+
+.activity-form .ant-input-textarea textarea {
+  border-radius: 10px;
+  border: 2px solid #FFE8CC;
+}
+
+.activity-form .ant-input-textarea textarea:focus,
+.activity-form .ant-input-textarea textarea:hover {
+  border-color: var(--primary-color);
+}
+
+/* 签到点设置 */
+.checkpoints-section {
+  background: #FFFAF5;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.checkpoint-item {
+  background: white;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #FFE8CC;
+  transition: all 0.3s ease;
+}
+
+.checkpoint-item:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.checkpoint-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.checkpoint-number {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.add-checkpoint-btn {
+  width: 100%;
+  height: 44px;
+  border-radius: 10px;
+  border: 2px dashed #FFD699;
+  color: var(--primary-color);
+  margin-top: 12px;
+}
+
+.add-checkpoint-btn:hover {
+  border-color: var(--primary-color);
+  background: #FFF9E6;
+}
+
+.checkpoint-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px;
+  background: linear-gradient(135deg, #E0F7FA 0%, #E1F5FE 100%);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.checkpoint-tip .anticon {
+  color: var(--accent-color);
+}
+
+/* 底部操作栏 */
+.form-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: white;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.footer-left,
+.footer-right {
+  flex: 1;
+}
+
+.footer-right {
+  text-align: right;
+}
+
+.footer-center {
+  text-align: center;
+}
+
+.step-indicator {
+  font-size: 14px;
+  color: var(--text-secondary);
+  background: #F5F5F5;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .form-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .form-title {
+    order: -1;
+    width: 100%;
+    text-align: left;
+  }
+
+  .activity-form {
+    padding: 0 16px;
+  }
+
+  .steps-wrapper {
+    display: none;
+  }
+
+  .form-card {
+    border-radius: 16px;
+  }
+
+  .cover-upload .ant-upload {
+    height: 150px;
+  }
+}
+
+/* 动画 */
+.form-card {
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
