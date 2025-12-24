@@ -54,8 +54,8 @@ jwt:
   expiration: 86400000
   # Token头部标识
   header: Authorization
-  # Token前缀
-  prefix: Bearer
+  # Token前缀（注意后面有空格）
+  prefix: "Bearer "
 
 # Knife4j配置
 springdoc:

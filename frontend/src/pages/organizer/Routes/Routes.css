@@ -1,0 +1,46 @@
+.routes-page {
+  padding: 24px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+}
+
+.routes-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filters-section {
+  margin-bottom: 16px;
+  padding: 16px;
+  background-color: #fafafa;
+  border-radius: 4px;
+}
+
+.route-name {
+  font-weight: 500;
+  color: #1890ff;
+  cursor: pointer;
+}
+
+.route-name:hover {
+  text-decoration: underline;
+}
+
+.use-count {
+  font-weight: 500;
+  color: #1890ff;
+}
+
+.route-detail-modal {
+  padding: 16px 0;
+}
+
+.route-detail-modal p {
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.route-detail-modal b {
+  color: #333;
+}
+

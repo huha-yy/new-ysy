@@ -1,0 +1,391 @@
+/* 🏔️ 徒步档案样式 - 阳光活力主题 */
+
+.hiking-profile-page {
+  min-height: 100%;
+  padding: 40px 0;
+  animation: fadeInUp 0.8s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hiking-profile-card {
+  max-width: 1000px;
+  margin: 0 auto;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(255, 167, 38, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 3px solid rgba(255, 167, 38, 0.15);
+  animation: slideUp 0.8s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hiking-profile-card .ant-card-head {
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  border: none;
+  padding: 20px 24px 12px;
+  border-radius: 20px 20px 0 0;
+}
+
+.hiking-profile-card .ant-card-head-title {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* 统计区域 */
+.stats-section {
+  margin-bottom: 40px;
+  padding: 32px;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFE8CC 100%);
+  border-radius: 20px;
+  border: 2px solid rgba(255, 167, 38, 0.1);
+  animation: slideUp 0.8s ease 0.2s;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #FFA726;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding: 8px 20px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 20px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(255, 167, 38, 0.1);
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(255, 167, 38, 0.2);
+}
+
+/* 徒步等级 */
+.level-section {
+  margin-bottom: 40px;
+  padding: 32px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(255, 167, 38, 0.1);
+}
+
+.level-display {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.current-level {
+  margin-bottom: 20px;
+}
+
+.level-label {
+  font-size: 16px;
+  color: #636E72;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.level-badge {
+  font-size: 24px;
+  font-weight: 700;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  color: #fff;
+  border-radius: 20px;
+  display: inline-block;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.level-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.level-desc {
+  font-size: 14px;
+  color: #636E72;
+  font-weight: 600;
+}
+
+.level-progress .ant-progress {
+  width: 120px;
+}
+
+.level-info {
+  text-align: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFE8CC 100%);
+  border-radius: 16px;
+  border: 2px solid rgba(255, 167, 38, 0.1);
+}
+
+.level-info p {
+  margin: 8px 0;
+  color: #636E72;
+  font-size: 14px;
+}
+
+.level-info p:last-child {
+  margin-bottom: 0;
+  color: #FFA726;
+  font-weight: 600;
+}
+
+/* 偏好设置 */
+.preference-section {
+  margin-bottom: 40px;
+  padding: 32px;
+  background: linear-gradient(135deg, #FFE8CC 0%, #FFF9E6 100%);
+  border-radius: 20px;
+  border: 2px solid rgba(255, 167, 38, 0.1);
+}
+
+.preference-section .ant-form-item-label > label {
+  font-weight: 600;
+  color: #2D3436;
+  font-size: 15px;
+}
+
+.preference-section .ant-input,
+.preference-section .ant-input-password,
+.preference-section .ant-picker,
+.preference-section .ant-select {
+  height: 48px;
+  border-radius: 12px;
+  border: 2px solid #FFE8CC;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.preference-section .ant-input:focus,
+.preference-section .ant-input-password:focus,
+.preference-section .ant-picker:focus,
+.preference-section .ant-select:focus {
+  border-color: #FFA726;
+  box-shadow: 0 0 4px rgba(255, 167, 38, 0.2);
+  background: #FFF9E6;
+}
+
+.preference-section .ant-select:hover {
+  border-color: #FFA726;
+}
+
+/* 成就徽章 */
+.badges-section {
+  margin-bottom: 40px;
+  padding: 32px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(255, 167, 38, 0.1);
+}
+
+.badges-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.badge-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFE8CC 100%);
+  border-radius: 16px;
+  border: 2px solid rgba(255, 167, 38, 0.1);
+  transition: all 0.3s ease;
+}
+
+.badge-item:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(255, 167, 38, 0.2);
+  border-color: #FFA726;
+}
+
+.badge-icon {
+  font-size: 48px;
+  text-align: center;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.badge-icon.locked {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
+.badge-info {
+  flex: 1;
+}
+
+.badge-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2D3436;
+  margin-bottom: 4px;
+}
+
+.badge-desc {
+  font-size: 13px;
+  color: #636E72;
+}
+
+/* 提交区域 */
+.submit-section {
+  padding-top: 32px;
+  border-top: 2px dashed rgba(255, 167, 38, 0.15);
+  margin-top: 40px;
+}
+
+.submit-section .ant-btn {
+  height: 54px;
+  font-size: 17px;
+  font-weight: 700;
+  padding: 0 32px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  border: none;
+  box-shadow: 0 6px 20px rgba(255, 167, 38, 0.3);
+  transition: all 0.3s ease;
+}
+
+.submit-section .ant-btn:hover {
+  background: linear-gradient(135deg, #FF8B4F 0%, #FFA726 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 167, 38, 0.4);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .hiking-profile-page {
+    padding: 24px 0;
+  }
+
+  .hiking-profile-card {
+    margin: 0 16px;
+    padding: 20px;
+  }
+
+  .badges-container {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+  }
+
+  .badge-item {
+    padding: 16px;
+  }
+
+  .badge-icon {
+    font-size: 40px;
+  }
+
+  .stats-section,
+  .level-section,
+  .preference-section,
+  .badges-section {
+    padding: 24px;
+  }
+
+  .section-title {
+    font-size: 20px;
+    padding: 6px 16px;
+  }
+
+  .stat-item {
+    padding: 16px;
+  }
+
+  .level-progress {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .level-progress .ant-progress {
+    width: 100px;
+  }
+
+  .submit-section .ant-btn {
+    height: 48px;
+    padding: 0 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hiking-profile-page {
+    padding: 16px 0;
+  }
+
+  .hiking-profile-card {
+    margin: 0 12px;
+    padding: 16px;
+  }
+
+  .badges-container {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .badge-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+    padding: 16px;
+  }
+
+  .badge-icon {
+    font-size: 36px;
+  }
+
+  .level-progress .ant-progress {
+    width: 80px;
+  }
+
+  .submit-section .ant-btn {
+    height: 46px;
+    padding: 0 20px;
+  }
+}
+

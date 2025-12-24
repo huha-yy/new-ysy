@@ -1,0 +1,183 @@
+/* 🔐 登录页样式 - 阳光活力主题 */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFE8CC 50%, #4ADE80 100%);
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.login-page::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 167, 38, 0.1) 0%, transparent 70%);
+  animation: rotate 30s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 12px 32px rgba(255, 167, 38, 0.25);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  animation: slideUpIn 0.8s ease;
+  position: relative;
+  z-index: 1;
+  border: 3px solid rgba(255, 167, 38, 0.2);
+}
+
+@keyframes slideUpIn {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.login-card .ant-card-head {
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  border-radius: 20px 20px 0 0;
+  border: none;
+  padding: 20px 24px 12px;
+}
+
+.login-card .ant-card-head-title {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.login-card .ant-form-item {
+  margin-bottom: 24px;
+}
+
+.login-card .ant-input,
+.login-card .ant-input-password {
+  height: 50px;
+  border-radius: 12px;
+  border: 2px solid #FFE8CC;
+  font-size: 15px;
+  padding: 0 20px;
+  transition: all 0.3s ease;
+}
+
+.login-card .ant-input:focus,
+.login-card .ant-input-password:focus {
+  border-color: #FFA726;
+  box-shadow: 0 0 0 4px rgba(255, 167, 38, 0.2);
+  background: #FFF9E6;
+}
+
+.login-card .ant-btn {
+  height: 54px;
+  font-size: 17px;
+  font-weight: 700;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  border: none;
+  box-shadow: 0 6px 20px rgba(255, 167, 38, 0.3);
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+
+.login-card .ant-btn:hover {
+  background: linear-gradient(135deg, #FF8B4F 0%, #FFA726 100%);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(255, 167, 38, 0.4);
+}
+
+.login-card .ant-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.login-footer {
+  text-align: center;
+  color: #636E72;
+  font-size: 15px;
+  padding-top: 24px;
+  border-top: 2px solid #FFE8CC;
+  margin-top: 24px;
+}
+
+.login-footer .ant-btn-link {
+  color: #FFA726;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.login-footer .ant-btn-link:hover {
+  color: #FFC93D;
+  text-decoration: underline;
+}
+
+/* 输入框图标 */
+.ant-input-prefix {
+  color: #FFA726;
+  font-size: 18px;
+}
+
+/* 📱 响应式设计 */
+@media (max-width: 768px) {
+  .login-card {
+    max-width: 100%;
+    padding: 20px;
+  }
+
+  .login-card .ant-input,
+  .login-card .ant-input-password {
+    height: 46px;
+  }
+
+  .login-card .ant-btn {
+    height: 48px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    margin: 12px;
+  }
+
+  .login-card .ant-input,
+  .login-card .ant-input-password {
+    height: 44px;
+    padding: 0 16px;
+  }
+}
