@@ -28,7 +28,7 @@ import java.util.List;
 @Tag(name = "签到管理", description = "签到相关接口")
 @Validated
 @RestController
-@RequestMapping("/api")
+@RequestMapping("")
 @RequiredArgsConstructor
 public class CheckInController {
 

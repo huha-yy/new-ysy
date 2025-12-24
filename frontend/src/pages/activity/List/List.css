@@ -1,0 +1,235 @@
+/* 🏔️ 活动列表样式 - 阳光活力主题 */
+
+.activity-list-page {
+  min-height: 100%;
+  padding-bottom: 64px;
+  animation: fadeInUp 0.8s ease;
+}
+
+.page-title {
+  font-size: 32px;
+  margin-bottom: 32px;
+  color: #2D3436;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding: 12px 24px;
+  border-radius: 16px;
+  display: inline-block;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 64px;
+  color: #636E72;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(255, 167, 38, 0.1);
+  font-weight: 600;
+}
+
+.activity-list {
+  margin-bottom: 32px;
+}
+
+.activity-card {
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #fff;
+  border: 3px solid rgba(255, 167, 38, 0.1);
+  box-shadow: 0 4px 16px rgba(255, 167, 38, 0.12);
+  animation: fadeInUp 0.6s ease;
+  animation-fill-mode: both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.activity-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.activity-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.activity-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.activity-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.activity-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(255, 167, 38, 0.25);
+  border-color: #FFA726;
+  z-index: 10;
+}
+
+.card-cover {
+  height: 220px;
+  background-size: cover;
+  background-position: center;
+  background-color: #FFE8CC;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-cover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+}
+
+.card-tag {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%);
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  animation: bounceIn 0.8s ease 0.6s;
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(-20px);
+  }
+  50% {
+    transform: scale(1.05) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.card-info {
+  margin-top: 16px;
+  padding: 0 4px;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: #636E72;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.fee-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 2px dashed #FFE8CC;
+}
+
+.fee {
+  font-size: 26px;
+  color: #FFA726;
+  font-weight: 800;
+  text-shadow: 0 2px 4px rgba(255, 167, 38, 0.2);
+}
+
+.views {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #636E72;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pagination {
+  text-align: center;
+  margin-top: 40px;
+  animation: fadeInUp 0.8s ease 0.6s;
+}
+
+.pagination .ant-pagination-item-active {
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%) !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(255, 167, 38, 0.3);
+  font-weight: 700;
+}
+
+/* 📱 响应式设计 */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 24px;
+    padding: 10px 16px;
+  }
+
+  .card-cover {
+    height: 180px;
+  }
+
+  .fee {
+    font-size: 22px;
+  }
+
+  .activity-card:hover {
+    transform: translateY(-6px);
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 20px;
+  }
+
+  .card-cover {
+    height: 160px;
+  }
+
+  .info-row {
+    font-size: 13px;
+  }
+}

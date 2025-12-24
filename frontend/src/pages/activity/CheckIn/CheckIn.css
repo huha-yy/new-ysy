@@ -1,0 +1,199 @@
+.checkin-page {
+  padding: 24px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+}
+
+.checkin-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.checkin-loading,
+.checkin-disabled {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 24px;
+}
+
+.checkin-loading .loading-spinner {
+  font-size: 18px;
+  color: #1890ff;
+}
+
+.checkin-disabled h3 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.checkin-disabled p {
+  margin: 0;
+  color: #666;
+  font-size: 16px;
+}
+
+/* 签到进度 */
+.checkin-progress-section {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  color: #fff;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.progress-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #fff;
+}
+
+/* 位置提示 */
+.location-alert {
+  margin-bottom: 24px;
+}
+
+/* 地图 */
+.map-section {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* 签到点列表 */
+.checkpoints-section {
+  margin-bottom: 24px;
+}
+
+.checkpoints-section h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  color: #333;
+}
+
+.checkpoints-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.checkpoint-item {
+  padding: 16px;
+  background-color: #fff;
+  border: 2px solid #e8e8e8;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.checkpoint-item:hover {
+  border-color: #1890ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+}
+
+.checkpoint-item.next {
+  border-color: #fa8c16;
+  background: linear-gradient(to right, #fff7e6, #fff);
+}
+
+.checkpoint-item.completed {
+  border-color: #52c41a;
+  background-color: #f6ffed;
+}
+
+.checkpoint-header {
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.checkpoint-seq {
+  background-color: #1890ff;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.checkpoint-item.completed .checkpoint-seq {
+  background-color: #52c41a;
+}
+
+.checkpoint-item.next .checkpoint-seq {
+  background-color: #fa8c16;
+}
+
+.checkpoint-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.checkpoint-body {
+  margin-bottom: 12px;
+}
+
+.checkpoint-distance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #e6f7ff;
+  border: 1px solid #91d5ff;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.checkpoint-info {
+  display: flex;
+  gap: 24px;
+  font-size: 14px;
+  color: #666;
+}
+
+.checkpoint-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 完成提示 */
+.complete-alert {
+  margin-top: 24px;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .checkin-page {
+    padding: 12px;
+  }
+
+  .progress-header h3 {
+    font-size: 16px;
+  }
+
+  .checkpoint-name {
+    font-size: 14px;
+  }
+
+  .checkpoint-info {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .checkin-progress-section {
+    padding: 16px;
+  }
+}
+

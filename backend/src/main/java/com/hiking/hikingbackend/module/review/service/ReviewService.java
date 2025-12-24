@@ -3,6 +3,7 @@ package com.hiking.hikingbackend.module.review.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.hiking.hikingbackend.module.review.dto.ReviewCreateDTO;
 import com.hiking.hikingbackend.module.review.vo.ReviewVO;
+import com.hiking.hikingbackend.module.review.vo.ReviewStatsVO;
 
 /**
  * 评价服务接口
@@ -31,5 +32,13 @@ public interface ReviewService {
      * @return 分页结果
      */
     IPage<ReviewVO> getActivityReviews(Long activityId, Integer pageNum, Integer pageSize);
+
+    /**
+     * 获取活动评分统计
+     *
+     * @param activityId 活动ID
+     * @return 评分统计
+     */
+    ReviewStatsVO getRatingStats(Long activityId);
 }
 

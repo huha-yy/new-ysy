@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "集合方案管理", description = "集合方案相关接口")
 @Validated
 @RestController
-@RequestMapping("/api/activities")
+@RequestMapping("/activities")
 @RequiredArgsConstructor
 public class GatheringPlanController {
 
