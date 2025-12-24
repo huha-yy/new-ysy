@@ -228,6 +228,8 @@ public class UserServiceImpl implements UserService {
                 .medicalHistory(userProfile != null ? userProfile.getMedicalHistory() : null)
                 .emergencyContact(userProfile != null ? userProfile.getEmergencyContact() : null)
                 .emergencyPhone(userProfile != null ? userProfile.getEmergencyPhone() : null)
+                .phone(user != null ? user.getPhone() : null)
+                .email(user != null ? user.getEmail() : null)
                 .equipmentList(userProfile != null ? userProfile.getEquipmentList() : null)
                 .preferenceIntensity(userProfile != null ? userProfile.getPreferenceIntensity() : null)
                 .preferenceDistance(userProfile != null ? userProfile.getPreferenceDistance() : null)

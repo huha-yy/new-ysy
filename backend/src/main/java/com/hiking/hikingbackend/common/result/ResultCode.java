@@ -136,6 +136,11 @@ public enum ResultCode {
      */
     NOT_ACTIVITY_ORGANIZER(2008, "不是活动组织者"),
 
+    /**
+     * 报名截止时间已过
+     */
+    REGISTRATION_DEADLINE_PASSED(2009, "报名截止时间已过"),
+
     // ========== 报名相关错误 (3001-3999) ==========
 
     /**
@@ -168,7 +173,27 @@ public enum ResultCode {
      */
     EXPERIENCE_REQUIREMENT_NOT_MET(3006, "经验等级不符合活动要求"),
 
+    /**
+     * 需要携带装备
+     */
+    EQUIPMENT_REQUIRED(3007, "活动要求携带指定装备"),
+
+    /**
+     * 需要确认健康状况
+     */
+    HEALTH_CONFIRM_REQUIRED(3008, "活动要求确认健康状况"),
+
     // ========== 路线相关错误 (4001-4999) ==========
+
+    /**
+     * 紧急联系人未填写
+     */
+    EMERGENCY_CONTACT_REQUIRED(3011, "请填写紧急联系电话"),
+
+    /**
+     * 紧急联系电话未填写
+     */
+    EMERGENCY_PHONE_REQUIRED(3012, "请填写紧急联系电话"),
 
     /**
      * 路线不存在

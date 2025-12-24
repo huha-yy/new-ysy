@@ -23,7 +23,7 @@ import java.util.List;
 @Tag(name = "字典管理", description = "字典相关接口")
 @Validated
 @RestController
-@RequestMapping("/api")
+@RequestMapping("")
 @RequiredArgsConstructor
 public class DictController {
 
