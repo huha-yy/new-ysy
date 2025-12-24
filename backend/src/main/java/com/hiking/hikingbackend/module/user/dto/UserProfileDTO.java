@@ -65,6 +65,16 @@ public class UserProfileDTO {
     private String emergencyPhone;
 
     /**
+     * 手机号
+     */
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
      * 常用装备清单
      */
     @Size(max = 512, message = "装备清单长度不能超过512个字符")

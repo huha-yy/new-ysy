@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "路线管理", description = "路线相关接口")
 @Validated
 @RestController
-@RequestMapping("/api")
+@RequestMapping("")
 @RequiredArgsConstructor
 public class RouteController {
 

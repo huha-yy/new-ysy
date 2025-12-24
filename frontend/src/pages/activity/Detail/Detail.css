@@ -1,0 +1,314 @@
+/* 📋 活动详情样式 - 阳光活力主题 */
+
+.activity-detail-page {
+  min-height: 100%;
+  padding-bottom: 100px;
+  animation: fadeInUp 0.8s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px;
+  color: #636E72;
+  font-size: 18px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(255, 167, 38, 0.1);
+  font-weight: 600;
+}
+
+/* 🌞 活动封面 */
+.activity-cover {
+  height: 450px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 24px rgba(255, 167, 38, 0.2);
+  position: relative;
+  overflow: hidden;
+  animation: slideDown 0.8s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.activity-cover::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 150px;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 100%);
+}
+
+/* 📝 活动标题和信息 */
+.activity-header {
+  background: #fff;
+  padding: 32px;
+  border-radius: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 16px rgba(255, 167, 38, 0.1);
+  animation: slideUp 0.8s ease 0.2s;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.activity-title {
+  font-size: 36px;
+  margin-bottom: 20px;
+  color: #2D3436;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.activity-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+/* 📋 Tab 内容 */
+.activity-tabs {
+  background: #fff;
+  padding: 24px;
+  border-radius: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 16px rgba(255, 167, 38, 0.1);
+  animation: slideUp 0.8s ease 0.3s;
+}
+
+.tab-content {
+  padding: 16px 0;
+}
+
+.description-content {
+  line-height: 1.9;
+  color: #636E72;
+  font-size: 16px;
+  padding: 20px;
+  background: #FFF9E6;
+  border-radius: 16px;
+  border-left: 4px solid #FFA726;
+}
+
+.organizer-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #FFA726;
+  box-shadow: 0 2px 8px rgba(255, 167, 38, 0.2);
+}
+
+.route-map {
+  margin-top: 32px;
+  height: 450px;
+  background: linear-gradient(135deg, #FFE8CC 0%, #FFF9E6 100%);
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: inset 0 4px 12px rgba(255, 167, 38, 0.1);
+  animation: fadeInUp 0.8s ease 0.5s;
+}
+
+.map-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: #636E72;
+  font-size: 18px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.map-placeholder .anticon {
+  font-size: 64px;
+  color: #FFA726;
+  opacity: 0.6;
+}
+
+/* 🎯 底部操作栏 */
+.activity-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #2D3436 0%, #4A5568 100%);
+  padding: 20px 24px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  animation: slideUp 0.8s ease 0.6s;
+}
+
+.organizer-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.organizer-name {
+  font-size: 16px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.activity-footer .ant-btn {
+  height: 50px;
+  font-size: 17px;
+  font-weight: 700;
+  padding: 0 32px;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  border: none;
+  box-shadow: 0 6px 20px rgba(255, 167, 38, 0.4);
+  transition: all 0.3s ease;
+  animation: bounceIn 0.8s ease 0.7s;
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+  60% {
+    transform: translateY(-6px) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.activity-footer .ant-btn:hover {
+  background: linear-gradient(135deg, #FF8B4F 0%, #FFA726 100%);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 167, 38, 0.5);
+}
+
+.activity-footer .ant-btn:disabled {
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+}
+
+/* 📱 响应式设计 */
+@media (max-width: 768px) {
+  .activity-cover {
+    height: 300px;
+    border-radius: 16px;
+  }
+
+  .activity-title {
+    font-size: 28px;
+  }
+
+  .route-map {
+    height: 350px;
+  }
+
+  .activity-header {
+    padding: 24px;
+    border-radius: 16px;
+  }
+
+  .activity-tabs {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .activity-footer {
+    padding: 16px 20px;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .activity-footer .ant-btn {
+    width: 100%;
+    height: 48px;
+  }
+
+  .organizer-name {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .activity-cover {
+    height: 250px;
+    border-radius: 12px;
+  }
+
+  .activity-title {
+    font-size: 24px;
+  }
+
+  .route-map {
+    height: 280px;
+  }
+
+  .activity-header {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+
+  .activity-tabs {
+    padding: 12px;
+  }
+
+  .activity-footer {
+    padding: 14px 16px;
+  }
+}

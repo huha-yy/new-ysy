@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "活动管理", description = "活动相关接口")
 @Validated
 @RestController
-@RequestMapping("/api")
+@RequestMapping("")
 @RequiredArgsConstructor
 public class ActivityController {
 

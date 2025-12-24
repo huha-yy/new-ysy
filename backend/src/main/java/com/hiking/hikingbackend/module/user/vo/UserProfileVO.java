@@ -46,6 +46,16 @@ public class UserProfileVO implements Serializable {
     private LocalDate birthDate;
 
     /**
+     * 手机号
+     */
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
      * 徒步经验：0新手 1初级 2中级 3高级 4专业
      */
     private Integer experienceLevel;
