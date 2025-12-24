@@ -1,0 +1,282 @@
+/* 🌞 报名审核页面样式 */
+.registration-review-page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  animation: fadeInUp 0.6s ease;
+}
+
+/* 页面头部 */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  background: white;
+  padding: 20px 24px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.back-btn {
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.back-btn:hover {
+  color: var(--primary-color);
+}
+
+.header-title {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.title-icon {
+  color: var(--primary-color);
+  font-size: 28px;
+}
+
+.activity-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.activity-name {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* 统计卡片 */
+.stats-row {
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-card .ant-statistic-title {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.stat-card .ant-statistic-content-prefix {
+  margin-right: 8px;
+}
+
+/* 报名列表卡片 */
+.registrations-card {
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  border: none;
+}
+
+.registrations-card .ant-card-body {
+  padding: 0;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  background: linear-gradient(135deg, #FFF9E6 0%, white 100%);
+  border-radius: 20px 20px 0 0;
+}
+
+.status-tabs .ant-tabs-nav {
+  margin: 0;
+}
+
+.search-area {
+  display: flex;
+  gap: 12px;
+}
+
+/* 表格样式 */
+.registrations-card .ant-table-thead > tr > th {
+  background: #FFFAF5;
+  color: var(--text-primary);
+  font-weight: 600;
+  border-bottom: 2px solid #FFE8CC;
+}
+
+.registrations-card .ant-table-tbody > tr:hover > td {
+  background: #FFF9E6;
+}
+
+/* 用户单元格 */
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-nickname {
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-username {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* 联系方式单元格 */
+.contact-cell {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.contact-cell > div {
+  margin-bottom: 4px;
+}
+
+.contact-cell .anticon {
+  margin-right: 6px;
+  color: var(--primary-color);
+}
+
+/* 备注 */
+.remark-text {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* 审核按钮 */
+.approve-btn {
+  background: linear-gradient(135deg, var(--success-color) 0%, #2ECC71 100%);
+  border: none;
+}
+
+.approve-btn:hover {
+  background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+}
+
+/* 拒绝弹窗 */
+.reject-modal-content p {
+  margin-bottom: 12px;
+  color: var(--text-secondary);
+}
+
+/* 详情弹窗 */
+.detail-content {
+  padding: 16px 0;
+}
+
+.user-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 20px;
+}
+
+.user-meta h3 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.user-meta p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.detail-descriptions .ant-descriptions-item-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.detail-descriptions .ant-descriptions-item-content {
+  color: var(--text-primary);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .registration-review-page {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .stats-row .ant-col {
+    margin-bottom: 12px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .search-area {
+    width: 100%;
+  }
+
+  .search-area .ant-input-affix-wrapper {
+    flex: 1;
+  }
+}
+
+/* 动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-card:nth-child(1) { animation: fadeInUp 0.4s ease 0.1s both; }
+.stat-card:nth-child(2) { animation: fadeInUp 0.4s ease 0.15s both; }
+.stat-card:nth-child(3) { animation: fadeInUp 0.4s ease 0.2s both; }
+.stat-card:nth-child(4) { animation: fadeInUp 0.4s ease 0.25s both; }
+

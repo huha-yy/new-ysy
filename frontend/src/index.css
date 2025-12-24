@@ -1,0 +1,270 @@
+/* 🌞 阳光活力主题 - 全局样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFE8CC 100%);
+  min-height: 100vh;
+}
+
+:root {
+  /* 🌞 主色调 - 阳光活力 */
+  --primary-color: #FFA726;        /* 温暖橙色 */
+  --primary-hover: #FF8B4F;     /* 深橙色 */
+  --secondary-color: #FFC93D;    /* 活力黄 */
+  --accent-color: #00D9FF;       /* 明亮蓝 */
+  --success-color: #4ADE80;      /* 清新绿 */
+  --danger-color: #FF6B6B;       /* 珊瑚红 */
+  
+  /* 📝 文字颜色 */
+  --text-primary: #2D3436;      /* 深色文字 */
+  --text-secondary: #636E72;    /* 次要文字 */
+  --text-light: #DFE6E9;        /* 浅色文字 */
+  
+  /* 🎨 背景颜色 */
+  --bg-primary: #FFF5EB;        /* 温暖米色 */
+  --bg-secondary: #FFF9E6;      /* 浅色背景 */
+  --bg-white: #FFFFFF;           /* 纯白 */
+  --bg-hover: #FFE5CC;         /* 悬停背景 */
+  
+  /* 💫 阴影效果 */
+  --shadow-sm: 0 2px 8px rgba(255, 167, 38, 0.15);
+  --shadow-md: 0 4px 12px rgba(255, 167, 38, 0.2);
+  --shadow-lg: 0 8px 24px rgba(255, 167, 38, 0.25);
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* 自定义样式 */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* 🌞 阳光活力滚动条 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFE8CC;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #FFA726 0%, #FFC93D 100%);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #FF8B4F 0%, #FFA726 100%);
+}
+
+/* Ant Design 主题覆盖 */
+.ant-btn-primary {
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  border: none;
+  box-shadow: 0 4px 12px rgba(255, 167, 38, 0.3);
+  transition: all 0.3s ease;
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, #FF8B4F 0%, #FFA726 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 167, 38, 0.4);
+}
+
+.ant-btn-primary:active {
+  transform: translateY(0);
+}
+
+.ant-card {
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  border: 2px solid rgba(255, 167, 38, 0.1);
+  transition: all 0.3s ease;
+}
+
+.ant-card:hover {
+  border-color: rgba(255, 167, 38, 0.3);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.ant-menu {
+  background: transparent !important;
+}
+
+.ant-menu-item {
+  color: #2D3436 !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.ant-menu-item:hover {
+  color: #FFA726 !important;
+  background: rgba(255, 167, 38, 0.1);
+}
+
+.ant-menu-item-selected {
+  color: #FFA726 !important;
+  background: rgba(255, 167, 38, 0.15);
+  font-weight: 600;
+}
+
+.ant-pagination-item-active {
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+}
+
+.ant-pagination-item-active:hover {
+  background: linear-gradient(135deg, #FF8B4F 0%, #FFA726 100%) !important;
+}
+
+/* 标签颜色优化 */
+.ant-tag-green {
+  background: linear-gradient(135deg, #4ADE80 0%, #2ECC71 100%);
+  border: none;
+  color: #fff;
+  font-weight: 500;
+}
+
+.ant-tag-blue {
+  background: linear-gradient(135deg, #00D9FF 0%, #00A8CC 100%);
+  border: none;
+  color: #fff;
+  font-weight: 500;
+}
+
+.ant-tag-orange {
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  border: none;
+  color: #fff;
+  font-weight: 500;
+}
+
+.ant-tag-red {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%);
+  border: none;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* 输入框优化 */
+.ant-input,
+.ant-input-password {
+  border-radius: 8px;
+  border: 2px solid #FFE8CC;
+  transition: all 0.3s ease;
+}
+
+.ant-input:focus,
+.ant-input-password:focus {
+  border-color: #FFA726;
+  box-shadow: 0 0 0 2px rgba(255, 167, 38, 0.2);
+}
+
+/* 表单标签 */
+.ant-form-item-label > label {
+  font-weight: 500;
+  color: #2D3436;
+}
+
+/* 列表项 */
+.ant-list-item {
+  padding: 20px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 167, 38, 0.1);
+}
+
+.ant-list-item:hover {
+  background: #FFF5EB;
+  border-color: rgba(255, 167, 38, 0.3);
+  transform: translateX(4px);
+}
+
+/* 选项卡 */
+.ant-tabs-tab {
+  color: #636E72 !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.ant-tabs-tab:hover {
+  color: #FFA726 !important;
+}
+
+.ant-tabs-tab-active {
+  color: #FFA726 !important;
+  font-weight: 600;
+  border-bottom: 2px solid #FFA726 !important;
+}
+
+/* 消息提示 */
+.ant-message-success {
+  background: linear-gradient(135deg, #4ADE80 0%, #2ECC71 100%) !important;
+  border: none;
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+}
+
+.ant-message-error {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%) !important;
+  border: none;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.ant-message-info {
+  background: linear-gradient(135deg, #00D9FF 0%, #00A8CC 100%) !important;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 217, 255, 0.3);
+}
+
+/* 加载动画 */
+.ant-spin-dot-item {
+  background-color: #FFA726 !important;
+}
+
+/* 动画效果 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

@@ -1,0 +1,174 @@
+/* 👤 个人中心样式 - 阳光活力主题 */
+
+.profile-page {
+  min-height: 100%;
+  padding: 40px 0;
+  animation: fadeInUp 0.8s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-card {
+  max-width: 900px;
+  margin: 0 auto;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(255, 167, 38, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 3px solid rgba(255, 167, 38, 0.15);
+  animation: slideUp 0.8s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-bottom: 32px;
+  padding-bottom: 32px;
+  border-bottom: 3px dashed rgba(255, 167, 38, 0.2);
+  position: relative;
+}
+
+.profile-header::after {
+  content: '✨';
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  font-size: 24px;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2) rotate(180deg);
+  }
+}
+
+.user-info {
+  flex: 1;
+}
+
+.username {
+  font-size: 28px;
+  margin-bottom: 8px;
+  color: #2D3436;
+  font-weight: 800;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding: 4px 16px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.user-id {
+  color: #636E72;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.profile-descriptions {
+  margin-bottom: 32px;
+}
+
+.profile-descriptions .ant-descriptions-item-label {
+  font-weight: 600;
+  color: #2D3436;
+  font-size: 15px;
+}
+
+.profile-descriptions .ant-descriptions-item-content {
+  font-size: 16px;
+  color: #636E72;
+  font-weight: 500;
+}
+
+.profile-actions {
+  text-align: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFE8CC 100%);
+  border-radius: 16px;
+}
+
+.profile-actions .ant-btn {
+  height: 50px;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 0 32px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  border: none;
+  box-shadow: 0 6px 20px rgba(255, 167, 38, 0.3);
+  transition: all 0.3s ease;
+}
+
+.profile-actions .ant-btn:hover {
+  background: linear-gradient(135deg, #FF8B4F 0%, #FFA726 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 167, 38, 0.4);
+}
+
+/* 📱 响应式设计 */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .username {
+    font-size: 24px;
+  }
+
+  .profile-card {
+    margin: 0 16px;
+  }
+
+  .profile-actions .ant-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-page {
+    padding: 24px 0;
+  }
+
+  .username {
+    font-size: 22px;
+  }
+
+  .profile-header {
+    gap: 24px;
+    padding: 24px;
+  }
+
+  .profile-descriptions {
+    margin-bottom: 24px;
+  }
+}

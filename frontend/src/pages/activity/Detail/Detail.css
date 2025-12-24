@@ -1,0 +1,404 @@
+/* 📋 活动详情样式 - 阳光活力主题 */
+
+.activity-detail-page {
+  min-height: 100%;
+  padding-bottom: 100px;
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 500px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* 🌞 活动封面 - 修复版 */
+.activity-cover {
+  width: 100%;
+  height: 450px;
+  position: relative;
+  overflow: hidden;
+  background-color: #f5f5f5;
+  border-radius: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 24px rgba(255, 167, 38, 0.15);
+  animation: fadeIn 0.5s ease;
+}
+
+/* 图片容器 */
+.cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* 保持图片比例，不变形 */
+  object-position: center;
+  display: block;
+  opacity: 0;
+  animation: fadeIn 0.5s ease 0.2s forwards;
+}
+
+.cover-image.loaded {
+  opacity: 1;
+}
+
+.cover-image.loading {
+  opacity: 0.3;
+}
+
+.cover-image.error {
+  opacity: 0.2;
+  filter: grayscale(100%);
+}
+
+/* 图片加载遮罩 */
+.image-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 图片错误遮罩 */
+.image-error-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  z-index: 20;
+  animation: fadeIn 0.3s ease;
+}
+
+.image-error-overlay span {
+  font-size: 18px;
+  color: #666;
+  font-weight: 600;
+}
+
+.image-error-overlay svg {
+  font-size: 48px;
+  color: #ff4d4f;
+}
+
+/* 占位图 */
+.cover-placeholder {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  height: 100%;
+  min-height: 450px;
+  background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
+}
+
+.cover-placeholder span {
+  font-size: 18px;
+  color: #999;
+  font-weight: 600;
+}
+
+.cover-placeholder svg {
+  font-size: 64px;
+  color: #ccc;
+}
+
+/* 📝 活动标题和信息 */
+.activity-header {
+  background: #fff;
+  padding: 32px;
+  border-radius: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 16px rgba(255, 167, 38, 0.1);
+  animation: slideUp 0.8s ease 0.2s;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.activity-title {
+  font-size: 36px;
+  margin-bottom: 20px;
+  color: #2D3436;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.activity-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+/* 📋 Tab 内容 */
+.activity-tabs {
+  background: #fff;
+  padding: 24px;
+  border-radius: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 16px rgba(255, 167, 38, 0.1);
+  animation: slideUp 0.8s ease 0.4s;
+}
+
+.tab-content {
+  padding: 16px 0;
+}
+
+.description-content {
+  line-height: 1.9;
+  color: #636E72;
+  font-size: 16px;
+  padding: 20px;
+  background: #FFF9E6;
+  border-radius: 16px;
+  border-left: 4px solid #FFA726;
+}
+
+.organizer-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #FFA726;
+  box-shadow: 0 2px 8px rgba(255, 167, 38, 0.2);
+}
+
+.organizer-name {
+  font-size: 16px;
+  color: #2D3436;
+  font-weight: 600;
+}
+
+/* 🗺️ 路线地图 */
+.route-map {
+  margin-top: 32px;
+  height: 450px;
+  background: linear-gradient(135deg, #FFE8CC 0%, #FFF9E6 100%);
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: inset 0 4px 12px rgba(255, 167, 38, 0.1);
+  animation: fadeIn 0.8s ease 0.5s;
+}
+
+.map-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: #636E72;
+  font-size: 18px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.map-placeholder svg {
+  font-size: 64px;
+  color: #FFA726;
+  opacity: 0.6;
+}
+
+/* 🎯 底部操作栏 */
+.activity-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #2D3436 0%, #4A5568 100%);
+  padding: 20px 24px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  animation: slideUp 0.8s ease 0.6s;
+}
+
+.organizer-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.organizer-name {
+  font-size: 16px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.activity-footer .ant-btn {
+  height: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 0 32px;
+  border-radius: 25px;
+  border: none;
+  transition: all 0.3s ease;
+  animation: bounceIn 0.8s ease 0.7s;
+}
+
+.activity-footer .ant-btn-primary {
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  box-shadow: 0 4px 15px rgba(255, 167, 38, 0.4);
+  border: none;
+}
+
+.activity-footer .ant-btn-primary:hover {
+  background: linear-gradient(135deg, #FF8B4F 0%, #FFA726 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 167, 38, 0.5);
+}
+
+.activity-footer .ant-btn-primary:active {
+  transform: translateY(0);
+}
+
+.activity-footer .ant-btn:disabled {
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+  60% {
+    transform: translateY(-6px) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 📱 响应式设计 */
+@media (max-width: 768px) {
+  .activity-cover {
+    height: 300px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+
+  .activity-header {
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+
+  .activity-title {
+    font-size: 28px;
+  }
+
+  .activity-tags {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .activity-tabs {
+    padding: 16px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+
+  .route-map {
+    height: 350px;
+    border-radius: 16px;
+  }
+
+  .activity-footer {
+    padding: 16px 20px;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .activity-footer .ant-btn {
+    width: 100%;
+    height: 48px;
+  }
+
+  .organizer-name {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .activity-cover {
+    height: 250px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+
+  .activity-header {
+    padding: 20px 16px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+
+  .activity-title {
+    font-size: 24px;
+  }
+
+  .activity-tabs {
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+
+  .route-map {
+    height: 280px;
+    border-radius: 12px;
+  }
+
+  .activity-footer {
+    padding: 14px 16px;
+  }
+
+  .activity-tags {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
