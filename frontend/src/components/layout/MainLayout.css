@@ -1,0 +1,260 @@
+/* 🌞 主布局样式 - 阳光活力主题 */
+
+.main-layout {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #FFF5EB 0%, #FFE8CC 100%);
+}
+
+/* 🌞 顶部导航栏 */
+.main-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  box-shadow: 0 4px 16px rgba(255, 167, 38, 0.2);
+  animation: slideDown 0.6s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  height: 70px;
+  padding: 0 24px;
+}
+
+/* 🏔️ Logo */
+.logo {
+  font-size: 24px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: #fff;
+  margin-right: 48px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.logo:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* 📝 导航菜单 */
+.header-menu {
+  flex: 1;
+  border: none;
+  background: transparent;
+}
+
+.header-menu .ant-menu-item {
+  margin: 0 12px;
+  padding: 0 16px !important;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.header-menu .ant-menu-item:hover {
+  color: #FFA726 !important;
+  background: rgba(255, 255, 255, 0.95);
+  transform: scale(1.05);
+}
+
+.header-menu .ant-menu-item-selected {
+  color: #FFA726 !important;
+  background: rgba(255, 255, 255, 0.95);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(255, 167, 38, 0.2);
+}
+
+/* 👤 用户区域 */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 24px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.user-info:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.username {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.auth-buttons .ant-btn {
+  height: 40px;
+  border-radius: 20px;
+  font-weight: 600;
+  padding: 0 24px;
+  transition: all 0.3s ease;
+}
+
+.auth-buttons .ant-btn-text {
+  color: #fff !important;
+}
+
+.auth-buttons .ant-btn-text:hover {
+  color: #FFA726 !important;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.auth-buttons .ant-btn-primary {
+  background: #fff !important;
+  color: #FFA726 !important;
+  box-shadow: 0 4px 12px rgba(255, 167, 38, 0.3);
+}
+
+.auth-buttons .ant-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 167, 38, 0.4);
+}
+
+/* 📝 内容区域 */
+.main-content {
+  flex: 1;
+  background: transparent;
+  padding: 32px 0;
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 🦶 页脚 */
+.main-footer {
+  text-align: center;
+  padding: 32px 0;
+  background: linear-gradient(135deg, #2D3436 0%, #4A5568 100%);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.main-footer .container {
+  position: relative;
+}
+
+.main-footer .container::before {
+  content: '🌞';
+  display: inline-block;
+  font-size: 24px;
+  margin-right: 8px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* 📱 响应式设计 */
+@media (max-width: 768px) {
+  .header-menu {
+    display: none;
+  }
+
+  .header-content {
+    padding: 0 16px;
+    height: 60px;
+  }
+
+  .logo {
+    font-size: 20px;
+    margin-right: 24px;
+    padding: 6px 16px;
+  }
+
+  .main-content {
+    padding: 24px 0;
+  }
+
+  .username {
+    display: none;
+  }
+
+  .auth-buttons {
+    gap: 8px;
+  }
+
+  .auth-buttons .ant-btn {
+    padding: 0 16px;
+    height: 36px;
+    font-size: 13px;
+  }
+
+  .main-footer {
+    padding: 24px 0;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    font-size: 18px;
+  }
+
+  .header-content {
+    padding: 0 12px;
+  }
+
+  .main-content {
+    padding: 16px 0;
+  }
+}

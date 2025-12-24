@@ -95,7 +95,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private String extractToken(String authHeader) {
         if (authHeader != null && authHeader.startsWith(jwtProperties.getPrefix())) {
-            return authHeader.substring(jwtProperties.getPrefix().length());
+            String token = authHeader.substring(jwtProperties.getPrefix().length());
+            // 去除空白字符
+            return token.trim();
         }
         return null;
     }

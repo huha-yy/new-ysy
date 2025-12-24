@@ -7,6 +7,7 @@ import com.hiking.hikingbackend.module.activity.dto.ActivityAuditDTO;
 import com.hiking.hikingbackend.module.activity.dto.ActivityCreateDTO;
 import com.hiking.hikingbackend.module.activity.dto.ActivityQuery;
 import com.hiking.hikingbackend.module.activity.dto.ActivityUpdateDTO;
+import com.hiking.hikingbackend.module.activity.dto.RegistrationCreateDTO;
 import com.hiking.hikingbackend.module.activity.service.ActivityService;
 import com.hiking.hikingbackend.module.activity.vo.ActivityDetailVO;
 import com.hiking.hikingbackend.module.activity.vo.ActivityListVO;
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "活动管理", description = "活动相关接口")
 @Validated
 @RestController
-@RequestMapping("/api")
+@RequestMapping("")
 @RequiredArgsConstructor
 public class ActivityController {
 
@@ -245,5 +246,30 @@ public class ActivityController {
         // 目前先返回空结果，后续实现
         throw new RuntimeException("功能开发中");
     }
-}
 
+    /**
+     * 报名活动
+     * 需要校验：当前用户必须是已登录，活动状态为已发布或进行中
+     *
+     * @param activityId 活动ID
+     * @param createDTO 报名数据
+     * @return 报名记录ID
+     */
+    @Operation(summary = "报名活动", description = "用户报名参加活动，需要登录，用户和组织者都可以报名")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PostMapping("/activities/{activityId}/register")
+    public Result<Long> registerActivity(
+            @Parameter(description = "活动ID", required = true, example = "1")
+            @PathVariable("activityId") Long activityId,
+            @Valid @RequestBody RegistrationCreateDTO createDTO) {
+        // 获取当前用户ID
+        Long userId = SecurityUtils.getCurrentUserId();
+        if (userId == null) {
+            throw new RuntimeException("无法获取当前用户ID");
+        }
+
+        Long registrationId = activityService.registerActivity(activityId, userId, createDTO);
+        return Result.success("报名成功", registrationId);
+    }
+
+}

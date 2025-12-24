@@ -9,11 +9,14 @@ import com.hiking.hikingbackend.module.activity.dto.ActivityAuditDTO;
 import com.hiking.hikingbackend.module.activity.dto.ActivityCreateDTO;
 import com.hiking.hikingbackend.module.activity.dto.ActivityQuery;
 import com.hiking.hikingbackend.module.activity.dto.ActivityUpdateDTO;
+import com.hiking.hikingbackend.module.activity.dto.RegistrationCreateDTO;
 import com.hiking.hikingbackend.module.activity.entity.Activity;
 import com.hiking.hikingbackend.module.activity.mapper.ActivityMapper;
 import com.hiking.hikingbackend.module.activity.service.ActivityService;
 import com.hiking.hikingbackend.module.activity.vo.ActivityDetailVO;
 import com.hiking.hikingbackend.module.activity.vo.ActivityListVO;
+import com.hiking.hikingbackend.module.registration.entity.Registration;
+import com.hiking.hikingbackend.module.registration.mapper.RegistrationMapper;
 import com.hiking.hikingbackend.module.route.entity.Route;
 import com.hiking.hikingbackend.module.route.mapper.RouteMapper;
 import com.hiking.hikingbackend.module.user.entity.User;
@@ -40,9 +43,13 @@ public class ActivityServiceImpl implements ActivityService {
 
     private final RouteMapper routeMapper;
 
+    private final RegistrationMapper registrationMapper;
+
     private static final int STATUS_DRAFT = 0;      // 草稿
     private static final int STATUS_PENDING = 1;    // 待审核
     private static final int STATUS_PUBLISHED = 2;   // 已发布
+    private static final int STATUS_IN_PROGRESS = 3;  // 进行中
+    private static final int STATUS_ENDED = 4;     // 已结束
     private static final int STATUS_CANCELLED = 5;   // 已取消
     private static final int STATUS_REJECTED = 6;   // 已驳回
 
@@ -57,8 +64,9 @@ public class ActivityServiceImpl implements ActivityService {
         // 1. 构建查询条件
         LambdaQueryWrapper<Activity> queryWrapper = new LambdaQueryWrapper<>();
         
-        // 只返回已发布的活动
-        queryWrapper.eq(Activity::getStatus, STATUS_PUBLISHED);
+        // 显示所有可见状态的活动（已发布、进行中、已结束）
+        // 状态：0=草稿, 1=待审核, 2=已发布, 3=进行中, 4=已结束, 5=已取消, 6=已驳回
+        queryWrapper.in(Activity::getStatus, STATUS_PUBLISHED, STATUS_IN_PROGRESS, STATUS_ENDED);
         
         // 关键词搜索（标题、描述）
         if (query.getKeyword() != null && !query.getKeyword().isEmpty()) {
@@ -397,6 +405,88 @@ public class ActivityServiceImpl implements ActivityService {
         activityMapper.updateById(activity);
         
         log.info("取消活动成功，活动ID：{}", activityId);
+    }
+
+    /**
+     * 报名活动
+     *
+     * @param activityId 活动ID
+     * @param userId 用户ID（从 Token 中获取）
+     * @param createDTO 报名数据 { remark, emergencyContact, emergencyPhone, equipmentConfirm, healthConfirm }
+     * @return 报名记录ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long registerActivity(Long activityId, Long userId, RegistrationCreateDTO createDTO) {
+        // 1. 查询活动是否存在
+        Activity activity = activityMapper.selectById(activityId);
+        if (activity == null) {
+            throw new BusinessException(ResultCode.ACTIVITY_NOT_FOUND);
+        }
+        
+        // 2. 校验活动状态（只有已发布和进行中的活动可以报名）
+        if (activity.getStatus() != STATUS_PUBLISHED && activity.getStatus() != STATUS_IN_PROGRESS) {
+            throw new BusinessException(ResultCode.ACTIVITY_NOT_STARTED);
+        }
+        
+        // 3. 检查活动是否已满员
+        Integer maxParticipants = activity.getMaxParticipants() != null ? activity.getMaxParticipants() : 0;
+        Integer currentParticipants = activity.getCurrentParticipants() != null ? activity.getCurrentParticipants() : 0;
+        if (currentParticipants >= maxParticipants) {
+            throw new BusinessException(ResultCode.ACTIVITY_FULL);
+        }
+        
+        // 4. 检查用户是否重复报名
+        LambdaQueryWrapper<Registration> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Registration::getUserId, userId)
+               .eq(Registration::getActivityId, activityId);
+        Registration existing = registrationMapper.selectOne(queryWrapper);
+        if (existing != null) {
+            throw new BusinessException(ResultCode.ALREADY_REGISTERED);
+        }
+        
+        // 5. 检查报名截止时间
+        if (activity.getRegistrationDeadline() != null 
+            && activity.getRegistrationDeadline().isBefore(java.time.LocalDateTime.now())) {
+            throw new BusinessException(ResultCode.REGISTRATION_DEADLINE_PASSED);
+        }
+        
+        // 6. 校验难度等级要求（如果有装备要求）
+        if (activity.getEquipmentRequirement() != null && !activity.getEquipmentRequirement().isBlank()) {
+            if (createDTO.getEquipmentConfirm() == null || !createDTO.getEquipmentConfirm()) {
+                throw new BusinessException(ResultCode.EQUIPMENT_REQUIRED);
+            }
+        }
+        
+        // 7. 校验健康状况要求（如果有）
+        if (activity.getDifficultyLevel() >= 3) {
+            if (createDTO.getHealthConfirm() == null || !createDTO.getHealthConfirm()) {
+                throw new BusinessException(ResultCode.HEALTH_CONFIRM_REQUIRED);
+            }
+        }
+        
+        // 8. 创建报名记录
+        Registration registration = new Registration();
+        registration.setUserId(userId);
+        registration.setActivityId(activityId);
+        registration.setStatus(1); // 1=已通过（报名即生效，无需审核）
+        registration.setQueueNumber(null);
+        registration.setRemark(createDTO.getRemark());
+        registration.setCreateTime(java.time.LocalDateTime.now());
+        registration.setUpdateTime(java.time.LocalDateTime.now());
+
+        // 9. 插入报名记录
+        registrationMapper.insert(registration);
+        
+        // 10. 更新活动当前人数（需要在同一事务中）
+        Activity updateActivity = new Activity();
+        updateActivity.setId(activityId);
+        updateActivity.setCurrentParticipants(currentParticipants + 1);
+        activityMapper.updateById(updateActivity);
+        
+        log.info("用户 {} 报名参加活动 {} 成功", userId, activityId);
+        
+        return registration.getId();
     }
 
     /**

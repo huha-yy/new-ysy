@@ -5,6 +5,7 @@ import com.hiking.hikingbackend.module.activity.dto.ActivityAuditDTO;
 import com.hiking.hikingbackend.module.activity.dto.ActivityCreateDTO;
 import com.hiking.hikingbackend.module.activity.dto.ActivityQuery;
 import com.hiking.hikingbackend.module.activity.dto.ActivityUpdateDTO;
+import com.hiking.hikingbackend.module.activity.dto.RegistrationCreateDTO;
 import com.hiking.hikingbackend.module.activity.vo.ActivityDetailVO;
 import com.hiking.hikingbackend.module.activity.vo.ActivityListVO;
 
@@ -82,5 +83,15 @@ public interface ActivityService {
      * @param activityId 活动ID
      */
     void cancelActivity(Long organizerId, Long activityId);
+
+    /**
+     * 报名活动
+     *
+     * @param activityId 活动ID
+     * @param userId 用户ID
+     * @param createDTO 报名数据
+     * @return 报名记录ID
+     */
+    Long registerActivity(Long activityId, Long userId, RegistrationCreateDTO createDTO);
 }
 
