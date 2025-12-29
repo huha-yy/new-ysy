@@ -1,0 +1,368 @@
+/* 💬 活动评价样式 - 阳光活力主题 */
+
+.review-page {
+  min-height: 100%;
+  padding: 40px 0;
+  animation: fadeInUp 0.8s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.review-card {
+  max-width: 900px;
+  margin: 0 auto;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(255, 167, 38, 0.2);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 3px solid rgba(255, 167, 38, 0.15);
+  animation: slideUp 0.8s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.review-card .ant-card-head {
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  border: none;
+  padding: 24px;
+  border-radius: 20px 20px 0 0;
+}
+
+.review-card .ant-card-head-title {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* 评分区域 */
+.rating-section {
+  margin-bottom: 40px;
+  padding: 32px;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFE8CC 100%);
+  border-radius: 20px;
+  border: 2px solid rgba(255, 167, 38, 0.1);
+  animation: slideUp 0.8s ease 0.2s;
+}
+
+.section-title {
+  font-size: 18px;
+  color: #FFA726;
+  font-weight: 700;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.section-title::before {
+  content: '✨';
+  margin-right: 8px;
+}
+
+.rating {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.rating .ant-rate-star {
+  font-size: 32px;
+  color: #FFC93D;
+  transition: all 0.3s ease;
+}
+
+.rating .ant-rate-star:hover {
+  transform: scale(1.1);
+}
+
+.rating .ant-rate-star-full {
+  color: #FFA726;
+}
+
+/* 评价内容区域 */
+.content-section {
+  margin-bottom: 40px;
+  padding: 32px;
+  background: #fff;
+  border-radius: 20px;
+  border: 2px solid rgba(255, 167, 38, 0.1);
+  animation: slideUp 0.8s ease 0.3s;
+}
+
+.content-section .ant-input-textarea {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #636E72;
+  border-radius: 12px;
+  border: 2px solid #FFE8CC;
+  transition: all 0.3s ease;
+}
+
+.content-section .ant-input-textarea:focus {
+  border-color: #FFA726;
+  box-shadow: 0 0 0 4px rgba(255, 167, 38, 0.2);
+  background: #FFF9E6;
+}
+
+/* 图片上传区域 */
+.upload-section {
+  margin-bottom: 40px;
+  padding: 32px;
+  background: linear-gradient(135deg, #FFE8CC 0%, #FFF9E6 100%);
+  border-radius: 20px;
+  border: 2px solid rgba(255, 167, 38, 0.1);
+  animation: slideUp 0.8s ease 0.4s;
+}
+
+.upload-section .ant-upload {
+  border: 2px dashed #FFA726;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.3s ease;
+}
+
+.upload-section .ant-upload:hover {
+  border-color: #FFC93D;
+  background: #FFF9E6;
+}
+
+.upload-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.upload-item {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  animation: fadeInUp 0.5s ease;
+}
+
+.upload-item:nth-child(n) {
+  animation-delay: n * 0.1s;
+}
+
+.upload-preview {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.upload-item .ant-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 80px;
+  height: 32px;
+  padding: 0;
+  border-radius: 6px;
+}
+
+.upload-item .ant-btn-text {
+  font-size: 12px;
+  padding: 0;
+  height: 32px;
+}
+
+.upload-item .ant-btn-link {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+}
+
+.upload-item .ant-btn-link-text {
+  font-size: 12px;
+}
+
+/* 是否匿名区域 */
+.anonymous-section {
+  margin-bottom: 40px;
+  padding: 32px;
+  background: #fff;
+  border-radius: 20px;
+  border: 2px solid rgba(255, 167, 38, 0.1);
+  animation: slideUp 0.8s ease 0.5s;
+}
+
+.anonymous-switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.anonymous-switch .ant-switch-checked {
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+}
+
+.anonymous-tip {
+  font-size: 13px;
+  color: #636E72;
+  font-weight: 500;
+}
+
+/* 提交区域 */
+.submit-section {
+  padding-top: 32px;
+  border-top: 2px dashed rgba(255, 167, 38, 0.15);
+  margin-top: 32px;
+}
+
+.submit-section .ant-btn {
+  height: 54px;
+  font-size: 17px;
+  font-weight: 700;
+  padding: 0 32px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  border: none;
+  box-shadow: 0 6px 20px rgba(255, 167, 38, 0.3);
+  transition: all 0.3s ease;
+}
+
+.submit-section .ant-btn-primary:hover {
+  background: linear-gradient(135deg, #FF8B4F 0%, #FFA726 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 167, 38, 0.4);
+}
+
+.submit-section .ant-btn {
+  height: 54px;
+  font-size: 17px;
+  font-weight: 700;
+  padding: 0 32px;
+  border-radius: 12px;
+  border: 2px solid #FFE8CC;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.submit-section .ant-btn:hover {
+  border-color: #FFA726;
+  background: #FFE8CC;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .review-page {
+    padding: 24px 0;
+  }
+
+  .review-card {
+    margin: 0 16px;
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .rating-section,
+  .content-section,
+  .upload-section,
+  .anonymous-section {
+    padding: 24px;
+  }
+
+  .section-title {
+    font-size: 16px;
+    padding: 6px 12px;
+  }
+
+  .rating .ant-rate-star {
+    font-size: 28px;
+  }
+
+  .upload-list {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+  }
+
+  .upload-preview {
+    height: 120px;
+  }
+
+  .submit-section .ant-btn {
+    height: 48px;
+    padding: 0 24px;
+    font-size: 16px;
+  }
+
+  .submit-section {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .review-page {
+    padding: 16px 0;
+  }
+
+  .review-card {
+    padding: 16px;
+  }
+
+  .rating-section,
+  .content-section,
+  .upload-section,
+  .anonymous-section {
+    padding: 20px;
+  }
+
+  .rating {
+    padding: 16px 0;
+  }
+
+  .rating .ant-rate-star {
+    font-size: 26px;
+  }
+
+  .upload-list {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .upload-preview {
+    height: 100px;
+  }
+
+  .upload-item .ant-btn {
+    width: 60px;
+    height: 28px;
+  }
+
+  .upload-item .ant-btn-text {
+    font-size: 11px;
+  }
+
+  .submit-section .ant-btn {
+    width: 100%;
+    height: 46px;
+    padding: 0 20px;
+    font-size: 15px;
+  }
+}
+
