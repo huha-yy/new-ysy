@@ -1,0 +1,29 @@
+// =============================================
+// 模块1：用户管理模块 ER 图（简化版）
+// =============================================
+
+Table user {
+  id BIGINT [primary key]
+  username VARCHAR(32) [unique, not null]
+  password VARCHAR(64) [not null]
+  phone VARCHAR(16) [unique]
+  email VARCHAR(64) [unique]
+  nickname VARCHAR(32)
+  role TINYINT [not null, default: 0, note: '0普通用户 1组织者 2管理员']
+  status TINYINT [not null, default: 1, note: '0禁用 1正常']
+}
+
+Table user_profile {
+  id BIGINT [primary key]
+  user_id BIGINT [unique, not null]
+  real_name VARCHAR(32)
+  gender TINYINT [note: '0未知 1男 2女']
+  birth_date DATE
+  experience_level TINYINT [not null, default: 0, note: '0新手 1初级 2中级 3高级 4专业']
+  health_status VARCHAR(256)
+  medical_history VARCHAR(512)
+  emergency_contact VARCHAR(32)
+  emergency_phone VARCHAR(16)
+}
+
+Ref: user.id < user_profile.user_id

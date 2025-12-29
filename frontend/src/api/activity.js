@@ -99,7 +99,7 @@ export const getMyActivities = (params) => {
  * @returns {Promise} 活动列表
  */
 export const getJoinedActivities = (params) => {
-  return request.get('/user/joined-activities', params)
+  return request.get('/user/registrations', params)
 }
 
 /**

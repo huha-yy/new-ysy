@@ -15,7 +15,8 @@ import {
   DashboardOutlined,
   BarChartOutlined,
   CrownOutlined,
-  FileTextOutlined
+  FileTextOutlined,
+  CompassOutlined
 } from '@ant-design/icons'
 import { ROLE } from '../../utils/constants'
 import './MainLayout.css'
@@ -124,6 +125,16 @@ function MainLayout() {
         key: 'create-activity',
         icon: <PlusOutlined />,
         label: <Link to="/organizer/activities/create">发布新活动</Link>
+      },
+      {
+        key: 'routes',
+        icon: <CompassOutlined />,
+        label: <Link to="/organizer/routes">路线管理</Link>
+      },
+      {
+        key: 'create-route',
+        icon: <PlusOutlined />,
+        label: <Link to="/organizer/route/create">创建路线</Link>
       }
     )
   }

@@ -4,210 +4,15 @@
   min-height: 100%;
 }
 
-/* 🌞 轮播Banner */
-.banner {
-  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 50%, #4ADE80 100%);
-  background-size: 200% 200%;
-  animation: gradientMove 8s ease infinite;
-  color: #fff;
-  padding: 140px 24px;
-  text-align: center;
-  margin-bottom: 56px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(255, 167, 38, 0.3);
+/* 📦 容器 */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
-@keyframes gradientMove {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.banner::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-  animation: rotate 20s linear infinite;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.banner-content h1 {
-  font-size: 56px;
-  margin-bottom: 20px;
-  font-weight: 800;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  animation: slideInDown 1s ease;
-  position: relative;
-  z-index: 1;
-}
-
-@keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.banner-content p {
-  font-size: 22px;
-  margin-bottom: 36px;
-  opacity: 0.95;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  animation: slideInUp 1s ease 0.3s;
-  position: relative;
-  z-index: 1;
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.banner-content .ant-btn {
-  height: 50px;
-  font-size: 18px;
-  font-weight: 700;
-  padding: 0 40px;
-  border-radius: 25px;
-  background: #fff !important;
-  color: #FFA726 !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 2;
-  animation: bounceIn 0.8s ease 0.6s;
-}
-
-@keyframes bounceIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.3) translateY(20px);
-  }
-  60% {
-    transform: scale(1.1) translateY(-6px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.banner-content .ant-btn:hover {
-  background: #FFA726 !important;
-  color: #fff !important;
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 8px 24px rgba(255, 167, 38, 0.4);
-}
-
-/* ✨ 功能特色 */
-.features {
-  margin-bottom: 56px;
-}
-
-.feature-card {
-  text-align: center;
-  padding: 40px 24px;
-  transition: all 0.4s ease;
-  border-radius: 20px;
-  background: #fff;
-  border: 3px solid rgba(255, 167, 38, 0.15);
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.feature-card:nth-child(1) {
-}
-
-.feature-card:nth-child(2) {
-}
-
-.feature-card:nth-child(3) {
-}
-
-.feature-card:nth-child(4) {
-}
-
-.feature-card:hover {
-  opacity: 1;
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 12px 24px rgba(255, 167, 38, 0.25);
-  border-color: #FFA726;
-  z-index: 10;
-}
-
-.feature-icon {
-  font-size: 56px;
-  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 20px;
-  display: inline-block;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-.feature-card h3 {
-  font-size: 20px;
-  margin-bottom: 12px;
-  color: #2D3436;
-  font-weight: 700;
-}
-
-.feature-card p {
-  color: #636E72;
-  font-size: 15px;
-  line-height: 1.6;
-}
-
-/* 📊 统计卡片 */
-.intro-section {
+/* 📝 关于我们 */
+.about-section {
   padding: 56px;
   background: linear-gradient(135deg, #FFF9E6 0%, #FFF5EB 100%);
   border-radius: 24px;
@@ -216,7 +21,7 @@
   border: 3px solid rgba(255, 167, 38, 0.1);
 }
 
-.intro-section h2 {
+.about-section h2 {
   font-size: 36px;
   margin-bottom: 24px;
   color: #2D3436;
@@ -225,12 +30,9 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  display: inline-block;
-  padding: 8px 20px;
-  border-radius: 12px;
 }
 
-.intro-section > p {
+.about-section > p {
   font-size: 17px;
   line-height: 1.9;
   color: #636E72;
@@ -239,6 +41,7 @@
   text-align: justify;
 }
 
+/* 📊 统计卡片 */
 .stat-card {
   text-align: center;
   border-radius: 20px;
@@ -247,18 +50,6 @@
   background: linear-gradient(135deg, #FFF5EB 0%, #FFF9E6 100%);
   border: 3px solid rgba(255, 167, 38, 0.2);
   transition: all 0.4s ease;
-}
-
-.stat-card:nth-child(1) {
-}
-
-.stat-card:nth-child(2) {
-}
-
-.stat-card:nth-child(3) {
-}
-
-.stat-card:nth-child(4) {
 }
 
 .stat-card:hover {
@@ -283,82 +74,133 @@
   font-weight: 600;
 }
 
+/* 🔝 回到顶部按钮 */
+.back-top-float-btn {
+  right: 32px !important;
+  bottom: 32px !important;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%) !important;
+  border: none !important;
+  box-shadow: 0 4px 16px rgba(255, 167, 38, 0.3) !important;
+  transition: all 0.3s ease;
+}
+
+.back-top-float-btn:hover {
+  box-shadow: 0 6px 20px rgba(255, 167, 38, 0.4) !important;
+  transform: scale(1.1);
+}
+
+.back-top-float-btn .ant-float-btn-icon {
+  font-size: 24px;
+}
+
+/* 📝 用户评价 */
+.reviews-section {
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 3px solid rgba(255, 167, 38, 0.2);
+}
+
+.reviews-section h3 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #2D3436;
+}
+
+.review-card {
+  border-radius: 16px;
+  border: 2px solid rgba(255, 167, 38, 0.15);
+  transition: all 0.3s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(255, 167, 38, 0.2);
+  border-color: #FFA726;
+}
+
+.review-content {
+  padding: 20px;
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.review-avatar {
+  font-size: 48px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FFF5EB 0%, #FFE8CC 100%);
+  border-radius: 50%;
+  border: 2px solid rgba(255, 167, 38, 0.3);
+}
+
+.review-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #2D3436;
+}
+
+.review-stars {
+  margin-top: 4px;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.review-card p {
+  margin: 0;
+  color: #636E72;
+  font-size: 15px;
+  line-height: 1.8;
+  font-style: italic;
+}
+
 /* 📱 响应式设计 */
 @media (max-width: 768px) {
-  .banner {
-    padding: 100px 16px;
-    margin-bottom: 40px;
+  .container {
+    padding: 0 16px;
   }
 
-  .banner-content h1 {
-    font-size: 40px;
-  }
-
-  .banner-content p {
-    font-size: 18px;
-  }
-
-  .banner-content .ant-btn {
-    height: 44px;
-    font-size: 16px;
-    padding: 0 32px;
-  }
-
-  .feature-card {
-    padding: 32px 20px;
-  }
-
-  .feature-icon {
-    font-size: 48px;
-  }
-
-  .feature-card h3 {
-    font-size: 18px;
-  }
-
-  .intro-section {
+  .about-section {
     padding: 40px 24px;
     border-radius: 16px;
   }
 
-  .intro-section h2 {
+  .about-section h2 {
     font-size: 28px;
   }
 
-  .intro-section > p {
+  .about-section > p {
     font-size: 15px;
   }
 
   .stat-card h3 {
     font-size: 32px;
   }
+
+  .stat-card p {
+    font-size: 14px;
+  }
 }
 
 @media (max-width: 480px) {
-  .banner {
-    padding: 80px 12px;
-  }
-
-  .banner-content h1 {
-    font-size: 32px;
-  }
-
-  .banner-content p {
-    font-size: 16px;
-  }
-
-  .banner-content .ant-btn {
-    height: 40px;
-    font-size: 14px;
-    padding: 0 24px;
-    width: 100%;
-  }
-
-  .intro-section h2 {
+  .about-section h2 {
     font-size: 24px;
   }
 
   .stat-card h3 {
     font-size: 28px;
+  }
+
+  .stat-card p {
+    font-size: 13px;
   }
 }

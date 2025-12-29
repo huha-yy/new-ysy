@@ -1,0 +1,306 @@
+/* 🎠 轮播Banner样式 */
+
+.banner-carousel-wrapper {
+  position: relative;
+  height: 600px;
+  overflow: hidden;
+  margin-bottom: 56px;
+}
+
+.banner-carousel {
+  height: 100%;
+}
+
+.banner-carousel .ant-carousel {
+  height: 100%;
+}
+
+.banner-carousel .slick-list,
+.banner-carousel .slick-track,
+.banner-carousel .slick-slide,
+.banner-carousel .slick-slide > div {
+  height: 100%;
+}
+
+/* 轮播项 */
+.carousel-item {
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.carousel-bg {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* 渐变遮罩 */
+.carousel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(45, 52, 54, 0.7) 0%,
+    rgba(45, 52, 54, 0.5) 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  transition: all 0.6s ease;
+}
+
+.carousel-item:hover .carousel-overlay {
+  background: linear-gradient(
+    135deg,
+    rgba(45, 52, 54, 0.5) 0%,
+    rgba(45, 52, 54, 0.3) 50%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+}
+
+/* 轮播内容 */
+.carousel-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 900px;
+  padding: 0 24px;
+  z-index: 10;
+}
+
+.content-wrapper {
+  text-align: center;
+  animation: slideInUp 1s ease;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.carousel-title {
+  font-size: 56px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 20px;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  line-height: 1.2;
+}
+
+.carousel-subtitle {
+  font-size: 22px;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 36px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  line-height: 1.6;
+}
+
+.carousel-cta {
+  height: 50px;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 0 40px;
+  border-radius: 25px;
+  background: #FFA726 !important;
+  border: none;
+  box-shadow: 0 6px 20px rgba(255, 167, 38, 0.4);
+  transition: all 0.3s ease;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.carousel-cta:hover {
+  background: #FF8B4F !important;
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 24px rgba(255, 167, 38, 0.5);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* 轮播箭头 */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 20;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-arrow:hover {
+  background: #FFA726;
+  color: #fff;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 20px rgba(255, 167, 38, 0.4);
+}
+
+.carousel-arrow-left {
+  left: 24px;
+}
+
+.carousel-arrow-right {
+  right: 24px;
+}
+
+.carousel-arrow .anticon {
+  font-size: 20px;
+}
+
+/* 轮播指示器 */
+.carousel-indicators {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 20;
+}
+
+.indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.indicator:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: scale(1.2);
+}
+
+.indicator.active {
+  width: 36px;
+  border-radius: 6px;
+  background: #FFA726;
+  border-color: #FFA726;
+}
+
+/* Ant Design 轮播点隐藏 */
+.custom-dots {
+  display: none;
+}
+
+/* 📱 响应式设计 */
+@media (max-width: 768px) {
+  .banner-carousel-wrapper {
+    height: 450px;
+  }
+
+  .carousel-title {
+    font-size: 36px;
+  }
+
+  .carousel-subtitle {
+    font-size: 18px;
+    margin-bottom: 24px;
+  }
+
+  .carousel-cta {
+    height: 44px;
+    font-size: 16px;
+    padding: 0 32px;
+  }
+
+  .carousel-arrow {
+    width: 44px;
+    height: 44px;
+  }
+
+  .carousel-arrow-left {
+    left: 12px;
+  }
+
+  .carousel-arrow-right {
+    right: 12px;
+  }
+
+  .indicator {
+    width: 10px;
+    height: 10px;
+  }
+
+  .indicator.active {
+    width: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-carousel-wrapper {
+    height: 380px;
+  }
+
+  .carousel-title {
+    font-size: 28px;
+  }
+
+  .carousel-subtitle {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .carousel-cta {
+    height: 40px;
+    font-size: 14px;
+    padding: 0 24px;
+    width: 100%;
+  }
+
+  .carousel-arrow {
+    width: 40px;
+    height: 40px;
+  }
+
+  .carousel-arrow .anticon {
+    font-size: 18px;
+  }
+
+  .carousel-indicators {
+    bottom: 24px;
+    gap: 8px;
+  }
+
+  .indicator {
+    width: 8px;
+    height: 8px;
+  }
+
+  .indicator.active {
+    width: 24px;
+  }
+}
+

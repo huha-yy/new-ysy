@@ -15,7 +15,9 @@ import {
   CloseCircleOutlined
 } from '@ant-design/icons'
 import { getActivityDetail, registerActivity } from '../../../api/activity'
+import { getActivityReviews, getActivityRatingStats } from '../../../api/review'
 import { DIFFICULTY_MAP } from '../../../utils/constants'
+import ReviewStats from '../../../components/ReviewStats/ReviewStats'
 import './Detail.css'
 
 function ActivityDetail() {
@@ -31,9 +33,55 @@ function ActivityDetail() {
   const [registerForm] = Form.useForm()
   const [registerLoading, setRegisterLoading] = useState(false)
 
+  // 评价相关状态
+  const [reviews, setReviews] = useState([])
+  const [reviewLoading, setReviewLoading] = useState(false)
+  const [reviewStats, setReviewStats] = useState(null)
+  const [reviewPagination, setReviewPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  })
+
   useEffect(() => {
     fetchActivityDetail()
   }, [id])
+
+  // 加载评价数据
+  useEffect(() => {
+    if (activity?.status === 4) {
+      fetchReviews()
+      fetchRatingStats()
+    }
+  }, [activity, reviewPagination.current])
+
+  const fetchReviews = async () => {
+    try {
+      setReviewLoading(true)
+      const result = await getActivityReviews(id, {
+        pageNum: reviewPagination.current,
+        pageSize: reviewPagination.pageSize
+      })
+      setReviews(result.records || [])
+      setReviewPagination({
+        ...reviewPagination,
+        total: result.total || 0
+      })
+    } catch (error) {
+      console.error('获取评价列表失败:', error)
+    } finally {
+      setReviewLoading(false)
+    }
+  }
+
+  const fetchRatingStats = async () => {
+    try {
+      const stats = await getActivityRatingStats(id)
+      setReviewStats(stats)
+    } catch (error) {
+      console.error('获取评价统计失败:', error)
+    }
+  }
 
   const fetchActivityDetail = async () => {
     setLoading(true)
@@ -347,27 +395,144 @@ function ActivityDetail() {
             items={[
               {
                 key: 'reviews',
-                label: '活动评价',
+                label: `活动评价${activity.status === 4 ? `(${reviewPagination.total || 0})` : ''}`,
                 children: (
                   <div className="tab-content reviews-content">
                     {activity.status === 4 ? (
-                      <div className="review-action">
-                        <Button 
-                          type="primary" 
-                          size="large" 
-                          icon={<StarOutlined />}
-                          onClick={handleReview}
-                        >
-                          <StarOutlined /> 评价
-                        </Button>
-                        <div className="review-tip">
-                          活动已结束，期待您的精彩评价！
+                      <>
+                        {/* 评价统计 */}
+                        {reviewStats && (
+                          <div className="review-stats-wrapper">
+                            <ReviewStats {...reviewStats} totalReviews={reviewPagination.total || 0} />
+                          </div>
+                        )}
+
+                        {/* 评价列表 */}
+                        <div className="reviews-list">
+                          {reviews.length > 0 ? (
+                            <>
+                              {reviews.map(review => (
+                                <div key={review.id} className="review-item">
+                                  <div className="review-header">
+                                    <Space>
+                                      {review.userAvatar ? (
+                                        <Avatar src={review.userAvatar} size={40} />
+                                      ) : (
+                                        <Avatar icon={<UserOutlined />} size={40} />
+                                      )}
+                                      <div className="review-user">
+                                        <div className="reviewer-name">
+                                          {review.isAnonymous ? '匿名用户' : review.userName}
+                                        </div>
+                                        <div className="review-time">
+                                          {dayjs(review.createTime).format('YYYY-MM-DD HH:mm')}
+                                        </div>
+                                      </div>
+                                    </Space>
+                                    <Rate
+                                      disabled
+                                      value={review.overallRating}
+                                      allowHalf
+                                      character={<StarOutlined />}
+                                      style={{ fontSize: 16 }}
+                                    />
+                                  </div>
+
+                                  <div className="review-body">
+                                    <div className="review-ratings">
+                                      <Space size="large">
+                                        <span>
+                                          路线: <b>{review.routeRating || '-'}</b>
+                                        </span>
+                                        <span>
+                                          组织: <b>{review.organizationRating || '-'}</b>
+                                        </span>
+                                        <span>
+                                          安全: <b>{review.safetyRating || '-'}</b>
+                                        </span>
+                                      </Space>
+                                    </div>
+                                    <div className="review-content-text">
+                                      {review.content}
+                                    </div>
+                                    {review.images && (
+                                      <div className="review-images">
+                                        {review.images.split(',').map((img, idx) => (
+                                          img && (
+                                            <img
+                                              key={idx}
+                                              src={img}
+                                              alt={`评价图片${idx + 1}`}
+                                              className="review-image"
+                                              onClick={() => window.open(img, '_blank')}
+                                            />
+                                          )
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+
+                              {/* 分页 */}
+                              {reviewPagination.total > reviewPagination.pageSize && (
+                                <div className="reviews-pagination">
+                                  <Button
+                                    disabled={reviewPagination.current <= 1}
+                                    onClick={() => setReviewPagination({
+                                      ...reviewPagination,
+                                      current: reviewPagination.current - 1
+                                    })}
+                                  >
+                                    上一页
+                                  </Button>
+                                  <span>
+                                    第 {reviewPagination.current} / {Math.ceil(reviewPagination.total / reviewPagination.pageSize)} 页
+                                  </span>
+                                  <Button
+                                    disabled={reviewPagination.current >= Math.ceil(reviewPagination.total / reviewPagination.pageSize)}
+                                    onClick={() => setReviewPagination({
+                                      ...reviewPagination,
+                                      current: reviewPagination.current + 1
+                                    })}
+                                  >
+                                    下一页
+                                  </Button>
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <div className="empty-reviews">
+                              <StarOutlined style={{ fontSize: 48, color: '#d9d9d9' }} />
+                              <p>暂无评价</p>
+                              <Button
+                                type="primary"
+                                icon={<StarOutlined />}
+                                onClick={handleReview}
+                              >
+                                率先评价
+                              </Button>
+                            </div>
+                          )}
                         </div>
-                      </div>
+
+                        {/* 评价按钮 */}
+                        <div className="review-action-bar">
+                          <Button
+                            type="primary"
+                            size="large"
+                            icon={<StarOutlined />}
+                            onClick={handleReview}
+                            block
+                          >
+                            <StarOutlined /> 我要评价
+                          </Button>
+                        </div>
+                      </>
                     ) : (
                       <div className="review-awaiting">
-                        <CloseCircleOutlined />
-                        <span>活动结束后方可评价</span>
+                        <CloseCircleOutlined style={{ fontSize: 48, color: '#d9d9d9' }} />
+                        <p>活动结束后方可评价</p>
                       </div>
                     )}
                   </div>
@@ -409,13 +574,23 @@ function ActivityDetail() {
             </div>
           </div>
           <Space size="middle" className="footer-actions">
-            <Button 
+            <Button
               size="large"
               onClick={handleGathering}
               icon={<SettingOutlined />}
             >
               集合信息
             </Button>
+            {activity.status === 3 && (
+              <Button
+                type="primary"
+                size="large"
+                onClick={() => navigate(`/activities/${id}/checkin`)}
+                icon={<EnvironmentOutlined />}
+              >
+                <EnvironmentOutlined /> 活动签到
+              </Button>
+            )}
             {activity.status === 4 && (
               <Button
                 size="large"

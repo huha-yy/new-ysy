@@ -75,5 +75,20 @@ public class ReviewController {
         IPage<ReviewVO> page = reviewService.getActivityReviews(activityId, pageNum, pageSize);
         return Result.success(page);
     }
+
+    /**
+     * 获取活动评分统计（含各项评分平均）
+     *
+     * @param activityId 活动ID
+     * @return 评分统计
+     */
+    @Operation(summary = "活动评分统计", description = "查询活动的评分统计，包含整体评分和各项评分的平均值")
+    @GetMapping("/activities/{activityId}/rating-stats")
+    public Result<com.hiking.hikingbackend.module.review.vo.ReviewStatsVO> getActivityRatingStats(
+            @Parameter(description = "活动ID", required = true, example = "1")
+            @PathVariable("activityId") Long activityId) {
+        com.hiking.hikingbackend.module.review.vo.ReviewStatsVO statsVO = reviewService.getRatingStats(activityId);
+        return Result.success(statsVO);
+    }
 }
 

@@ -1,0 +1,93 @@
+/* 🎯 用户数据概览样式 */
+
+.user-dashboard-card {
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  border: none;
+  border-radius: 20px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 24px rgba(255, 167, 38, 0.3);
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 32px;
+  color: #fff;
+}
+
+.dashboard-header h2 {
+  font-size: 32px;
+  margin-bottom: 8px;
+  font-weight: 800;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header p {
+  font-size: 16px;
+  margin: 0;
+  opacity: 0.95;
+}
+
+.stat-item {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+  color: #FFA726;
+}
+
+.stat-icon.completed {
+  color: #4ADE80;
+}
+
+.stat-icon.upcoming {
+  color: #3B82F6;
+}
+
+.stat-icon.hot {
+  color: #F43F5E;
+}
+
+.stat-content {
+  font-size: 32px;
+  font-weight: 800;
+  color: #2D3436;
+  line-height: 1.2;
+}
+
+.stat-content p {
+  font-size: 14px;
+  color: #636E72;
+  margin: 8px 0 0;
+  font-weight: 600;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .dashboard-header h2 {
+    font-size: 24px;
+  }
+
+  .dashboard-header p {
+    font-size: 14px;
+  }
+
+  .stat-icon {
+    font-size: 28px;
+  }
+
+  .stat-content {
+    font-size: 24px;
+  }
+}
+
