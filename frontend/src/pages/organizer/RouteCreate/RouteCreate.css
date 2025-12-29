@@ -1,0 +1,198 @@
+.route-create-page {
+  padding: 24px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+}
+
+.create-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.steps-nav {
+  margin-bottom: 32px;
+  padding: 24px;
+  background-color: #fafafa;
+  border-radius: 4px;
+}
+
+.step-content {
+  min-height: 400px;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 4px;
+  margin-bottom: 24px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.difficulty-option {
+  display: flex;
+  flex-direction: column;
+}
+
+.difficulty-label {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.difficulty-desc {
+  font-size: 12px;
+  color: #999;
+}
+
+.confirm-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.confirm-section {
+  padding: 16px;
+  background-color: #fafafa;
+  border-radius: 4px;
+  border: 1px solid #f0f0f0;
+}
+
+.confirm-section h3 {
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #1890ff;
+  color: #333;
+}
+
+.confirm-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.confirm-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.confirm-item label {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 4px;
+}
+
+.confirm-item span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.confirm-description {
+  padding: 12px;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+}
+
+.confirm-description label {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.confirm-description p {
+  margin: 0;
+  color: #666;
+  line-height: 1.6;
+}
+
+.route-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+}
+
+.stat-item span {
+  font-size: 14px;
+  color: #666;
+}
+
+.stat-item b {
+  color: #1890ff;
+  font-size: 16px;
+}
+
+.checkpoints-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkpoint-confirm-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+}
+
+.checkpoint-seq {
+  background-color: #52c41a;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.checkpoint-name {
+  flex: 1;
+  font-weight: 500;
+  color: #333;
+}
+
+.checkpoint-radius {
+  font-size: 12px;
+  color: #999;
+}
+
+.step-actions {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+  background-color: #fafafa;
+  border-radius: 4px;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .form-row,
+  .confirm-grid,
+  .route-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .route-create-page {
+    padding: 12px;
+  }
+
+  .step-content {
+    padding: 16px;
+  }
+}
+

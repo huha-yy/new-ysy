@@ -10,8 +10,10 @@ import com.hiking.hikingbackend.module.route.dto.RouteCreateDTO;
 import com.hiking.hikingbackend.module.route.dto.RouteQuery;
 import com.hiking.hikingbackend.module.route.entity.Checkpoint;
 import com.hiking.hikingbackend.module.route.entity.Route;
+import com.hiking.hikingbackend.module.route.entity.RoutePoint;
 import com.hiking.hikingbackend.module.route.mapper.CheckpointMapper;
 import com.hiking.hikingbackend.module.route.mapper.RouteMapper;
+import com.hiking.hikingbackend.module.route.mapper.RoutePointMapper;
 import com.hiking.hikingbackend.module.route.service.RouteService;
 import com.hiking.hikingbackend.module.route.vo.CheckpointVO;
 import com.hiking.hikingbackend.module.route.vo.RouteVO;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -39,6 +42,8 @@ public class RouteServiceImpl implements RouteService {
     private final RouteMapper routeMapper;
 
     private final CheckpointMapper checkpointMapper;
+
+    private final RoutePointMapper routePointMapper;
 
     private final UserMapper userMapper;
 
@@ -64,7 +69,24 @@ public class RouteServiceImpl implements RouteService {
             throw new BusinessException(ResultCode.USER_NOT_FOUND);
         }
 
-        // 2. 构建路线对象
+        // 2. 从路线点中提取起点和终点信息
+        if (createDTO.getRoutePoints() != null && !createDTO.getRoutePoints().isEmpty()) {
+            List<RouteCreateDTO.RoutePointDTO> points = createDTO.getRoutePoints();
+            RouteCreateDTO.RoutePointDTO startPoint = points.get(0);
+            RouteCreateDTO.RoutePointDTO endPoint = points.get(points.size() - 1);
+
+            // 自动设置起点和终点信息（如果没有手动设置）
+            if (createDTO.getStartLatitude() == null) {
+                createDTO.setStartLatitude(BigDecimal.valueOf(startPoint.getLat()));
+                createDTO.setStartLongitude(BigDecimal.valueOf(startPoint.getLng()));
+            }
+            if (createDTO.getEndLatitude() == null) {
+                createDTO.setEndLatitude(BigDecimal.valueOf(endPoint.getLat()));
+                createDTO.setEndLongitude(BigDecimal.valueOf(endPoint.getLng()));
+            }
+        }
+
+        // 3. 构建路线对象
         Route route = Route.builder()
                 .name(createDTO.getName())
                 .description(createDTO.getDescription())
@@ -89,9 +111,62 @@ public class RouteServiceImpl implements RouteService {
                 .build();
 
         routeMapper.insert(route);
-        log.info("创建路线成功，路线ID：{}，创建者ID：{}", route.getId(), userId);
+        Long routeId = route.getId();
+        log.info("创建路线成功，路线ID：{}，创建者ID：{}", routeId, userId);
 
-        return route.getId();
+        // 4. 保存路线点（route_point表）
+        if (createDTO.getRoutePoints() != null && !createDTO.getRoutePoints().isEmpty()) {
+            List<RoutePoint> routePoints = createDTO.getRoutePoints().stream()
+                    .map(point -> RoutePoint.builder()
+                            .routeId(routeId)
+                            .latitude(BigDecimal.valueOf(point.getLat()))
+                            .longitude(BigDecimal.valueOf(point.getLng()))
+                            .pointType(1) // 默认为途经点
+                            .sequence(createDTO.getRoutePoints().indexOf(point) + 1)
+                            .build())
+                    .toList();
+
+            routePoints.forEach(routePointMapper::insert);
+            log.info("保存路线点成功，路线ID：{}，路线点数量：{}", routeId, routePoints.size());
+        }
+
+        // 5. 保存签到点（checkpoint表）
+        if (createDTO.getCheckpoints() != null && !createDTO.getCheckpoints().isEmpty()) {
+            List<Checkpoint> checkpoints = createDTO.getCheckpoints().stream()
+                    .map(cp -> Checkpoint.builder()
+                            .routeId(routeId)
+                            .name(cp.getName())
+                            .latitude(BigDecimal.valueOf(cp.getLatitude()))
+                            .longitude(BigDecimal.valueOf(cp.getLongitude()))
+                            .radius(cp.getRadius() != null ? cp.getRadius() : CHECKPOINT_RADIUS_DEFAULT)
+                            .sequence(cp.getSequence() != null ? cp.getSequence() : createDTO.getCheckpoints().indexOf(cp) + 1)
+                            .checkpointType(cp.getType() != null ? cp.getType() : CHECKPOINT_TYPE_WAY)
+                            .isRequired(cp.getIsRequired() != null && cp.getIsRequired() ? CHECKPOINT_REQUIRED : 0)
+                            .build())
+                    .toList();
+
+            checkpoints.forEach(checkpointMapper::insert);
+            log.info("保存签到点成功，路线ID：{}，签到点数量：{}", routeId, checkpoints.size());
+        }
+
+        // 6. 保存途经点（也保存到route_point表，type=1）
+        if (createDTO.getWaypoints() != null && !createDTO.getWaypoints().isEmpty()) {
+            List<RoutePoint> waypoints = createDTO.getWaypoints().stream()
+                    .map(wp -> RoutePoint.builder()
+                            .routeId(routeId)
+                            .name(wp.getName())
+                            .latitude(BigDecimal.valueOf(wp.getLatitude()))
+                            .longitude(BigDecimal.valueOf(wp.getLongitude()))
+                            .pointType(wp.getPointType() != null ? wp.getPointType() : 1)
+                            .sequence(wp.getSequence() != null ? wp.getSequence() : createDTO.getWaypoints().indexOf(wp) + 1)
+                            .build())
+                    .toList();
+
+            waypoints.forEach(routePointMapper::insert);
+            log.info("保存途经点成功，路线ID：{}，途经点数量：{}", routeId, waypoints.size());
+        }
+
+        return routeId;
     }
 
     /**

@@ -198,21 +198,35 @@ function MyActivities() {
       key: 'participants',
       width: 120,
       align: 'center',
-      render: (_, record) => (
-        <div className="participants-cell">
-          <div className="participants-count">
-            <TeamOutlined /> {record.currentParticipants || 0} / {record.maxParticipants}
+      render: (_, record) => {
+        const hasRegistrations = record.currentParticipants > 0
+        const handleClick = () => {
+          console.log('点击报名管理，活动ID:', record.id)
+          if (hasRegistrations) {
+            navigate(`/organizer/activities/${record.id}/registrations`)
+          }
+        }
+        return (
+          <div className="participants-cell">
+            <div
+              className={`participants-count ${hasRegistrations ? 'clickable' : ''}`}
+              onClick={handleClick}
+              style={{ cursor: hasRegistrations ? 'pointer' : 'default' }}
+              title={hasRegistrations ? '点击查看报名详情' : '暂无报名'}
+            >
+              <TeamOutlined /> {record.currentParticipants || 0} / {record.maxParticipants}
+            </div>
+            <div className="participants-progress">
+              <div 
+                className="progress-bar" 
+                style={{ 
+                  width: `${((record.currentParticipants || 0) / record.maxParticipants) * 100}%` 
+                }}
+              />
+            </div>
           </div>
-          <div className="participants-progress">
-            <div 
-              className="progress-bar" 
-              style={{ 
-                width: `${((record.currentParticipants || 0) / record.maxParticipants) * 100}%` 
-              }}
-            />
-          </div>
-        </div>
-      )
+        )
+      }
     },
     {
       title: '费用',
@@ -304,9 +318,22 @@ function MyActivities() {
 
         // 待审核状态：可查看
         if (record.status === ACTIVITY_STATUS.PENDING) {
-          actions.push(
-            <Tag key="pending" color="processing">审核中...</Tag>
-          )
+          if (record.currentParticipants > 0) {
+            actions.push(
+              <Badge 
+                key="pending" 
+                count={record.currentParticipants} 
+                overflowCount={99}
+                style={{ backgroundColor: '#ff4d4f' }}
+              >
+                <Tag color="processing">审核中</Tag>
+              </Badge>
+            )
+          } else {
+            actions.push(
+              <Tag key="pending" color="processing">审核中...</Tag>
+            )
+          }
         }
 
         // 已驳回状态：可编辑、重新提交
@@ -326,10 +353,13 @@ function MyActivities() {
         if (record.status === ACTIVITY_STATUS.PUBLISHED) {
           actions.push(
             <Tooltip title="报名管理" key="registrations">
-              <Button 
-                type="text" 
+              <Button
+                type="text"
                 icon={<TeamOutlined />}
-                onClick={() => navigate(`/organizer/activities/${record.id}/registrations`)}
+                onClick={() => {
+                  console.log('点击报名管理按钮，活动ID:', record.id)
+                  navigate(`/organizer/activities/${record.id}/registrations`)
+                }}
                 style={{ color: 'var(--success-color)' }}
               />
             </Tooltip>
@@ -346,6 +376,23 @@ function MyActivities() {
                 <Button type="text" icon={<StopOutlined />} danger />
               </Tooltip>
             </Popconfirm>
+          )
+        }
+
+        // 待审核状态：如果有报名，也显示报名管理
+        if (record.status === ACTIVITY_STATUS.PENDING && record.currentParticipants > 0) {
+          actions.push(
+            <Tooltip title="查看报名" key="registrations">
+              <Button
+                type="text"
+                icon={<TeamOutlined />}
+                onClick={() => {
+                  console.log('点击查看报名按钮，活动ID:', record.id)
+                  navigate(`/organizer/activities/${record.id}/registrations`)
+                }}
+                style={{ color: 'var(--primary-color)' }}
+              />
+            </Tooltip>
           )
         }
 

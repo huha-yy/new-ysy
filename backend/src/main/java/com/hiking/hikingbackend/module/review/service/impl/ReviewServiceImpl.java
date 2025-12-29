@@ -13,6 +13,7 @@ import com.hiking.hikingbackend.module.review.dto.ReviewCreateDTO;
 import com.hiking.hikingbackend.module.review.entity.Review;
 import com.hiking.hikingbackend.module.review.mapper.ReviewMapper;
 import com.hiking.hikingbackend.module.review.service.ReviewService;
+import com.hiking.hikingbackend.module.review.vo.ReviewStatsVO;
 import com.hiking.hikingbackend.module.review.vo.ReviewVO;
 import com.hiking.hikingbackend.module.user.entity.User;
 import com.hiking.hikingbackend.module.user.mapper.UserMapper;
@@ -191,6 +192,89 @@ public class ReviewServiceImpl implements ReviewService {
                 .createTime(review.getCreateTime())
                 .updateTime(review.getUpdateTime())
                 .build();
+    }
+
+    /**
+     * 获取活动评分统计
+     *
+     * @param activityId 活动ID
+     * @return 评分统计
+     */
+    @Override
+    public ReviewStatsVO getRatingStats(Long activityId) {
+        // 1. 查询所有评价
+        LambdaQueryWrapper<Review> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Review::getActivityId, activityId)
+                .eq(Review::getStatus, REVIEW_STATUS_VISIBLE);
+        java.util.List<Review> reviews = reviewMapper.selectList(queryWrapper);
+
+        if (reviews == null || reviews.isEmpty()) {
+            // 无评价时返回默认值
+            return ReviewStatsVO.builder()
+                    .overallRating(java.math.BigDecimal.ZERO)
+                    .routeRating(java.math.BigDecimal.ZERO)
+                    .organizationRating(java.math.BigDecimal.ZERO)
+                    .safetyRating(java.math.BigDecimal.ZERO)
+                    .totalReviews(0L)
+                    .ratingDistribution(java.util.Collections.emptyList())
+                    .build();
+        }
+
+        // 2. 计算各项评分平均值
+        java.math.BigDecimal overallAvg = calculateAverage(reviews, Review::getOverallRating);
+        java.math.BigDecimal routeAvg = calculateAverage(reviews, Review::getRouteRating);
+        java.math.BigDecimal organizationAvg = calculateAverage(reviews, Review::getOrganizationRating);
+        java.math.BigDecimal safetyAvg = calculateAverage(reviews, Review::getSafetyRating);
+
+        // 3. 统计评分分布（1-5星各有多少个）
+        java.util.List<ReviewStatsVO.RatingDistribution> distribution = new java.util.ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            final int rating = i;
+            long count = reviews.stream()
+                    .filter(r -> r.getOverallRating() != null && r.getOverallRating().intValue() == rating)
+                    .count();
+            distribution.add(ReviewStatsVO.RatingDistribution.builder()
+                    .rating(rating)
+                    .count(count)
+                    .build());
+        }
+
+        // 4. 构建返回对象
+        return ReviewStatsVO.builder()
+                .overallRating(overallAvg)
+                .routeRating(routeAvg)
+                .organizationRating(organizationAvg)
+                .safetyRating(safetyAvg)
+                .totalReviews((long) reviews.size())
+                .ratingDistribution(distribution)
+                .build();
+    }
+
+    /**
+     * 计算平均值
+     *
+     * @param reviews 评价列表
+     * @param getter 评分getter方法
+     * @return 平均值（保留1位小数）
+     */
+    private java.math.BigDecimal calculateAverage(java.util.List<Review> reviews, 
+                                                         java.util.function.Function<Review, Integer> getter) {
+        double sum = 0;
+        int count = 0;
+
+        for (Review review : reviews) {
+            Integer rating = getter.apply(review);
+            if (rating != null) {
+                sum += rating;
+                count++;
+            }
+        }
+
+        if (count == 0) {
+            return java.math.BigDecimal.ZERO;
+        }
+
+        return java.math.BigDecimal.valueOf(sum / count).setScale(1, java.math.RoundingMode.HALF_UP);
     }
 }
 

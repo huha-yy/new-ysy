@@ -32,13 +32,23 @@ const STATUS_MAP = {
   0: { text: '待审核', color: 'processing', icon: <ClockCircleOutlined /> },
   1: { text: '已通过', color: 'success', icon: <CheckOutlined /> },
   2: { text: '已拒绝', color: 'error', icon: <CloseOutlined /> },
-  3: { text: '已取消', color: 'default', icon: <ExclamationCircleOutlined /> }
+  3: { text: '候补中', color: 'warning', icon: <ExclamationCircleOutlined /> },
+  4: { text: '已取消', color: 'default', icon: <ExclamationCircleOutlined /> }
 }
 
 function RegistrationReview() {
   const navigate = useNavigate()
   const { id: activityId } = useParams()
-  
+
+  // 如果没有 activityId，返回活动列表
+  useEffect(() => {
+    console.log('RegistrationReview 组件已加载，activityId:', activityId)
+    if (!activityId) {
+      message.error('活动ID不存在')
+      navigate('/organizer/activities')
+    }
+  }, [activityId, navigate])
+
   const [loading, setLoading] = useState(false)
   const [activity, setActivity] = useState(null)
   const [registrations, setRegistrations] = useState([])
@@ -48,16 +58,22 @@ function RegistrationReview() {
   const [rejectModal, setRejectModal] = useState({ visible: false, id: null })
   const [rejectReason, setRejectReason] = useState('')
   const [detailModal, setDetailModal] = useState({ visible: false, record: null })
+  const [error, setError] = useState(null)
 
   // 加载活动信息
   useEffect(() => {
-    fetchActivityInfo()
-    fetchRegistrations()
+    if (activityId) {
+      console.log('开始加载数据，activityId:', activityId)
+      fetchActivityInfo()
+      fetchRegistrations()
+    }
   }, [activityId])
 
   const fetchActivityInfo = async () => {
     try {
+      console.log('获取活动信息，activityId:', activityId)
       const res = await getActivityDetail(activityId)
+      console.log('活动信息返回:', res)
       setActivity(res)
     } catch (error) {
       console.error('获取活动信息失败:', error)
@@ -74,7 +90,9 @@ function RegistrationReview() {
 
   const fetchRegistrations = async (params = {}) => {
     setLoading(true)
+    setError(null)
     try {
+      console.log('获取报名列表，activityId:', activityId)
       const res = await getActivityRegistrations(activityId, {
         pageNum: pagination.current,
         pageSize: pagination.pageSize,
@@ -82,6 +100,8 @@ function RegistrationReview() {
         keyword,
         ...params
       })
+      console.log('报名列表返回数据:', res)
+      console.log('报名记录详情:', res?.records || res?.list)
       if (res) {
         setRegistrations(res.records || res.list || res || [])
         setPagination(prev => ({
@@ -91,50 +111,49 @@ function RegistrationReview() {
       }
     } catch (error) {
       console.error('获取报名列表失败:', error)
+      setError('获取报名列表失败，请稍后重试')
       // 使用模拟数据
       setRegistrations([
         {
           id: 1,
           userId: 101,
-          username: 'hiking_lover',
-          nickname: '登山爱好者',
-          avatar: null,
-          phone: '138****1234',
-          email: 'hiker@example.com',
-          remark: '我有3年徒步经验，非常期待这次活动！',
-          emergencyContact: '李先生',
-          emergencyPhone: '139****5678',
+          userNickname: '登山爱好者',
+          userAvatar: null,
+          activityId: activityId,
+          activityTitle: '周末香山登顶徒步',
+          activityDate: '2025-01-20',
           status: 0,
-          createdAt: '2024-12-22 14:30:00'
+          statusText: '待审核',
+          remark: '我有3年徒步经验，非常期待这次活动！',
+          createTime: '2024-12-22 14:30:00'
         },
         {
           id: 2,
           userId: 102,
-          username: 'outdoor_fan',
-          nickname: '户外达人',
-          avatar: null,
-          phone: '137****4567',
-          email: 'outdoor@example.com',
-          remark: '已准备好所有装备',
-          emergencyContact: '王女士',
-          emergencyPhone: '136****8901',
+          userNickname: '户外达人',
+          userAvatar: null,
+          activityId: activityId,
+          activityTitle: '周末香山登顶徒步',
+          activityDate: '2025-01-20',
           status: 0,
-          createdAt: '2024-12-23 09:15:00'
+          statusText: '待审核',
+          remark: '已准备好所有装备',
+          createTime: '2024-12-23 09:15:00'
         },
         {
           id: 3,
           userId: 103,
-          username: 'nature_seeker',
-          nickname: '自然探索者',
-          avatar: null,
-          phone: '135****7890',
-          email: 'nature@example.com',
-          remark: '第一次参加户外徒步',
-          emergencyContact: '张先生',
-          emergencyPhone: '134****2345',
+          userNickname: '自然探索者',
+          userAvatar: null,
+          activityId: activityId,
+          activityTitle: '周末香山登顶徒步',
+          activityDate: '2025-01-20',
           status: 1,
-          createdAt: '2024-12-21 16:45:00',
-          auditTime: '2024-12-22 10:00:00'
+          statusText: '已通过',
+          remark: '第一次参加户外徒步',
+          auditorNickname: '活动组织者',
+          auditTime: '2024-12-22 10:00:00',
+          createTime: '2024-12-21 16:45:00'
         }
       ])
       setPagination(prev => ({ ...prev, total: 3 }))
@@ -224,27 +243,16 @@ function RegistrationReview() {
       width: 200,
       render: (_, record) => (
         <div className="user-cell">
-          <Avatar 
-            size={40} 
-            icon={<UserOutlined />} 
-            src={record.avatar}
+          <Avatar
+            size={40}
+            icon={<UserOutlined />}
+            src={record.userAvatar}
             className="user-avatar"
           />
           <div className="user-info">
-            <div className="user-nickname">{record.nickname || record.username}</div>
-            <div className="user-username">@{record.username}</div>
+            <div className="user-nickname">{record.userNickname || `用户${record.userId}`}</div>
+            <div className="user-username">ID: {record.userId}</div>
           </div>
-        </div>
-      )
-    },
-    {
-      title: '联系方式',
-      key: 'contact',
-      width: 180,
-      render: (_, record) => (
-        <div className="contact-cell">
-          <div><PhoneOutlined /> {record.phone}</div>
-          <div><MailOutlined /> {record.email}</div>
         </div>
       )
     },
@@ -262,8 +270,8 @@ function RegistrationReview() {
     },
     {
       title: '报名时间',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      dataIndex: 'createTime',
+      key: 'createTime',
       width: 140,
       render: (time) => dayjs(time).format('MM-DD HH:mm')
     },
@@ -348,6 +356,7 @@ function RegistrationReview() {
     { key: '0', label: <Badge count={stats.pending} offset={[10, 0]}>待审核</Badge> },
     { key: '1', label: `已通过 (${stats.approved})` },
     { key: '2', label: `已拒绝 (${stats.rejected})` },
+    { key: '3', label: `候补中 (${stats.waiting})` },
     { key: 'all', label: `全部 (${stats.total})` }
   ]
 
@@ -554,16 +563,16 @@ function RegistrationReview() {
         {detailModal.record && (
           <div className="detail-content">
             <div className="user-header">
-              <Avatar 
-                size={64} 
-                icon={<UserOutlined />} 
-                src={detailModal.record.avatar}
+              <Avatar
+                size={64}
+                icon={<UserOutlined />}
+                src={detailModal.record.userAvatar}
               />
               <div className="user-meta">
-                <h3>{detailModal.record.nickname || detailModal.record.username}</h3>
-                <p>@{detailModal.record.username}</p>
+                <h3>{detailModal.record.userNickname || `用户${detailModal.record.userId}`}</h3>
+                <p>用户ID: {detailModal.record.userId}</p>
               </div>
-              <Tag 
+              <Tag
                 color={STATUS_MAP[detailModal.record.status]?.color}
                 style={{ marginLeft: 'auto' }}
               >
@@ -572,24 +581,32 @@ function RegistrationReview() {
             </div>
 
             <Descriptions column={2} className="detail-descriptions">
-              <Descriptions.Item label="手机号码">
-                {detailModal.record.phone}
-              </Descriptions.Item>
-              <Descriptions.Item label="邮箱">
-                {detailModal.record.email}
-              </Descriptions.Item>
-              <Descriptions.Item label="紧急联系人">
-                {detailModal.record.emergencyContact || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label="紧急联系电话">
-                {detailModal.record.emergencyPhone || '-'}
-              </Descriptions.Item>
               <Descriptions.Item label="报名时间" span={2}>
-                {dayjs(detailModal.record.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+                {dayjs(detailModal.record.createTime).format('YYYY-MM-DD HH:mm:ss')}
               </Descriptions.Item>
-              <Descriptions.Item label="报名留言" span={2}>
+              {detailModal.record.auditorNickname && (
+                <Descriptions.Item label="审核人">
+                  {detailModal.record.auditorNickname}
+                </Descriptions.Item>
+              )}
+              {detailModal.record.auditTime && (
+                <Descriptions.Item label="审核时间">
+                  {dayjs(detailModal.record.auditTime).format('YYYY-MM-DD HH:mm:ss')}
+                </Descriptions.Item>
+              )}
+              {detailModal.record.queueNumber && detailModal.record.queueNumber > 0 && (
+                <Descriptions.Item label="排队序号">
+                  {detailModal.record.queueNumber}
+                </Descriptions.Item>
+              )}
+              <Descriptions.Item label="报名留言" span={detailModal.record.queueNumber > 0 ? 2 : 1}>
                 {detailModal.record.remark || '无'}
               </Descriptions.Item>
+              {detailModal.record.rejectReason && (
+                <Descriptions.Item label="拒绝原因" span={2}>
+                  {detailModal.record.rejectReason}
+                </Descriptions.Item>
+              )}
             </Descriptions>
           </div>
         )}

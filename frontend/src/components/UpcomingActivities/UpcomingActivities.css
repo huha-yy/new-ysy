@@ -1,0 +1,61 @@
+/* 🗓️ 即将参加的活动样式 */
+
+.upcoming-activities-card {
+  margin-bottom: 40px;
+  border-radius: 16px;
+  border: 2px solid rgba(255, 167, 38, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid rgba(255, 167, 38, 0.15);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.title-icon {
+  font-size: 24px;
+  color: #FFA726;
+}
+
+.section-title h3 {
+  font-size: 20px;
+  margin: 0;
+  font-weight: 700;
+  color: #2D3436;
+}
+
+.section-header .ant-btn {
+  color: #FFA726;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.section-header .ant-btn:hover {
+  color: #FF8B4F;
+  background: rgba(255, 167, 38, 0.1);
+  transform: translateX(4px);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .section-title h3 {
+    font-size: 18px;
+  }
+
+  .title-icon {
+    font-size: 20px;
+  }
+}
+

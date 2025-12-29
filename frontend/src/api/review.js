@@ -80,3 +80,11 @@ export const getActivityRatingStats = (activityId) => {
   return request.get(`/activities/${activityId}/rating-stats`)
 }
 
+/**
+ * 获取活动评分统计（备用接口）
+ * @param {number} activityId - 活动ID
+ * @returns {Promise} 评分统计
+ */
+export const getActivityStats = (activityId) => {
+  return request.get(`/activities/${activityId}/stats`)
+}

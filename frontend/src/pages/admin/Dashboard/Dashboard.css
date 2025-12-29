@@ -237,6 +237,10 @@
   background: linear-gradient(135deg, var(--accent-color) 0%, #00A8CC 100%);
 }
 
+.shortcut-icon.registrations {
+  background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
+}
+
 .shortcut-item span {
   font-weight: 500;
   color: var(--text-primary);

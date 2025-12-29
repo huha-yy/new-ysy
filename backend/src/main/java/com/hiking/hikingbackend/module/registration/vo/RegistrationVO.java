@@ -34,6 +34,12 @@ public class RegistrationVO {
     @Schema(description = "用户头像", example = "https://example.com/avatar.jpg")
     private String userAvatar;
 
+    @Schema(description = "用户手机号", example = "13800138000")
+    private String phone;
+
+    @Schema(description = "用户邮箱", example = "zhangsan@example.com")
+    private String email;
+
     @Schema(description = "活动ID", example = "1")
     private Long activityId;
 

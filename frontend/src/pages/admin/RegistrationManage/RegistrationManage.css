@@ -1,0 +1,296 @@
+/* =============================================
+   报名管理页面样式
+   ============================================= */
+
+.registration-manage-page {
+  padding: 24px;
+  background: #f0f2f5;
+  min-height: 100vh;
+}
+
+/* =============================================
+   页面头部
+   ============================================= */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 20px 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.title-icon {
+  font-size: 28px;
+  color: #1890ff;
+}
+
+/* =============================================
+   统计卡片
+   ============================================= */
+
+.stats-row {
+  margin-bottom: 24px;
+}
+
+.stats-row .ant-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.stats-row .ant-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.stats-row .ant-statistic-title {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin-bottom: 8px;
+}
+
+.stats-row .ant-statistic-content {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* =============================================
+   搜索卡片
+   ============================================= */
+
+.search-card {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.search-card .ant-card-body {
+  padding: 20px 24px;
+}
+
+.search-label {
+  display: inline-block;
+  width: 70px;
+  text-align: right;
+  margin-right: 12px;
+  color: #595959;
+  font-weight: 500;
+}
+
+/* =============================================
+   表格卡片
+   ============================================= */
+
+.table-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.table-card .ant-card-body {
+  padding: 20px 24px;
+}
+
+.table-card .ant-tabs {
+  margin-bottom: 16px;
+}
+
+.table-card .ant-tabs-nav {
+  margin-bottom: 20px;
+}
+
+/* =============================================
+   表格样式
+   ============================================= */
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-nickname {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.user-username {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.contact-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: #595959;
+}
+
+.contact-cell span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.remark-text {
+  color: #595959;
+  font-size: 13px;
+}
+
+/* =============================================
+   详情弹窗
+   ============================================= */
+
+.detail-modal {
+  padding: 12px 0;
+}
+
+.detail-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-item .label {
+  width: 120px;
+  color: #8c8c8c;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.detail-item .value {
+  flex: 1;
+  color: #262626;
+  font-size: 14px;
+  word-break: break-all;
+}
+
+/* =============================================
+   响应式设计
+   ============================================= */
+
+@media (max-width: 1400px) {
+  .stats-row .ant-col {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .registration-manage-page {
+    padding: 16px;
+  }
+
+  .page-header {
+    padding: 16px 20px;
+  }
+
+  .search-card .ant-card-body {
+    padding: 16px 20px;
+  }
+
+  .table-card .ant-card-body {
+    padding: 16px 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-row {
+    display: none;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .search-card .ant-row {
+    flex-direction: column;
+  }
+
+  .search-card .ant-col {
+    width: 100% !important;
+    margin-bottom: 12px;
+  }
+
+  .search-label {
+    text-align: left;
+    width: auto;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .table-card {
+    overflow-x: auto;
+  }
+
+  .table-card .ant-table-wrapper {
+    min-width: 800px;
+  }
+}
+
+/* =============================================
+   动画效果
+   ============================================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-header,
+.stats-row,
+.search-card,
+.table-card {
+  animation: fadeIn 0.3s ease;
+}
+
+.stats-row .ant-card:nth-child(1) { animation-delay: 0.1s; }
+.stats-row .ant-card:nth-child(2) { animation-delay: 0.15s; }
+.stats-row .ant-card:nth-child(3) { animation-delay: 0.2s; }
+.stats-row .ant-card:nth-child(4) { animation-delay: 0.25s; }
+.stats-row .ant-card:nth-child(5) { animation-delay: 0.3s; }
+.stats-row .ant-card:nth-child(6) { animation-delay: 0.35s; }
+

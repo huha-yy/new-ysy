@@ -25,7 +25,9 @@ export const REGISTRATION_STATUS = {
   PENDING: 0,    // 待审核
   APPROVED: 1,   // 已通过
   REJECTED: 2,   // 已拒绝
-  CANCELLED: 3   // 已取消
+  WAITING: 3,    // 候补中
+  CANCELLED: 4,   // 已取消
+  ABSENT: 5      // 已缺席
 }
 
 // 难度等级
@@ -50,4 +52,3 @@ export const CHECKIN_STATUS = {
   PENDING: 0,  // 待签到
   COMPLETED: 1 // 已签到
 }
-

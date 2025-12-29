@@ -347,12 +347,12 @@ function AdminDashboard() {
               </div>
               <div 
                 className="shortcut-item"
-                onClick={() => navigate('/admin/activities')}
+                onClick={() => navigate('/admin/registrations')}
               >
-                <div className="shortcut-icon activities">
-                  <CalendarOutlined />
+                <div className="shortcut-icon registrations">
+                  <FileTextOutlined />
                 </div>
-                <span>活动管理</span>
+                <span>报名管理</span>
               </div>
               <div 
                 className="shortcut-item"
