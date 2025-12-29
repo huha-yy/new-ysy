@@ -4,6 +4,95 @@
   min-height: 100%;
 }
 
+/* 📦 容器 */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* 🔥 热门活动列表 */
+.hot-activities-section {
+  margin-bottom: 56px;
+  animation: fadeInUp 0.8s ease;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 3px solid rgba(255, 167, 38, 0.2);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.title-icon {
+  font-size: 32px;
+  color: #FFA726;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.section-title h2 {
+  font-size: 32px;
+  margin: 0;
+  font-weight: 800;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-header .ant-btn {
+  color: #FFA726;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.section-header .ant-btn:hover {
+  color: #FF8B4F;
+  background: rgba(255, 167, 38, 0.1);
+  transform: translateX(4px);
+}
+
+/* 加载状态 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 0;
+}
+
+.loading-container .ant-spin-text {
+  color: #FFA726;
+  font-weight: 600;
+  margin-top: 16px;
+}
+
+/* 💀 骨架屏 */
+.activity-skeleton {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 167, 38, 0.15);
+}
+
+.activity-skeleton .ant-skeleton-input {
+  height: 180px;
+  border-radius: 12px 12px 0 0;
+}
+
+.activity-skeleton .ant-skeleton-paragraph {
+  padding: 20px 16px;
+}
+
 /* 🌞 轮播Banner */
 .banner {
   background: linear-gradient(135deg, #FFA726 0%, #FFC93D 50%, #4ADE80 100%);
@@ -165,6 +254,22 @@
 .feature-card:nth-child(4) {
 }
 
+.feature-card:nth-child(1) {
+  animation: fadeInUp 0.6s ease 0.1s backwards;
+}
+
+.feature-card:nth-child(2) {
+  animation: fadeInUp 0.6s ease 0.2s backwards;
+}
+
+.feature-card:nth-child(3) {
+  animation: fadeInUp 0.6s ease 0.3s backwards;
+}
+
+.feature-card:nth-child(4) {
+  animation: fadeInUp 0.6s ease 0.4s backwards;
+}
+
 .feature-card:hover {
   opacity: 1;
   transform: translateY(-8px) scale(1.02);
@@ -277,14 +382,156 @@
   text-shadow: 0 2px 4px rgba(255, 167, 38, 0.2);
 }
 
+/* 🔝 回到顶部按钮 */
+.back-top-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 4px 16px rgba(255, 167, 38, 0.3);
+  transition: all 0.3s ease;
+}
+
+.back-top-btn:hover {
+  transform: translateY(-4px) scale(1.1);
+  box-shadow: 0 6px 20px rgba(255, 167, 38, 0.4);
+}
+
+.ant-back-top {
+  right: 32px;
+  bottom: 32px;
+  z-index: 1000;
+}
+
 .stat-card p {
   color: #636E72;
   font-size: 15px;
   font-weight: 600;
 }
 
+/* 🔧 活动筛选器 */
+.activity-filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  min-width: 180px;
+}
+
+.filter-select .ant-select-selector {
+  border-radius: 20px;
+  border: 2px solid rgba(255, 167, 38, 0.2);
+  padding: 8px 16px;
+  height: 42px;
+}
+
+.filter-select:hover .ant-select-selector,
+.filter-select.ant-select-focused .ant-select-selector {
+  border-color: #FFA726;
+  box-shadow: 0 0 0 4px rgba(255, 167, 38, 0.1);
+}
+
+.filter-select .ant-select-selection-placeholder {
+  color: #636E72;
+  font-weight: 500;
+}
+
+/* 📝 用户评价 */
+.reviews-section {
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 3px solid rgba(255, 167, 38, 0.2);
+}
+
+.reviews-section h3 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #2D3436;
+}
+
+.review-card {
+  border-radius: 16px;
+  border: 2px solid rgba(255, 167, 38, 0.15);
+  transition: all 0.3s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(255, 167, 38, 0.2);
+  border-color: #FFA726;
+}
+
+.review-content {
+  padding: 20px;
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.review-avatar {
+  font-size: 48px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FFF5EB 0%, #FFE8CC 100%);
+  border-radius: 50%;
+  border: 2px solid rgba(255, 167, 38, 0.3);
+}
+
+.review-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #2D3436;
+}
+
+.review-stars {
+  margin-top: 4px;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.review-card p {
+  margin: 0;
+  color: #636E72;
+  font-size: 15px;
+  line-height: 1.8;
+  font-style: italic;
+}
+
 /* 📱 响应式设计 */
 @media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  .section-header {
+    margin-bottom: 24px;
+  }
+
+  .section-title h2 {
+    font-size: 26px;
+  }
+
+  .title-icon {
+    font-size: 28px;
+  }
+
   .banner {
     padding: 100px 16px;
     margin-bottom: 40px;

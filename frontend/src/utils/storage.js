@@ -4,6 +4,7 @@
 
 const TOKEN_KEY = 'token'
 const USER_KEY = 'user'
+const REMEMBER_ME_KEY = 'rememberMe'
 
 // Token 操作
 export const getToken = () => {
@@ -30,6 +31,20 @@ export const setUser = (user) => {
 
 export const removeUser = () => {
   localStorage.removeItem(USER_KEY)
+}
+
+// 记住我功能
+export const getRememberMe = () => {
+  const rememberMeStr = localStorage.getItem(REMEMBER_ME_KEY)
+  return rememberMeStr ? JSON.parse(rememberMeStr) : null
+}
+
+export const setRememberMe = (data) => {
+  localStorage.setItem(REMEMBER_ME_KEY, JSON.stringify(data))
+}
+
+export const removeRememberMe = () => {
+  localStorage.removeItem(REMEMBER_ME_KEY)
 }
 
 // 通用操作

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 路线创建DTO
@@ -89,5 +90,87 @@ public class RouteCreateDTO {
 
     @Schema(description = "是否公开：0否 1是", example = "1")
     private Integer isPublic;
+
+    @Schema(description = "路线点列表", example = "[{\"lng\": 116.39, \"lat\": 39.90}, {\"lng\": 116.40, \"lat\": 39.91}]")
+    @NotEmpty(message = "路线点不能为空")
+    @Size(min = 2, message = "至少需要2个路线点（起点和终点）")
+    private List<RoutePointDTO> routePoints;
+
+    @Schema(description = "签到点列表")
+    private List<CheckpointDTO> checkpoints;
+
+    @Schema(description = "途经点列表")
+    private List<WaypointDTO> waypoints;
+
+    /**
+     * 路线点DTO
+     */
+    @Data
+    @Schema(description = "路线点")
+    public static class RoutePointDTO {
+        @Schema(description = "经度", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "经度不能为空")
+        private Double lng;
+
+        @Schema(description = "纬度", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "纬度不能为空")
+        private Double lat;
+    }
+
+    /**
+     * 签到点DTO
+     */
+    @Data
+    @Schema(description = "签到点")
+    public static class CheckpointDTO {
+        @Schema(description = "签到点名称", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "签到点名称不能为空")
+        private String name;
+
+        @Schema(description = "纬度", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "纬度不能为空")
+        private Double latitude;
+
+        @Schema(description = "经度", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "经度不能为空")
+        private Double longitude;
+
+        @Schema(description = "签到半径（米）", example = "100")
+        private Integer radius;
+
+        @Schema(description = "序号")
+        private Integer sequence;
+
+        @Schema(description = "类型：1集合点 2途中点 3终点")
+        private Integer type;
+
+        @Schema(description = "是否必签：0否 1是")
+        private Boolean isRequired;
+    }
+
+    /**
+     * 途经点DTO
+     */
+    @Data
+    @Schema(description = "途经点")
+    public static class WaypointDTO {
+        @Schema(description = "途经点名称", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "途经点名称不能为空")
+        private String name;
+
+        @Schema(description = "纬度", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "纬度不能为空")
+        private Double latitude;
+
+        @Schema(description = "经度", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "经度不能为空")
+        private Double longitude;
+
+        @Schema(description = "点位类型")
+        private Integer pointType;
+
+        @Schema(description = "序号")
+        private Integer sequence;
+    }
 }
 

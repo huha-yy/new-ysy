@@ -1,0 +1,33 @@
+.map-view-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+}
+
+.map-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 10;
+  gap: 12px;
+}
+
+.loading-text {
+  font-size: 14px;
+  color: #666;
+  margin-top: 8px;
+}
+

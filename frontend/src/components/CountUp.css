@@ -1,0 +1,11 @@
+/* 🔢 数字滚动动画样式 */
+
+.count-up {
+  font-weight: 800;
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
+}
+

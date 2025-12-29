@@ -14,6 +14,8 @@ const ActivityDetail = lazy(() => import('../pages/activity/Detail'))
 // 懒加载页面组件 - 用户页面
 const ActivityReview = lazy(() => import('../pages/activity/Review'))
 const GatheringInfo = lazy(() => import('../pages/activity/Gathering'))
+
+const CheckInPage = lazy(() => import('../pages/activity/CheckIn'))
 const UserProfile = lazy(() => import('../pages/user/Profile'))
 const HikingProfile = lazy(() => import('../pages/user/HikingProfile'))
 const ProfileEdit = lazy(() => import('../pages/user/ProfileEdit'))
@@ -25,6 +27,11 @@ const OrganizerMyActivities = lazy(() => import('../pages/organizer/MyActivities
 const OrganizerActivityForm = lazy(() => import('../pages/organizer/ActivityForm'))
 const OrganizerRegistrationReview = lazy(() => import('../pages/organizer/RegistrationReview'))
 const OrganizerCheckinMonitor = lazy(() => import('../pages/organizer/CheckinMonitor'))
+
+const OrganizerRoutes = lazy(() => import('../pages/organizer/Routes'))
+const OrganizerRouteCreate = lazy(() => import('../pages/organizer/RouteCreate'))
+const OrganizerRouteEdit = lazy(() => import('../pages/organizer/RouteEdit'))
+const OrganizerGatheringPlan = lazy(() => import('../pages/organizer/GatheringPlan'))
 
 // 懒加载页面组件 - 管理员页面
 const AdminDashboard = lazy(() => import('../pages/admin/Dashboard'))
@@ -108,6 +115,14 @@ const router = createBrowserRouter([
         ))
       },
       {
+        path: 'activities/:id/checkin',
+        element: lazyWrapper(() => (
+          <AuthRoute>
+            <CheckInPage />
+          </AuthRoute>
+        ))
+      },
+      {
         path: 'user/registrations',
         element: lazyWrapper(() => (
           <AuthRoute>
@@ -162,6 +177,38 @@ const router = createBrowserRouter([
         element: lazyWrapper(() => (
           <AuthRoute>
             <OrganizerCheckinMonitor />
+          </AuthRoute>
+        ))
+      },
+      {
+        path: 'organizer/routes',
+        element: lazyWrapper(() => (
+          <AuthRoute>
+            <OrganizerRoutes />
+          </AuthRoute>
+        ))
+      },
+      {
+        path: 'organizer/route/create',
+        element: lazyWrapper(() => (
+          <AuthRoute>
+            <OrganizerRouteCreate />
+          </AuthRoute>
+        ))
+      },
+      {
+        path: 'organizer/route/:id/edit',
+        element: lazyWrapper(() => (
+          <AuthRoute>
+            <OrganizerRouteEdit />
+          </AuthRoute>
+        ))
+      },
+      {
+        path: 'organizer/activities/:id/gathering',
+        element: lazyWrapper(() => (
+          <AuthRoute>
+            <OrganizerGatheringPlan />
           </AuthRoute>
         ))
       },
