@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Card, Form, Rate, Input, Button, Upload, Switch, message, Modal, Space, Avatar, Checkbox, Divider, Descriptions, Tag, Badge, Spin, Tabs } from 'antd'
-import { 
+import {
   UserOutlined,
   CalendarOutlined,
   TeamOutlined,
@@ -12,10 +12,13 @@ import {
   PictureOutlined,
   PhoneOutlined,
   CheckCircleOutlined,
-  CloseCircleOutlined
+  CloseCircleOutlined,
+  CloseOutlined,
+  ClockCircleOutlined
 } from '@ant-design/icons'
 import { getActivityDetail, registerActivity } from '../../../api/activity'
-import { DIFFICULTY_MAP } from '../../../utils/constants'
+import { getActivityRegistrations, cancelRegistration } from '../../../api/registration'
+import { DIFFICULTY_MAP, REGISTRATION_STATUS } from '../../../utils/constants'
 import './Detail.css'
 
 function ActivityDetail() {
@@ -30,10 +33,19 @@ function ActivityDetail() {
   const [registerVisible, setRegisterVisible] = useState(false)
   const [registerForm] = Form.useForm()
   const [registerLoading, setRegisterLoading] = useState(false)
+  
+  // 报名记录状态
+  const [myRegistration, setMyRegistration] = useState(null)
 
   useEffect(() => {
     fetchActivityDetail()
   }, [id])
+  
+  useEffect(() => {
+    if (activity) {
+      fetchMyRegistration()
+    }
+  }, [activity])
 
   const fetchActivityDetail = async () => {
     setLoading(true)
@@ -54,6 +66,26 @@ function ActivityDetail() {
     }
   }
 
+  // 查询用户报名记录
+  const fetchMyRegistration = async () => {
+    if (!activity) return
+    
+    try {
+      const result = await getActivityRegistrations(id, {
+        pageNum: 1,
+        pageSize: 100
+      })
+      
+      // 找到当前用户的报名记录
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
+      const myReg = result.records?.find(r => r.userId === currentUser.id)
+      setMyRegistration(myReg || null)
+    } catch (error) {
+      console.error('查询报名记录失败:', error)
+      setMyRegistration(null)
+    }
+  }
+
   const handleImageLoad = () => {
     setImageLoading(false)
     setImageError(false)
@@ -67,6 +99,12 @@ function ActivityDetail() {
   // 打开报名弹窗
   const handleRegister = () => {
     if (!activity) return
+
+    // 如果已经报名，不显示报名弹窗
+    if (myRegistration) {
+      message.info('您已经报名该活动')
+      return
+    }
 
     // 检查活动状态
     if (activity.status !== 2 && activity.status !== 3) {
@@ -144,6 +182,29 @@ function ActivityDetail() {
     registerForm.resetFields()
   }
 
+  // 取消报名
+  const handleCancelRegistration = () => {
+    if (!myRegistration) return
+
+    Modal.confirm({
+      title: '确认取消报名?',
+      content: '取消后需要重新报名才能参加该活动',
+      okText: '确认取消',
+      okType: 'danger',
+      cancelText: '再想想',
+      onOk: async () => {
+        try {
+          await cancelRegistration(myRegistration.id)
+          message.success('取消报名成功')
+          fetchMyRegistration() // 重新获取报名状态
+        } catch (error) {
+          console.error('取消报名失败:', error)
+          message.error(error.response?.data?.message || '取消报名失败')
+        }
+      }
+    })
+  }
+
   const handleGathering = () => {
     window.location.href = `/activities/${id}/gathering`
   }
@@ -215,6 +276,11 @@ function ActivityDetail() {
                 {activity.currentParticipants}/{activity.maxParticipants}人
               </Badge>
             </Tag>
+            {activity.registrationDeadline && (
+              <Tag icon={<ClockCircleOutlined />} color="blue">
+                报名截止: {activity.registrationDeadline}
+              </Tag>
+            )}
           </Space>
         </div>
 
@@ -234,6 +300,13 @@ function ActivityDetail() {
               {activity.fee > 0 && <span className="fee-note">（{activity.feeDescription}）</span>}
             </div>
           </Descriptions.Item>
+          {activity.registrationDeadline && (
+            <Descriptions.Item label="报名截止时间">
+              <Tag icon={<ClockCircleOutlined />} color="blue">
+                {activity.registrationDeadline}
+              </Tag>
+            </Descriptions.Item>
+          )}
           <Descriptions.Item label="活动状态">
             <div>
               <Tag color={getStatusColor(activity.status)}>
@@ -297,7 +370,7 @@ function ActivityDetail() {
             <Descriptions.Item label="预计用时">
               {activity.routeEstimatedHours}小时
             </Descriptions.Item>
-            <Descriptions.Item label="难度" label="活动状态">
+            <Descriptions.Item label="难度">
               <Tag color={getDifficultyColor(activity.routeDifficultyLevel)}>
                 {activity.routeDifficultyText}
               </Tag>
@@ -393,6 +466,7 @@ function ActivityDetail() {
               size="large"
               onClick={handleGathering}
               icon={<SettingOutlined />}
+              key="gathering"
             >
               集合信息
             </Button>
@@ -401,19 +475,35 @@ function ActivityDetail() {
                 size="large"
                 onClick={handleReview}
                 icon={<StarOutlined />}
+                key="review"
               >
                 活动评价
               </Button>
             )}
-            <Button
-              type="primary"
-              size="large"
-              onClick={handleRegister}
-              disabled={activity.isFull || ![2, 3].includes(activity.status)}
-              loading={registerLoading}
-            >
-              {activity.isFull ? '已报满' : '立即报名'}
-            </Button>
+            {myRegistration ? (
+              // 已报名，显示取消报名按钮
+              <Button
+                danger
+                size="large"
+                onClick={handleCancelRegistration}
+                icon={<CloseOutlined />}
+                key="cancel"
+              >
+                取消报名
+              </Button>
+            ) : (
+              // 未报名，显示立即报名按钮
+              <Button
+                type="primary"
+                size="large"
+                onClick={handleRegister}
+                disabled={activity.isFull || ![2, 3].includes(activity.status)}
+                loading={registerLoading}
+                key="register"
+              >
+                {activity.isFull ? '已报满' : '立即报名'}
+              </Button>
+            )}
           </Space>
         </div>
       </div>
@@ -453,6 +543,11 @@ function ActivityDetail() {
                 <Tag color={getDifficultyColor(activity.difficultyLevel)}>
                   {activity.difficultyText}
                 </Tag>
+                {activity.registrationDeadline && (
+                  <Tag icon={<ClockCircleOutlined />} color="blue">
+                    报名截止: {activity.registrationDeadline}
+                  </Tag>
+                )}
               </Space>
             </div>
           </div>

@@ -1,0 +1,25 @@
+// =============================================
+// 模块4：系统基础模块 ER 图（简化版）
+// =============================================
+
+Table dict_type {
+  id BIGINT [primary key]
+  dict_name VARCHAR(64) [not null]
+  dict_code VARCHAR(64) [unique, not null]
+  description VARCHAR(256]
+  status TINYINT [not null, default: 1, note: '0禁用 1正常']
+}
+
+Table dict_data {
+  id BIGINT [primary key]
+  dict_type_id BIGINT [not null]
+  dict_code VARCHAR(64) [not null]
+  label VARCHAR(64) [not null]
+  value VARCHAR(64) [not null]
+  sequence INT [not null, default: 0]
+  is_default TINYINT [not null, default: 0, note: '0否 1是']
+  status TINYINT [not null, default: 1, note: '0禁用 1正常']
+  remark VARCHAR(256)
+}
+
+Ref: dict_type.id > dict_data.dict_type_id

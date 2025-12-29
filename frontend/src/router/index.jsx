@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import MainLayout from '../components/layout/MainLayout'
 import AuthRoute from '../components/AuthRoute'
+import ErrorBoundary from '../components/ErrorBoundary'
 import { Spin } from 'antd'
 
 // 懒加载页面组件 - 公共页面
@@ -10,10 +11,13 @@ const Login = lazy(() => import('../pages/user/Login'))
 const Register = lazy(() => import('../pages/user/Register'))
 const ActivityList = lazy(() => import('../pages/activity/List'))
 const ActivityDetail = lazy(() => import('../pages/activity/Detail'))
+const NotFound = lazy(() => import('../pages/NotFound'))
 
 // 懒加载页面组件 - 用户页面
 const ActivityReview = lazy(() => import('../pages/activity/Review'))
 const GatheringInfo = lazy(() => import('../pages/activity/Gathering'))
+
+const CheckInPage = lazy(() => import('../pages/activity/CheckIn'))
 const UserProfile = lazy(() => import('../pages/user/Profile'))
 const HikingProfile = lazy(() => import('../pages/user/HikingProfile'))
 const ProfileEdit = lazy(() => import('../pages/user/ProfileEdit'))
@@ -26,17 +30,30 @@ const OrganizerActivityForm = lazy(() => import('../pages/organizer/ActivityForm
 const OrganizerRegistrationReview = lazy(() => import('../pages/organizer/RegistrationReview'))
 const OrganizerCheckinMonitor = lazy(() => import('../pages/organizer/CheckinMonitor'))
 
+const OrganizerRoutes = lazy(() => import('../pages/organizer/Routes'))
+const OrganizerRouteCreate = lazy(() => import('../pages/organizer/RouteCreate'))
+const OrganizerRouteEdit = lazy(() => import('../pages/organizer/RouteEdit'))
+const OrganizerGatheringPlan = lazy(() => import('../pages/organizer/GatheringPlan'))
+
 // 懒加载页面组件 - 管理员页面
 const AdminDashboard = lazy(() => import('../pages/admin/Dashboard'))
 const AdminActivityAudit = lazy(() => import('../pages/admin/ActivityAudit'))
 const AdminUserManage = lazy(() => import('../pages/admin/UserManage'))
 const AdminStatistics = lazy(() => import('../pages/admin/Statistics'))
+const AdminRegistrationManage = lazy(() => import('../pages/admin/RegistrationManage'))
 
 // 加载组件
 const LoadingFallback = () => (
   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
     <Spin size="large" />
   </div>
+)
+
+// 错误包装组件
+const ErrorWrapper = ({ children }) => (
+  <ErrorBoundary>
+    {children}
+  </ErrorBoundary>
 )
 
 // 包装懒加载组件的辅助函数
@@ -50,7 +67,11 @@ const lazyWrapper = (Component) => (
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <MainLayout />,
+    element: (
+      <ErrorBoundary>
+        <MainLayout />
+      </ErrorBoundary>
+    ),
     children: [
       // ========== 公共路由 ==========
       {
@@ -104,6 +125,14 @@ const router = createBrowserRouter([
         element: lazyWrapper(() => (
           <AuthRoute>
             <GatheringInfo />
+          </AuthRoute>
+        ))
+      },
+      {
+        path: 'activities/:id/checkin',
+        element: lazyWrapper(() => (
+          <AuthRoute>
+            <CheckInPage />
           </AuthRoute>
         ))
       },
@@ -165,6 +194,38 @@ const router = createBrowserRouter([
           </AuthRoute>
         ))
       },
+      {
+        path: 'organizer/routes',
+        element: lazyWrapper(() => (
+          <AuthRoute>
+            <OrganizerRoutes />
+          </AuthRoute>
+        ))
+      },
+      {
+        path: 'organizer/route/create',
+        element: lazyWrapper(() => (
+          <AuthRoute>
+            <OrganizerRouteCreate />
+          </AuthRoute>
+        ))
+      },
+      {
+        path: 'organizer/route/:id/edit',
+        element: lazyWrapper(() => (
+          <AuthRoute>
+            <OrganizerRouteEdit />
+          </AuthRoute>
+        ))
+      },
+      {
+        path: 'organizer/activities/:id/gathering',
+        element: lazyWrapper(() => (
+          <AuthRoute>
+            <OrganizerGatheringPlan />
+          </AuthRoute>
+        ))
+      },
       
       // ========== 管理员路由 ==========
       {
@@ -214,6 +275,14 @@ const router = createBrowserRouter([
             <AdminStatistics />
           </AuthRoute>
         ))
+      },
+      {
+        path: 'admin/registrations',
+        element: lazyWrapper(() => (
+          <AuthRoute>
+            <AdminRegistrationManage />
+          </AuthRoute>
+        ))
       }
     ]
   },
@@ -225,6 +294,15 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: lazyWrapper(Register)
+  },
+  // 404 路由（放在最后）
+  {
+    path: '*',
+    element: lazyWrapper(() => (
+      <ErrorBoundary>
+        <NotFound />
+      </ErrorBoundary>
+    ))
   }
 ])
 

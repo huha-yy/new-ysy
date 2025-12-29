@@ -239,6 +239,35 @@
   font-size: 13px;
   color: var(--text-primary);
   margin-bottom: 6px;
+  transition: all 0.3s ease;
+}
+
+.participants-count.clickable {
+  cursor: pointer;
+  color: var(--primary-color);
+  font-weight: 600;
+  text-decoration: none;
+  position: relative;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.participants-count.clickable:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: scale(1.05);
+}
+
+.participants-count.clickable::after {
+  content: '→';
+  margin-left: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.participants-count.clickable:hover::after {
+  opacity: 1;
 }
 
 .participants-progress {

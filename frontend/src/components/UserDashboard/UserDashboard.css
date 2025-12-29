@@ -1,0 +1,150 @@
+/* 🎯 用户数据概览样式 */
+
+.user-dashboard-card {
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  border: none;
+  border-radius: 24px;
+  margin-bottom: 40px;
+  box-shadow: 0 12px 32px rgba(255, 167, 38, 0.35);
+  overflow: hidden;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 32px;
+  color: #fff;
+}
+
+.dashboard-header h2 {
+  font-size: 36px;
+  margin-bottom: 10px;
+  font-weight: 800;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard-header p {
+  font-size: 17px;
+  margin: 0;
+  opacity: 0.95;
+}
+
+/* 统计卡片 */
+.user-dashboard-card .stat-item {
+  text-align: center;
+  background: #fff;
+  border-radius: 18px;
+  border: none;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 24px 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.user-dashboard-card .stat-item:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+/* 图标容器 - 带有清晰的背景色 */
+.stat-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  transition: all 0.3s ease;
+}
+
+.user-dashboard-card .stat-item:hover .stat-icon-wrapper {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.stat-icon {
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 统计数字样式 */
+.stat-content {
+  font-size: 36px;
+  font-weight: 800;
+  color: #2D3436;
+  line-height: 1.2;
+}
+
+/* 覆盖 CountUp 的橙色渐变样式，使用深色文字 */
+.stat-content .count-up {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: #2D3436 !important;
+  background-clip: unset !important;
+  color: #2D3436 !important;
+}
+
+.stat-content p {
+  font-size: 14px;
+  color: #636E72;
+  margin: 10px 0 0;
+  font-weight: 600;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .user-dashboard-card {
+    border-radius: 20px;
+  }
+
+  .dashboard-header h2 {
+    font-size: 26px;
+  }
+
+  .dashboard-header p {
+    font-size: 15px;
+  }
+
+  .user-dashboard-card .stat-item {
+    padding: 20px 12px;
+  }
+
+  .stat-icon-wrapper {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+  }
+
+  .stat-icon {
+    font-size: 24px;
+  }
+
+  .stat-content {
+    font-size: 28px;
+  }
+
+  .stat-content p {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header h2 {
+    font-size: 22px;
+  }
+
+  .stat-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+  }
+
+  .stat-icon {
+    font-size: 22px;
+  }
+
+  .stat-content {
+    font-size: 24px;
+  }
+}

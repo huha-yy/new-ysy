@@ -5,44 +5,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #FFF9E6 0%, #FFE8CC 50%, #4ADE80 100%);
-  background-size: 400% 400%;
-  animation: gradientMove 15s ease infinite;
+  /* 使用Unsplash高质量山脉图片 */
+  background:
+    /* 渐变遮罩，保证文字可读性 */
+    linear-gradient(135deg, rgba(255, 249, 230, 0.85) 0%, rgba(255, 232, 204, 0.85) 50%, rgba(74, 222, 128, 0.75) 100%),
+    /* 高质量山脉背景图 */
+    url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=1920&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   padding: 24px;
   position: relative;
   overflow: hidden;
-}
-
-@keyframes gradientMove {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.register-page::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255, 167, 38, 0.1) 0%, transparent 70%);
-  animation: rotate 30s linear infinite;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .register-card {
@@ -141,7 +115,7 @@
 }
 
 .register-footer .ant-btn-link {
-  color: #FFA726;
+  color: #fff;
   font-weight: 600;
   font-size: 15px;
   transition: all 0.3s ease;

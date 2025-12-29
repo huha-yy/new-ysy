@@ -1,0 +1,52 @@
+.route-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.editor-controls {
+  margin-bottom: 16px;
+}
+
+.edit-mode-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.edit-tip {
+  margin-top: 8px;
+}
+
+.route-stats {
+  padding: 12px;
+  background-color: #f0f2f5;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.checkpoints-list,
+.waypoints-list {
+  margin-top: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.section-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.checkpoint-item,
+.waypoint-item {
+  padding: 8px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+
+.checkpoint-radius {
+  color: #999;
+  font-size: 12px;
+}
+

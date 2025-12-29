@@ -1,0 +1,281 @@
+// =============================================
+// 户外徒步活动管理系统 - 数据库逻辑模型（简化版）
+// 只显示核心业务字段，隐藏公共字段
+// =============================================
+
+// =============================================
+// 1. 用户表
+// =============================================
+Table user {
+  id BIGINT [primary key]
+  username VARCHAR(32) [unique, not null]
+  password VARCHAR(64) [not null]
+  phone VARCHAR(16) [unique]
+  email VARCHAR(64) [unique]
+  nickname VARCHAR(32)
+  avatar VARCHAR(256)
+  role TINYINT [not null, default: 0, note: '0普通用户 1组织者 2管理员']
+  status TINYINT [not null, default: 1, note: '0禁用 1正常']
+}
+
+// =============================================
+// 2. 用户档案表
+// =============================================
+Table user_profile {
+  id BIGINT [primary key]
+  user_id BIGINT [unique, not null]
+  real_name VARCHAR(32)
+  gender TINYINT [note: '0未知 1男 2女']
+  birth_date DATE
+  experience_level TINYINT [not null, default: 0, note: '0新手 1初级 2中级 3高级 4专业']
+  health_status VARCHAR(256)
+  medical_history VARCHAR(512)
+  emergency_contact VARCHAR(32)
+  emergency_phone VARCHAR(16)
+}
+
+// =============================================
+// 3. 活动表
+// =============================================
+Table activity {
+  id BIGINT [primary key]
+  title VARCHAR(128) [not null]
+  cover_image VARCHAR(256)
+  description TEXT
+  organizer_id BIGINT [not null]
+  route_id BIGINT
+  activity_date DATE [not null]
+  start_time TIME [not null]
+  end_time TIME
+  max_participants INT [not null, default: 20]
+  current_participants INT [not null, default: 0]
+  registration_deadline DATETIME [not null]
+  difficulty_level TINYINT [not null, default: 1, note: '1休闲 2简单 3中等 4困难 5极限']
+  fee DECIMAL(10,2) [default: 0.00]
+  equipment_requirement VARCHAR(512)
+  status TINYINT [not null, default: 0, note: '0草稿 1待审核 2已发布 3进行中 4已结束 5已取消 6已驳回']
+}
+
+// =============================================
+// 4. 报名表
+// =============================================
+Table registration {
+  id BIGINT [primary key]
+  user_id BIGINT [not null]
+  activity_id BIGINT [not null]
+  status TINYINT [not null, default: 0, note: '0待审核 1已通过 2已拒绝 3候补中 4已取消 5已缺席']
+  queue_number INT
+  remark VARCHAR(256)
+}
+
+// =============================================
+// 5. 集合方案表
+// =============================================
+Table gathering_plan {
+  id BIGINT [primary key]
+  activity_id BIGINT [unique, not null]
+  gathering_time DATETIME [not null]
+  gathering_address VARCHAR(256) [not null]
+  gathering_latitude DECIMAL(10,7)
+  gathering_longitude DECIMAL(10,7)
+  transport_guide VARCHAR(512)
+  items_to_bring VARCHAR(512)
+  notice TEXT
+  organizer_phone VARCHAR(16)
+  is_published TINYINT [not null, default: 0, note: '0否 1是']
+}
+
+// =============================================
+// 6. 路线表
+// =============================================
+Table route {
+  id BIGINT [primary key]
+  name VARCHAR(128) [not null]
+  description TEXT
+  creator_id BIGINT [not null]
+  difficulty_level TINYINT [not null, default: 1, note: '1休闲 2简单 3中等 4困难 5极限']
+  total_distance DECIMAL(6,2) [note: '公里']
+  elevation_gain INT [note: '米']
+  elevation_loss INT [note: '米']
+  max_elevation INT [note: '米']
+  min_elevation INT [note: '米']
+  estimated_hours DECIMAL(4,1)
+  start_point_name VARCHAR(64)
+  start_latitude DECIMAL(10,7)
+  start_longitude DECIMAL(10,7)
+  end_point_name VARCHAR(64)
+  end_latitude DECIMAL(10,7)
+  end_longitude DECIMAL(10,7)
+  region VARCHAR(64)
+  is_public TINYINT [not null, default: 1, note: '0否 1是']
+  status TINYINT [not null, default: 1, note: '0禁用 1正常']
+}
+
+// =============================================
+// 7. 路线点位表
+// =============================================
+Table route_point {
+  id BIGINT [primary key]
+  route_id BIGINT [not null]
+  point_type TINYINT [not null, default: 1, note: '1途经点 2风险点 3休息点 4补给点']
+  name VARCHAR(64) [not null]
+  description VARCHAR(256)
+  latitude DECIMAL(10,7) [not null]
+  longitude DECIMAL(10,7) [not null]
+  elevation INT [note: '米']
+  sequence INT [not null, default: 0]
+  risk_level TINYINT [note: '1低 2中 3高（仅风险点）']
+  risk_tip VARCHAR(256)
+}
+
+// =============================================
+// 8. 签到点表
+// =============================================
+Table checkpoint {
+  id BIGINT [primary key]
+  route_id BIGINT [not null]
+  name VARCHAR(64) [not null]
+  description VARCHAR(256)
+  latitude DECIMAL(10,7) [not null]
+  longitude DECIMAL(10,7) [not null]
+  radius INT [not null, default: 100, note: '有效签到半径（米）']
+  sequence INT [not null, default: 0, note: '1=集合点，最大=终点']
+  checkpoint_type TINYINT [not null, default: 2, note: '1集合点 2途中点 3终点']
+  is_required TINYINT [not null, default: 1, note: '0否 1是']
+  expected_arrive_minutes INT [note: '预计到达时间（从出发算起，分钟）']
+}
+
+// =============================================
+// 9. 签到记录表
+// =============================================
+Table check_in_record {
+  id BIGINT [primary key]
+  user_id BIGINT [not null]
+  activity_id BIGINT [not null]
+  checkpoint_id BIGINT [not null]
+  check_in_time DATETIME [not null]
+  latitude DECIMAL(10,7) [not null]
+  longitude DECIMAL(10,7) [not null]
+  distance_to_checkpoint INT [note: '米']
+  status TINYINT [not null, default: 1, note: '1正常 2迟到 3补签']
+}
+
+// =============================================
+// 10. 轨迹记录表
+// =============================================
+Table track_record {
+  id BIGINT [primary key]
+  user_id BIGINT [not null]
+  activity_id BIGINT [not null]
+  latitude DECIMAL(10,7) [not null]
+  longitude DECIMAL(10,7) [not null]
+  elevation INT [note: '米']
+  accuracy INT [note: '定位精度（米）']
+  speed DECIMAL(5,2) [note: 'km/h']
+  record_time DATETIME [not null]
+}
+
+// =============================================
+// 11. 预警事件表
+// =============================================
+Table alert_event {
+  id BIGINT [primary key]
+  activity_id BIGINT [not null]
+  user_id BIGINT [not null]
+  alert_type TINYINT [not null, note: '1偏离路线 2严重偏离 3长时间静止 4超时未签到 5失联']
+  alert_level TINYINT [not null, default: 1, note: '1警告 2严重']
+  latitude DECIMAL(10,7)
+  longitude DECIMAL(10,7)
+  description VARCHAR(256)
+  trigger_time DATETIME [not null]
+  handle_status TINYINT [not null, default: 0, note: '0未处理 1处理中 2已处理 3已忽略']
+}
+
+// =============================================
+// 12. 评价表
+// =============================================
+Table review {
+  id BIGINT [primary key]
+  user_id BIGINT [not null]
+  activity_id BIGINT [not null]
+  overall_rating TINYINT [not null, note: '1-5星']
+  route_rating TINYINT [note: '1-5星']
+  organization_rating TINYINT [note: '1-5星']
+  safety_rating TINYINT [note: '1-5星']
+  content VARCHAR(512)
+  images VARCHAR(1024) [note: '多个逗号分隔']
+  is_anonymous TINYINT [not null, default: 0, note: '0否 1是']
+}
+
+// =============================================
+// 13. 消息表
+// =============================================
+Table message {
+  id BIGINT [primary key]
+  user_id BIGINT [not null]
+  title VARCHAR(128) [not null]
+  content VARCHAR(512) [not null]
+  message_type TINYINT [not null, default: 1, note: '1系统通知 2报名通知 3活动通知 4预警通知']
+  related_id BIGINT
+  related_type VARCHAR(32)
+  is_read TINYINT [not null, default: 0, note: '0否 1是']
+}
+
+// =============================================
+// 14. 字典类型表
+// =============================================
+Table dict_type {
+  id BIGINT [primary key]
+  dict_name VARCHAR(64) [not null]
+  dict_code VARCHAR(64) [unique, not null]
+  description VARCHAR(256)
+  status TINYINT [not null, default: 1, note: '0禁用 1正常']
+}
+
+// =============================================
+// 15. 字典数据表
+// =============================================
+Table dict_data {
+  id BIGINT [primary key]
+  dict_type_id BIGINT [not null]
+  dict_code VARCHAR(64) [not null]
+  label VARCHAR(64) [not null]
+  value VARCHAR(64) [not null]
+  sequence INT [not null, default: 0]
+  is_default TINYINT [not null, default: 0, note: '0否 1是']
+  status TINYINT [not null, default: 1, note: '0禁用 1正常']
+}
+
+// =============================================
+// 表关系定义
+// =============================================
+
+// 用户相关关系
+Ref: user.id < user_profile.user_id
+Ref: user.id > activity.organizer_id
+Ref: user.id > registration.user_id
+Ref: user.id > route.creator_id
+Ref: user.id > check_in_record.user_id
+Ref: user.id > track_record.user_id
+Ref: user.id > alert_event.user_id
+Ref: user.id > review.user_id
+Ref: user.id > message.user_id
+
+// 活动相关关系
+Ref: activity.id - gathering_plan.activity_id
+Ref: activity.route_id > route.id
+Ref: activity.id > registration.activity_id
+Ref: activity.id > check_in_record.activity_id
+Ref: activity.id > track_record.activity_id
+Ref: activity.id > alert_event.activity_id
+Ref: activity.id > review.activity_id
+
+// 路线相关关系
+Ref: route.id > route_point.route_id
+Ref: route.id > checkpoint.route_id
+
+// 签到点关系
+Ref: checkpoint.id > check_in_record.checkpoint_id
+
+// 字典关系
+Ref: dict_type.id > dict_data.dict_type_id

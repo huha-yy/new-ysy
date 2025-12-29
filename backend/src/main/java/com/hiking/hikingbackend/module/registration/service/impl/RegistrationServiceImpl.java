@@ -45,8 +45,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     private static final int STATUS_REJECTED = 2;  // 已拒绝
     private static final int STATUS_WAITING = 3;  // 候补中
     private static final int STATUS_CANCELLED = 4; // 已取消
+    private static final int STATUS_ABSENT = 5;    // 已缺席
 
     private static final int ACTIVITY_STATUS_PUBLISHED = 2; // 活动已发布
+    private static final int ACTIVITY_STATUS_IN_PROGRESS = 3; // 活动进行中
 
     /**
      * 提交报名
@@ -64,13 +66,13 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new BusinessException(ResultCode.USER_NOT_FOUND);
         }
 
-        // 2. 校验活动是否存在且状态为已发布
+        // 2. 校验活动是否存在且状态为已发布或进行中
         Activity activity = activityMapper.selectById(createDTO.getActivityId());
         if (activity == null) {
             throw new BusinessException(ResultCode.ACTIVITY_NOT_FOUND);
         }
-        if (activity.getStatus() != ACTIVITY_STATUS_PUBLISHED) {
-            throw new BusinessException(ResultCode.ACTIVITY_NOT_PUBLISHED);
+        if (activity.getStatus() != ACTIVITY_STATUS_PUBLISHED && activity.getStatus() != ACTIVITY_STATUS_IN_PROGRESS) {
+            throw new BusinessException(ResultCode.ACTIVITY_NOT_STARTED);
         }
 
         // 3. 校验报名截止时间
@@ -89,7 +91,14 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new BusinessException(ResultCode.ALREADY_REGISTERED);
         }
 
-        // 5. 校验活动容量
+        // 5. 删除旧的报名记录（已拒绝、已取消、已缺席状态的记录可以重新报名）
+        LambdaQueryWrapper<Registration> deleteWrapper = new LambdaQueryWrapper<>();
+        deleteWrapper.eq(Registration::getUserId, userId)
+                   .eq(Registration::getActivityId, createDTO.getActivityId())
+                   .in(Registration::getStatus, STATUS_REJECTED, STATUS_CANCELLED, STATUS_ABSENT);
+        registrationMapper.delete(deleteWrapper);
+
+        // 6. 校验活动容量
         Integer currentParticipants = activity.getCurrentParticipants() != null ? activity.getCurrentParticipants() : 0;
         Integer maxParticipants = activity.getMaxParticipants() != null ? activity.getMaxParticipants() : 0;
 
