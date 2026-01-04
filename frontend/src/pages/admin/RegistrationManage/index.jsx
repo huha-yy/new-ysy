@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import {
-  Card, Table, Tag, Space, Button, Select, Input,
+import { 
+  Card, Table, Tag, Space, Button, Select, Input, 
   DatePicker, Row, Col, message, Modal, Statistic,
-  Tabs, Tooltip, Badge, Avatar, Empty
+  Tabs, Tooltip, Badge, Avatar
 } from 'antd'
 import {
   ReloadOutlined,
@@ -14,11 +14,10 @@ import {
   EyeOutlined,
   UserOutlined,
   PhoneOutlined,
-  MailOutlined,
-  CheckOutlined
+  MailOutlined
 } from '@ant-design/icons'
 import { getActivityList } from '../../../api/activity'
-import { getActivityRegistrations, auditRegistration } from '../../../api/registration'
+import { getActivityRegistrations } from '../../../api/registration'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
 import './RegistrationManage.css'
@@ -41,63 +40,13 @@ function RegistrationManage() {
   const [activities, setActivities] = useState([])
   const [registrations, setRegistrations] = useState([])
   const [selectedActivity, setSelectedActivity] = useState(null)
-  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0, statusStats: {} })
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
   const [activeTab, setActiveTab] = useState('all')
   const [searchParams, setSearchParams] = useState({
     keyword: '',
     status: undefined,
     dateRange: null
   })
-  const [rejectModal, setRejectModal] = useState({ visible: false, id: null })
-  const [rejectReason, setRejectReason] = useState('')
-
-  // 保存各状态的总数（用于显示标签）
-  const [statusCounts, setStatusCounts] = useState({
-    pending: 0,
-    approved: 0,
-    rejected: 0,
-    waiting: 0,
-    cancelled: 0,
-    total: 0
-  })
-
-  // 获取各状态的统计数据
-  const fetchStatusStats = async (activityId) => {
-    try {
-      const statuses = [0, 1, 2, 3, 4]
-      const counts = {
-        pending: 0,
-        approved: 0,
-        rejected: 0,
-        waiting: 0,
-        cancelled: 0,
-        total: 0
-      }
-
-      for (const status of statuses) {
-        try {
-          const res = await getActivityRegistrations(activityId, {
-            pageNum: 1,
-            pageSize: 1,
-            status
-          })
-          const count = res?.total || 0
-          counts.total += count
-          if (status === 0) counts.pending = count
-          else if (status === 1) counts.approved = count
-          else if (status === 2) counts.rejected = count
-          else if (status === 3) counts.waiting = count
-          else counts.cancelled = count
-        } catch (e) {
-          console.error(`获取状态${status}统计失败:`, e)
-        }
-      }
-
-      setStatusCounts(counts)
-    } catch (error) {
-      console.error('获取统计数据失败:', error)
-    }
-  }
 
   // 加载活动列表
   useEffect(() => {
@@ -108,24 +57,8 @@ function RegistrationManage() {
   useEffect(() => {
     if (selectedActivity) {
       fetchRegistrations()
-      // 切换活动时，获取各状态统计数据
-      fetchStatusStats(selectedActivity)
     }
-  }, [selectedActivity])
-
-  // 监听筛选条件变化，重新加载列表
-  useEffect(() => {
-    if (selectedActivity) {
-      fetchRegistrations()
-    }
-  }, [activeTab, pagination.current, pagination.pageSize, searchParams])
-
-  // 当筛选条件改变时（非分页变化），重新获取统计数据
-  useEffect(() => {
-    if (selectedActivity) {
-      fetchStatusStats(selectedActivity)
-    }
-  }, [selectedActivity, searchParams])
+  }, [selectedActivity, activeTab, pagination.current, searchParams])
 
   const fetchActivities = async () => {
     try {
@@ -147,27 +80,18 @@ function RegistrationManage() {
 
   const fetchRegistrations = async () => {
     if (!selectedActivity) return
-
+    
     setLoading(true)
     try {
-      const params = {
+      const res = await getActivityRegistrations(selectedActivity, {
         pageNum: pagination.current,
         pageSize: pagination.pageSize,
         status: activeTab !== 'all' ? parseInt(activeTab) : undefined,
         keyword: searchParams.keyword || undefined
-      }
-
-      // 处理日期范围参数
-      if (searchParams.dateRange && searchParams.dateRange.length === 2) {
-        params.startTime = searchParams.dateRange[0].format('YYYY-MM-DD HH:mm:ss')
-        params.endTime = searchParams.dateRange[1].format('YYYY-MM-DD HH:mm:ss')
-      }
-
-      const res = await getActivityRegistrations(selectedActivity, params)
-
+      })
+      
       if (res) {
-        const allRegistrations = res.records || res.list || []
-        setRegistrations(allRegistrations)
+        setRegistrations(res.records || res.list || [])
         setPagination(prev => ({
           ...prev,
           total: res.total || 0
@@ -183,12 +107,12 @@ function RegistrationManage() {
 
   // 计算统计数据
   const stats = {
-    total: statusCounts.total,
-    pending: statusCounts.pending,
-    approved: statusCounts.approved,
-    rejected: statusCounts.rejected,
-    waiting: statusCounts.waiting,
-    cancelled: statusCounts.cancelled
+    total: registrations.length,
+    pending: registrations.filter(r => r.status === 0).length,
+    approved: registrations.filter(r => r.status === 1).length,
+    rejected: registrations.filter(r => r.status === 2).length,
+    waiting: registrations.filter(r => r.status === 3).length,
+    cancelled: registrations.filter(r => r.status === 4).length
   }
 
   // 处理搜索
@@ -207,42 +131,6 @@ function RegistrationManage() {
     setPagination(prev => ({ ...prev, current: 1 }))
   }
 
-  // 审核通过
-  const handleApprove = async (id) => {
-    try {
-      await auditRegistration(id, { approved: true })
-      message.success('审核通过')
-      fetchRegistrations()
-    } catch (error) {
-      message.error('操作失败')
-    }
-  }
-
-  // 显示拒绝弹窗
-  const showRejectModal = (id) => {
-    setRejectModal({ visible: true, id })
-    setRejectReason('')
-  }
-
-  // 确认拒绝
-  const handleReject = async () => {
-    if (!rejectReason.trim()) {
-      message.warning('请输入拒绝原因')
-      return
-    }
-    try {
-      await auditRegistration(rejectModal.id, { 
-        approved: false, 
-        rejectReason: rejectReason.trim() 
-      })
-      message.success('已拒绝该报名')
-      setRejectModal({ visible: false, id: null })
-      fetchRegistrations()
-    } catch (error) {
-      message.error('操作失败')
-    }
-  }
-
   // 查看详情
   const handleViewDetail = (record) => {
     Modal.info({
@@ -254,7 +142,7 @@ function RegistrationManage() {
             <Col span={12}>
               <div className="detail-item">
                 <span className="label">用户昵称:</span>
-                <span className="value">{record.nickname || record.username || record.userNickname || '-'}</span>
+                <span className="value">{record.nickname || record.username || '-'}</span>
               </div>
             </Col>
             <Col span={12}>
@@ -274,14 +162,14 @@ function RegistrationManage() {
             <Col span={12}>
               <div className="detail-item">
                 <span className="label">报名时间:</span>
-                <span className="value">{(record.createdAt || record.createTime) ? dayjs(record.createdAt || record.createTime).format('YYYY-MM-DD HH:mm:ss') : '-'}</span>
+                <span className="value">{record.createdAt ? dayjs(record.createdAt).format('YYYY-MM-DD HH:mm:ss') : '-'}</span>
               </div>
             </Col>
           </Row>
-          {(record.auditTime || record.audit_time) && (
+          {record.auditTime && (
             <div className="detail-item">
               <span className="label">审核时间:</span>
-              <span className="value">{dayjs(record.auditTime || record.audit_time).format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span className="value">{dayjs(record.auditTime).format('YYYY-MM-DD HH:mm:ss')}</span>
             </div>
           )}
           {record.rejectReason && (
@@ -315,15 +203,15 @@ function RegistrationManage() {
       width: 200,
       render: (_, record) => (
         <div className="user-cell">
-          <Avatar
-            size={40}
-            icon={<UserOutlined />}
-            src={record.avatar || record.userAvatar}
+          <Avatar 
+            size={40} 
+            icon={<UserOutlined />} 
+            src={record.avatar}
             className="user-avatar"
           />
           <div className="user-info">
-            <div className="user-nickname">{record.nickname || record.username || record.userNickname || `用户${record.userId}`}</div>
-            <div className="user-username">@{record.username || record.userId}</div>
+            <div className="user-nickname">{record.nickname || record.username}</div>
+            <div className="user-username">@{record.username}</div>
           </div>
         </div>
       )
@@ -353,8 +241,8 @@ function RegistrationManage() {
     },
     {
       title: '报名时间',
-      dataIndex: 'createTime',
-      key: 'createTime',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
       width: 140,
       render: (time) => time ? dayjs(time).format('MM-DD HH:mm') : '-'
     },
@@ -383,48 +271,17 @@ function RegistrationManage() {
     {
       title: '操作',
       key: 'actions',
-      width: 200,
+      width: 120,
       align: 'center',
-      render: (_, record) => {
-        if (record.status === 0) {
-          return (
-            <Space>
-              <Button 
-                type="primary" 
-                size="small"
-                icon={<CheckOutlined />}
-                onClick={() => handleApprove(record.id)}
-              >
-                通过
-              </Button>
-              <Button 
-                danger 
-                size="small"
-                onClick={() => showRejectModal(record.id)}
-              >
-                拒绝
-              </Button>
-              <Button 
-                type="link" 
-                size="small"
-                icon={<EyeOutlined />}
-                onClick={() => handleViewDetail(record)}
-              >
-                详情
-              </Button>
-            </Space>
-          )
-        }
-        return (
-          <Button 
-            type="link" 
-            icon={<EyeOutlined />}
-            onClick={() => handleViewDetail(record)}
-          >
-            详情
-          </Button>
-        )
-      }
+      render: (_, record) => (
+        <Button 
+          type="link" 
+          icon={<EyeOutlined />}
+          onClick={() => handleViewDetail(record)}
+        >
+          详情
+        </Button>
+      )
     }
   ]
 
@@ -514,7 +371,7 @@ function RegistrationManage() {
       {/* 查询区域 */}
       <Card className="search-card">
         <Row gutter={16} align="middle">
-          <Col span={5}>
+          <Col span={6}>
             <span className="search-label">选择活动:</span>
             <Select
               style={{ width: '100%' }}
@@ -523,7 +380,6 @@ function RegistrationManage() {
               onChange={setSelectedActivity}
               showSearch
               optionFilterProp="children"
-              notFoundContent="暂无活动"
             >
               {activities.map(activity => (
                 <Option key={activity.id} value={activity.id}>
@@ -532,17 +388,16 @@ function RegistrationManage() {
               ))}
             </Select>
           </Col>
-          <Col span={5}>
+          <Col span={6}>
             <span className="search-label">关键词:</span>
             <Input
               placeholder="搜索用户名/昵称/手机号"
               value={searchParams.keyword}
               onChange={(e) => setSearchParams({ ...searchParams, keyword: e.target.value })}
               onPressEnter={handleSearch}
-              allowClear
             />
           </Col>
-          <Col span={4}>
+          <Col span={6}>
             <span className="search-label">状态:</span>
             <Select
               style={{ width: '100%' }}
@@ -559,16 +414,6 @@ function RegistrationManage() {
             </Select>
           </Col>
           <Col span={6}>
-            <span className="search-label">报名时间:</span>
-            <RangePicker
-              style={{ width: '100%' }}
-              value={searchParams.dateRange}
-              onChange={(dates) => setSearchParams({ ...searchParams, dateRange: dates })}
-              format="YYYY-MM-DD"
-              placeholder={['开始日期', '结束日期']}
-            />
-          </Col>
-          <Col span={4}>
             <Space>
               <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
                 搜索
@@ -583,74 +428,31 @@ function RegistrationManage() {
 
       {/* 报名列表 */}
       <Card className="table-card">
-        {!selectedActivity ? (
-          <Empty
-            description="请先选择要管理的活动"
-            style={{ padding: '60px 0' }}
-          />
-        ) : (
-          <>
-            <Tabs
-              activeKey={activeTab}
-              onChange={setActiveTab}
-              items={tabItems}
-            />
+        <Tabs
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          items={tabItems}
+        />
 
-            <Table
-              loading={loading}
-              columns={columns}
-              dataSource={registrations}
-              rowKey="id"
-              pagination={{
-                current: pagination.current,
-                pageSize: pagination.pageSize,
-                total: pagination.total,
-                showSizeChanger: true,
-                showQuickJumper: true,
-                showTotal: (total) => `共 ${total} 条记录`,
-                onChange: (page, pageSize) => {
-                  setPagination({ current: page, pageSize, total: pagination.total, statusStats: pagination.statusStats })
-                },
-                onShowSizeChange: (current, size) => {
-                  setPagination(prev => ({ ...prev, pageSize: size, current: 1 }))
-                }
-              }}
-              scroll={{ x: 1200 }}
-              locale={{
-                emptyText: (
-                  <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description="暂无报名数据"
-                  />
-                )
-              }}
-            />
-          </>
-        )}
+        <Table
+          loading={loading}
+          columns={columns}
+          dataSource={registrations}
+          rowKey="id"
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total) => `共 ${total} 条记录`,
+            onChange: (page, pageSize) => {
+              setPagination({ current: page, pageSize, total: pagination.total })
+            }
+          }}
+          scroll={{ x: 1200 }}
+        />
       </Card>
-
-      {/* 拒绝弹窗 */}
-      <Modal
-        title="拒绝报名"
-        open={rejectModal.visible}
-        onOk={handleReject}
-        onCancel={() => setRejectModal({ visible: false, id: null })}
-        okText="确认拒绝"
-        cancelText="取消"
-        okButtonProps={{ danger: true }}
-      >
-        <div className="reject-modal-content">
-          <p>请输入拒绝原因，该原因将发送给报名用户：</p>
-          <Input.TextArea
-            value={rejectReason}
-            onChange={e => setRejectReason(e.target.value)}
-            placeholder="例如：人数已满、不符合参与要求等..."
-            rows={4}
-            maxLength={200}
-            showCount
-          />
-        </div>
-      </Modal>
     </div>
   )
 }
