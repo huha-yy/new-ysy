@@ -39,6 +39,57 @@ function MyActivities() {
   const [activeTab, setActiveTab] = useState('all')
   const [keyword, setKeyword] = useState('')
 
+  // 保存各状态的数量
+  const [statusCounts, setStatusCounts] = useState({
+    total: 0,
+    draft: 0,
+    pending: 0,
+    published: 0,
+    inProgress: 0,
+    ended: 0,
+    rejected: 0
+  })
+
+  // 获取各状态的统计数据
+  const fetchStatusStats = async () => {
+    try {
+      const statuses = [0, 1, 2, 3, 4, 6]
+      const counts = {
+        total: 0,
+        draft: 0,
+        pending: 0,
+        published: 0,
+        inProgress: 0,
+        ended: 0,
+        rejected: 0
+      }
+
+      for (const status of statuses) {
+        try {
+          const res = await getMyActivities({
+            pageNum: 1,
+            pageSize: 1,
+            status
+          })
+          const count = res?.total || 0
+          counts.total += count
+          if (status === 0) counts.draft = count
+          else if (status === 1) counts.pending = count
+          else if (status === 2) counts.published = count
+          else if (status === 3) counts.inProgress = count
+          else if (status === 4) counts.ended = count
+          else if (status === 6) counts.rejected = count
+        } catch (e) {
+          console.error(`获取状态${status}统计失败:`, e)
+        }
+      }
+
+      setStatusCounts(counts)
+    } catch (error) {
+      console.error('获取统计数据失败:', error)
+    }
+  }
+
   // 加载活动列表
   const fetchActivities = async (params = {}) => {
     setLoading(true)
@@ -106,6 +157,11 @@ function MyActivities() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchActivities()
+    fetchStatusStats()
+  }, [])
 
   useEffect(() => {
     fetchActivities()
@@ -400,11 +456,24 @@ function MyActivities() {
         if (record.status === ACTIVITY_STATUS.IN_PROGRESS) {
           actions.push(
             <Tooltip title="签到监控" key="checkin">
-              <Button 
-                type="text" 
+              <Button
+                type="text"
                 icon={<CheckCircleOutlined />}
                 onClick={() => navigate(`/organizer/activities/${record.id}/checkin`)}
                 style={{ color: 'var(--success-color)' }}
+              />
+            </Tooltip>
+          )
+        }
+
+        // 已驳回状态：可重新提交
+        if (record.status === ACTIVITY_STATUS.REJECTED) {
+          actions.push(
+            <Tooltip title="编辑并重新提交" key="edit">
+              <Button
+                type="text"
+                icon={<EditOutlined />}
+                onClick={() => navigate(`/organizer/activities/${record.id}/edit`)}
               />
             </Tooltip>
           )
@@ -415,20 +484,7 @@ function MyActivities() {
     }
   ]
 
-  // 统计卡片数据
-  const getStatCards = () => {
-    const stats = {
-      total: activities.length,
-      draft: activities.filter(a => a.status === 0).length,
-      pending: activities.filter(a => a.status === 1).length,
-      published: activities.filter(a => a.status === 2).length,
-      inProgress: activities.filter(a => a.status === 3).length,
-      ended: activities.filter(a => a.status === 4).length
-    }
-    return stats
-  }
-
-  const stats = getStatCards()
+  const stats = statusCounts
 
   const tabItems = [
     { key: 'all', label: `全部 (${stats.total})` },
@@ -436,7 +492,8 @@ function MyActivities() {
     { key: '1', label: `待审核 (${stats.pending})` },
     { key: '2', label: `已发布 (${stats.published})` },
     { key: '3', label: `进行中 (${stats.inProgress})` },
-    { key: '4', label: `已结束 (${stats.ended})` }
+    { key: '4', label: `已结束 (${stats.ended})` },
+    { key: '6', label: `已驳回 (${stats.rejected})` }
   ]
 
   return (
@@ -503,6 +560,13 @@ function MyActivities() {
           <div className="stat-content">
             <div className="stat-value">{stats.ended}</div>
             <div className="stat-label">已结束</div>
+          </div>
+        </div>
+        <div className="stat-card rejected">
+          <div className="stat-icon">❌</div>
+          <div className="stat-content">
+            <div className="stat-value">{stats.rejected}</div>
+            <div className="stat-label">已驳回</div>
           </div>
         </div>
       </div>

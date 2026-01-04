@@ -57,7 +57,49 @@ function ActivityAudit() {
     total: 0
   })
 
+  // 获取各状态的统计数据
+  const fetchStatusStats = async () => {
+    try {
+      const statuses = [0, 1, 2, 3, 4, 5, 6]
+      const counts = {
+        pending: 0,
+        approved: 0,
+        rejected: 0,
+        total: 0
+      }
+
+      for (const status of statuses) {
+        try {
+          const res = await getAllActivities({
+            pageNum: 1,
+            pageSize: 1,
+            status
+          })
+          const count = res?.total || 0
+          counts.total += count
+          if (status === 1) counts.pending = count
+          else if (status === 2) counts.approved = count
+          else if (status === 6) counts.rejected = count
+        } catch (e) {
+          console.error(`获取状态${status}统计失败:`, e)
+        }
+      }
+
+      setStats(counts)
+    } catch (error) {
+      console.error('获取统计数据失败:', error)
+    }
+  }
+
   useEffect(() => {
+    // 初始加载：获取统计数据
+    fetchStatusStats()
+    // 加载当前标签的数据
+    fetchActivities()
+  }, [])
+
+  useEffect(() => {
+    // 切换标签：重新加载列表
     fetchActivities()
   }, [activeTab])
 
@@ -90,65 +132,7 @@ function ActivityAudit() {
       }
     } catch (error) {
       console.error('获取活动列表失败:', error)
-      // 使用模拟数据
-      const mockData = [
-        {
-          id: 1,
-          title: '长城野长城穿越之旅',
-          coverImage: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400',
-          organizerId: 10,
-          organizerName: '户外探险家',
-          difficultyLevel: 4,
-          startTime: '2025-01-05 07:00:00',
-          endTime: '2025-01-05 19:00:00',
-          startLocation: '北京市怀柔区慕田峪长城',
-          maxParticipants: 20,
-          fee: 199,
-          status: 1,
-          description: '这是一次极具挑战性的野长城穿越活动...',
-          createdAt: '2024-12-22 14:30:00'
-        },
-        {
-          id: 2,
-          title: '青海湖环湖骑行三日游',
-          coverImage: 'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=400',
-          organizerId: 11,
-          organizerName: '骑行俱乐部',
-          difficultyLevel: 3,
-          startTime: '2025-02-01 08:00:00',
-          endTime: '2025-02-03 18:00:00',
-          startLocation: '青海省西宁市',
-          maxParticipants: 30,
-          fee: 1299,
-          status: 1,
-          description: '环青海湖骑行，欣赏壮丽风光...',
-          createdAt: '2024-12-23 10:15:00'
-        },
-        {
-          id: 3,
-          title: '秦岭徒步露营两日游',
-          coverImage: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400',
-          organizerId: 12,
-          organizerName: '山野行者',
-          difficultyLevel: 3,
-          startTime: '2025-01-18 07:00:00',
-          endTime: '2025-01-19 17:00:00',
-          startLocation: '陕西省西安市鄠邑区',
-          maxParticipants: 15,
-          fee: 399,
-          status: 1,
-          description: '深入秦岭腹地，体验野外露营...',
-          createdAt: '2024-12-24 16:45:00'
-        }
-      ]
-      setActivities(mockData)
-      setStats({
-        pending: 3,
-        approved: 45,
-        rejected: 5,
-        total: 53
-      })
-      setPagination(prev => ({ ...prev, total: mockData.length }))
+      message.error('获取活动列表失败')
     } finally {
       setLoading(false)
     }

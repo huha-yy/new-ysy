@@ -132,7 +132,6 @@
         INNER JOIN `user` u ON a.organizer_id = u.id
         LEFT JOIN `gathering_plan` gp ON a.id = gp.activity_id
         <where>
-            1=1
             <if test="query.keyword != null and query.keyword != ''">
                 AND a.title LIKE CONCAT('%', #{query.keyword}, '%')
             </if>
