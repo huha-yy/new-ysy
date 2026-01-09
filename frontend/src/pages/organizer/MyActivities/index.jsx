@@ -13,10 +13,12 @@ import {
   ClockCircleOutlined,
   ExclamationCircleOutlined,
   SearchOutlined,
-  ReloadOutlined
+  ReloadOutlined,
+  EnvironmentOutlined
 } from '@ant-design/icons'
 import { getMyActivities, deleteActivity, cancelActivity, submitActivity } from '../../../api/activity'
 import { ACTIVITY_STATUS, DIFFICULTY_MAP } from '../../../utils/constants'
+import { getActivityCoverUrl } from '../../../utils/imageUrl'
 import dayjs from 'dayjs'
 import './MyActivities.css'
 
@@ -227,9 +229,9 @@ function MyActivities() {
       width: 350,
       render: (_, record) => (
         <div className="activity-info-cell">
-          <img 
-            src={record.coverImage || 'https://via.placeholder.com/80x60?text=活动'} 
-            alt={record.title} 
+          <img
+            src={getActivityCoverUrl(record)}
+            alt={record.title}
             className="activity-cover-thumb"
           />
           <div className="activity-info-text">
@@ -405,7 +407,7 @@ function MyActivities() {
           )
         }
 
-        // 已发布状态：可查看报名、取消活动
+        // 已发布状态：可查看报名、设置集合方案、取消活动
         if (record.status === ACTIVITY_STATUS.PUBLISHED) {
           actions.push(
             <Tooltip title="报名管理" key="registrations">
@@ -417,6 +419,16 @@ function MyActivities() {
                   navigate(`/organizer/activities/${record.id}/registrations`)
                 }}
                 style={{ color: 'var(--success-color)' }}
+              />
+            </Tooltip>
+          )
+          actions.push(
+            <Tooltip title="设置集合方案" key="gathering">
+              <Button
+                type="text"
+                icon={<EnvironmentOutlined />}
+                onClick={() => navigate(`/organizer/activities/${record.id}/gathering`)}
+                style={{ color: 'var(--primary-color)' }}
               />
             </Tooltip>
           )
@@ -452,7 +464,7 @@ function MyActivities() {
           )
         }
 
-        // 进行中状态：可查看签到
+        // 进行中状态：可查看签到、设置集合方案
         if (record.status === ACTIVITY_STATUS.IN_PROGRESS) {
           actions.push(
             <Tooltip title="签到监控" key="checkin">
@@ -461,6 +473,16 @@ function MyActivities() {
                 icon={<CheckCircleOutlined />}
                 onClick={() => navigate(`/organizer/activities/${record.id}/checkin`)}
                 style={{ color: 'var(--success-color)' }}
+              />
+            </Tooltip>
+          )
+          actions.push(
+            <Tooltip title="设置集合方案" key="gathering">
+              <Button
+                type="text"
+                icon={<EnvironmentOutlined />}
+                onClick={() => navigate(`/organizer/activities/${record.id}/gathering`)}
+                style={{ color: 'var(--primary-color)' }}
               />
             </Tooltip>
           )

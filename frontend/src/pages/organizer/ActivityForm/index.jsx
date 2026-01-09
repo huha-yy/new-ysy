@@ -21,6 +21,8 @@ import {
 } from '@ant-design/icons'
 import { createActivity, updateActivity, getActivityDetail, submitActivity } from '../../../api/activity'
 import { createRoute, getRouteList, getRouteDetail } from '../../../api/route'
+import { uploadImage } from '../../../api/file'
+import { getImageUrl } from '../../../utils/imageUrl'
 import { DIFFICULTY_MAP } from '../../../utils/constants'
 import dayjs from 'dayjs'
 import './ActivityForm.css'
@@ -283,21 +285,23 @@ function ActivityForm() {
   // 图片上传处理
   const handleUploadChange = (info) => {
     if (info.file.status === 'done') {
-      setCoverImage(info.file.response?.url || '')
       message.success('上传成功')
     } else if (info.file.status === 'error') {
       message.error('上传失败')
     }
   }
 
-  // 模拟上传（实际项目应对接后端）
-  const customUpload = async ({ file, onSuccess }) => {
-    // 模拟上传
-    setTimeout(() => {
-      const fakeUrl = URL.createObjectURL(file)
-      setCoverImage(fakeUrl)
-      onSuccess({ url: fakeUrl })
-    }, 1000)
+  // 真实上传到后端
+  const customUpload = async ({ file, onSuccess, onError }) => {
+    try {
+      const result = await uploadImage(file)
+      setCoverImage(result.url)
+      onSuccess({ url: result.url })
+    } catch (error) {
+      console.error('上传失败:', error)
+      message.error(error.message || '上传失败')
+      onError(error)
+    }
   }
 
   // 添加签到点
@@ -451,7 +455,7 @@ function ActivityForm() {
             >
               {coverImage ? (
                 <div className="cover-preview">
-                  <img src={coverImage} alt="封面" />
+                  <img src={getImageUrl(coverImage)} alt="封面" />
                   <div className="cover-overlay">
                     <PictureOutlined /> 更换封面
                   </div>

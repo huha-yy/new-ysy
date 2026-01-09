@@ -6,11 +6,12 @@ import request from './request'
 
 /**
  * GPS签到
+ * @param {number} activityId - 活动ID
  * @param {Object} data - 签到信息 { checkpointId, latitude, longitude }
  * @returns {Promise}
  */
-export const checkin = (data) => {
-  return request.post('/checkin', data)
+export const checkin = (activityId, data) => {
+  return request.post(`/checkin?activityId=${activityId}`, data)
 }
 
 /**

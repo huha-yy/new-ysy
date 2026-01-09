@@ -220,6 +220,8 @@ public class UserServiceImpl implements UserService {
         // 3. 组装VO
         return UserProfileVO.builder()
                 .userId(user.getId())
+                .nickname(user.getNickname())
+                .avatar(user.getAvatar())
                 .realName(userProfile != null ? userProfile.getRealName() : null)
                 .gender(userProfile != null ? userProfile.getGender() : null)
                 .birthDate(userProfile != null ? userProfile.getBirthDate() : null)
@@ -255,12 +257,35 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(ResultCode.USER_NOT_FOUND);
         }
 
-        // 2. 查询档案是否存在
+        // 2. 更新用户基本信息（nickname, avatar, phone, email）
+        boolean userUpdated = false;
+        if (profileDTO.getNickname() != null) {
+            user.setNickname(profileDTO.getNickname());
+            userUpdated = true;
+        }
+        if (profileDTO.getAvatar() != null) {
+            user.setAvatar(profileDTO.getAvatar());
+            userUpdated = true;
+        }
+        if (profileDTO.getPhone() != null) {
+            user.setPhone(profileDTO.getPhone());
+            userUpdated = true;
+        }
+        if (profileDTO.getEmail() != null) {
+            user.setEmail(profileDTO.getEmail());
+            userUpdated = true;
+        }
+        if (userUpdated) {
+            userMapper.updateById(user);
+            log.info("更新用户基本信息成功，用户ID：{}", userId);
+        }
+
+        // 3. 查询档案是否存在
         LambdaQueryWrapper<UserProfile> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(UserProfile::getUserId, userId);
         UserProfile userProfile = userProfileMapper.selectOne(queryWrapper);
 
-        // 3. 更新或创建档案
+        // 4. 更新或创建档案
         if (userProfile == null) {
             // 不存在则创建
             UserProfile newProfile = UserProfile.builder()
@@ -284,24 +309,21 @@ public class UserServiceImpl implements UserService {
             log.info("创建用户档案成功，用户ID：{}", userId);
         } else {
             // 存在则更新
-            UserProfile updateProfile = UserProfile.builder()
-                    .userId(userId)
-                    .realName(profileDTO.getRealName())
-                    .gender(profileDTO.getGender())
-                    .birthDate(profileDTO.getBirthDate())
-                    .experienceLevel(profileDTO.getExperienceLevel())
-                    .healthStatus(profileDTO.getHealthStatus())
-                    .medicalHistory(profileDTO.getMedicalHistory())
-                    .emergencyContact(profileDTO.getEmergencyContact())
-                    .emergencyPhone(profileDTO.getEmergencyPhone())
-                    .equipmentList(profileDTO.getEquipmentList())
-                    .preferenceIntensity(profileDTO.getPreferenceIntensity())
-                    .preferenceDistance(profileDTO.getPreferenceDistance())
-                    .preferenceRegion(profileDTO.getPreferenceRegion())
-                    .bio(profileDTO.getBio())
-                    .build();
+            userProfile.setRealName(profileDTO.getRealName());
+            userProfile.setGender(profileDTO.getGender());
+            userProfile.setBirthDate(profileDTO.getBirthDate());
+            userProfile.setExperienceLevel(profileDTO.getExperienceLevel());
+            userProfile.setHealthStatus(profileDTO.getHealthStatus());
+            userProfile.setMedicalHistory(profileDTO.getMedicalHistory());
+            userProfile.setEmergencyContact(profileDTO.getEmergencyContact());
+            userProfile.setEmergencyPhone(profileDTO.getEmergencyPhone());
+            userProfile.setEquipmentList(profileDTO.getEquipmentList());
+            userProfile.setPreferenceIntensity(profileDTO.getPreferenceIntensity());
+            userProfile.setPreferenceDistance(profileDTO.getPreferenceDistance());
+            userProfile.setPreferenceRegion(profileDTO.getPreferenceRegion());
+            userProfile.setBio(profileDTO.getBio());
 
-            userProfileMapper.updateById(updateProfile);
+            userProfileMapper.updateById(userProfile);
             log.info("更新用户档案成功，用户ID：{}", userId);
         }
     }

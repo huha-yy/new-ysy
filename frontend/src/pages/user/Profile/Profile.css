@@ -76,12 +76,8 @@
 .username {
   font-size: 28px;
   margin-bottom: 8px;
-  color: #2D3436;
+  color: #FFA726;
   font-weight: 800;
-  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   padding: 4px 16px;
   border-radius: 8px;
   display: inline-block;

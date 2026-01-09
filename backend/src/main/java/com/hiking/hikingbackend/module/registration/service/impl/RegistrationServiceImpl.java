@@ -219,8 +219,9 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new BusinessException(ResultCode.FORBIDDEN);
         }
 
-        // 3. 校验状态（只有已通过和候补中可取消）
-        if (registration.getStatus() != STATUS_APPROVED && registration.getStatus() != STATUS_WAITING) {
+        // 3. 校验状态（只有待审核、已通过和候补中可取消）
+        int originalStatus = registration.getStatus();
+        if (originalStatus != STATUS_PENDING && originalStatus != STATUS_APPROVED && originalStatus != STATUS_WAITING) {
             throw new BusinessException(ResultCode.CANNOT_CANCEL_REGISTRATION);
         }
 
@@ -230,19 +231,18 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new BusinessException(ResultCode.ACTIVITY_NOT_FOUND);
         }
 
-        // 5. 更新报名状态
-        registration.setStatus(STATUS_CANCELLED);
-        registration.setCancelTime(LocalDateTime.now());
-        // cancelReason留空，用户主动取消，未记录原因
-        registration.setCancelReason(null);
-
-        // 6. 如果原状态为已通过，减少活动当前人数
-        if (registration.getStatus() == STATUS_APPROVED) {
+        // 5. 如果原状态为已通过，减少活动当前人数
+        if (originalStatus == STATUS_APPROVED) {
             Integer currentParticipants = activity.getCurrentParticipants() != null ? activity.getCurrentParticipants() : 0;
             activity.setCurrentParticipants(Math.max(0, currentParticipants - 1));
             activityMapper.updateById(activity);
             log.info("取消报名（已通过），活动当前人数：{}", currentParticipants - 1);
         }
+
+        // 6. 更新报名状态
+        registration.setStatus(STATUS_CANCELLED);
+        registration.setCancelTime(LocalDateTime.now());
+        registration.setCancelReason(null);
 
         registrationMapper.updateById(registration);
         log.info("取消报名成功，报名ID：{}，用户ID：{}", registrationId, userId);

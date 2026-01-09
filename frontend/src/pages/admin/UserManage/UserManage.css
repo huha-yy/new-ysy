@@ -1,24 +1,23 @@
-/* 🌞 用户管理页面样式 */
+/* 🌞 用户管理页面样式 - 所有选择器都使用 .user-manage-page 前缀避免样式污染 */
 .user-manage-page {
   padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
-  animation: fadeInUp 0.6s ease;
 }
 
 /* 页面头部 */
-.page-header {
+.user-manage-page .page-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 24px;
 }
 
-.header-left {
+.user-manage-page .header-left {
   flex: 1;
 }
 
-.page-title {
+.user-manage-page .page-title {
   font-size: 28px;
   font-weight: 700;
   color: var(--text-primary);
@@ -28,55 +27,54 @@
   gap: 12px;
 }
 
-.title-icon {
+.user-manage-page .title-icon {
   color: var(--primary-color);
   font-size: 32px;
 }
 
-.page-subtitle {
+.user-manage-page .page-subtitle {
   color: var(--text-secondary);
   font-size: 14px;
   margin: 0;
 }
 
 /* 统计卡片 */
-.stats-row {
+.user-manage-page .stats-row {
   margin-bottom: 24px;
 }
 
-.stat-card {
+.user-manage-page .stat-card {
   border-radius: 16px;
   box-shadow: var(--shadow-sm);
   border: none;
-  transition: all 0.3s ease;
 }
 
-.stat-card:hover {
+.user-manage-page .stat-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
 }
 
-.stat-card .ant-statistic-title {
+.user-manage-page .stat-card .ant-statistic-title {
   color: var(--text-secondary);
   font-size: 14px;
 }
 
-.stat-card .ant-statistic-content-prefix {
+.user-manage-page .stat-card .ant-statistic-content-prefix {
   margin-right: 8px;
 }
 
 /* 用户列表卡片 */
-.users-card {
+.user-manage-page .users-card {
   border-radius: 20px;
   box-shadow: var(--shadow-md);
   border: none;
 }
 
-.users-card .ant-card-body {
+.user-manage-page .users-card .ant-card-body {
   padding: 0;
 }
 
-.card-header {
+.user-manage-page .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -86,65 +84,65 @@
   border-radius: 20px 20px 0 0;
 }
 
-.role-tabs .ant-tabs-nav {
+.user-manage-page .role-tabs .ant-tabs-nav {
   margin: 0;
 }
 
-.search-area {
+.user-manage-page .search-area {
   display: flex;
   gap: 12px;
 }
 
 /* 表格样式 */
-.users-card .ant-table-thead > tr > th {
+.user-manage-page .users-card .ant-table-thead > tr > th {
   background: #FFFAF5;
   color: var(--text-primary);
   font-weight: 600;
   border-bottom: 2px solid #FFE8CC;
 }
 
-.users-card .ant-table-tbody > tr:hover > td {
+.user-manage-page .users-card .ant-table-tbody > tr:hover > td {
   background: #FFF9E6;
 }
 
-.disabled-row {
+.user-manage-page .disabled-row {
   background: #FFF5F5;
 }
 
-.disabled-row:hover > td {
+.user-manage-page .disabled-row:hover > td {
   background: #FFEBEB !important;
 }
 
 /* 用户单元格 */
-.user-cell {
+.user-manage-page .user-cell {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.user-avatar {
+.user-manage-page .user-avatar {
   border: 2px solid transparent;
 }
 
-.user-avatar.role-0 {
+.user-manage-page .user-avatar.role-0 {
   border-color: #1890ff;
 }
 
-.user-avatar.role-1 {
+.user-manage-page .user-avatar.role-1 {
   border-color: #fa8c16;
 }
 
-.user-avatar.role-2 {
+.user-manage-page .user-avatar.role-2 {
   border-color: #ff4d4f;
   box-shadow: 0 0 8px rgba(255, 77, 79, 0.3);
 }
 
-.user-info {
+.user-manage-page .user-info {
   flex: 1;
   min-width: 0;
 }
 
-.user-nickname {
+.user-manage-page .user-nickname {
   font-weight: 600;
   color: var(--text-primary);
   display: flex;
@@ -152,48 +150,48 @@
   gap: 6px;
 }
 
-.admin-icon {
+.user-manage-page .admin-icon {
   color: #ff4d4f;
   font-size: 14px;
 }
 
-.user-username {
+.user-manage-page .user-username {
   font-size: 12px;
   color: var(--text-secondary);
 }
 
 /* 联系方式单元格 */
-.contact-cell {
+.user-manage-page .contact-cell {
   font-size: 13px;
   color: var(--text-secondary);
 }
 
-.contact-cell > div {
+.user-manage-page .contact-cell > div {
   margin-bottom: 4px;
 }
 
-.contact-cell .anticon {
+.user-manage-page .contact-cell .anticon {
   margin-right: 6px;
   color: var(--primary-color);
 }
 
 /* 统计单元格 */
-.stats-cell {
+.user-manage-page .stats-cell {
   font-size: 13px;
   color: var(--text-secondary);
 }
 
-.stat-item .anticon {
+.user-manage-page .stat-item .anticon {
   margin-right: 4px;
   color: var(--primary-color);
 }
 
 /* 用户详情弹窗 */
-.user-detail-content {
+.user-manage-page .user-detail-content {
   padding: 16px 0;
 }
 
-.user-header {
+.user-manage-page .user-header {
   display: flex;
   align-items: center;
   gap: 20px;
@@ -202,16 +200,16 @@
   margin-bottom: 20px;
 }
 
-.user-header .ant-avatar {
+.user-manage-page .user-header .ant-avatar {
   border: 3px solid #f0f0f0;
 }
 
-.user-header .ant-avatar.role-2 {
+.user-manage-page .user-header .ant-avatar.role-2 {
   border-color: #ff4d4f;
   box-shadow: 0 0 12px rgba(255, 77, 79, 0.3);
 }
 
-.user-meta h3 {
+.user-manage-page .user-meta h3 {
   margin: 0 0 4px 0;
   font-size: 20px;
   font-weight: 600;
@@ -221,18 +219,18 @@
   gap: 8px;
 }
 
-.user-meta p {
+.user-manage-page .user-meta p {
   margin: 0 0 8px 0;
   color: var(--text-secondary);
   font-size: 14px;
 }
 
-.detail-descriptions .ant-descriptions-item-label {
+.user-manage-page .detail-descriptions .ant-descriptions-item-label {
   color: var(--text-secondary);
   font-weight: 500;
 }
 
-.detail-descriptions .ant-descriptions-item-content {
+.user-manage-page .detail-descriptions .ant-descriptions-item-content {
   color: var(--text-primary);
 }
 
@@ -242,39 +240,21 @@
     padding: 16px;
   }
 
-  .stats-row .ant-col {
+  .user-manage-page .stats-row .ant-col {
     margin-bottom: 12px;
   }
 
-  .card-header {
+  .user-manage-page .card-header {
     flex-direction: column;
     gap: 12px;
     align-items: stretch;
   }
 
-  .search-area {
+  .user-manage-page .search-area {
     width: 100%;
   }
 
-  .search-area .ant-input-affix-wrapper {
+  .user-manage-page .search-area .ant-input-affix-wrapper {
     flex: 1;
   }
 }
-
-/* 动画 */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.stat-card:nth-child(1) { animation: fadeInUp 0.4s ease 0.1s both; }
-.stat-card:nth-child(2) { animation: fadeInUp 0.4s ease 0.15s both; }
-.stat-card:nth-child(3) { animation: fadeInUp 0.4s ease 0.2s both; }
-.stat-card:nth-child(4) { animation: fadeInUp 0.4s ease 0.25s both; }
-

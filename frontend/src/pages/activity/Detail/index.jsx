@@ -19,6 +19,7 @@ import {
 import { getActivityDetail, registerActivity } from '../../../api/activity'
 import { getActivityRegistrations, cancelRegistration } from '../../../api/registration'
 import { DIFFICULTY_MAP, REGISTRATION_STATUS } from '../../../utils/constants'
+import { getImageUrl } from '../../../utils/imageUrl'
 import './Detail.css'
 
 function ActivityDetail() {
@@ -247,7 +248,7 @@ function ActivityDetail() {
           )}
           {activity.coverImage ? (
             <img
-              src={activity.coverImage}
+              src={getImageUrl(activity.coverImage)}
               alt={activity.title}
               className={`cover-image ${imageLoading ? 'loading' : ''} ${imageError ? 'error' : ''}`}
               onLoad={handleImageLoad}

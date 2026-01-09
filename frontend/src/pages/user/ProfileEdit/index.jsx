@@ -3,6 +3,8 @@ import { Card, Form, Input, Button, Upload, message, Radio, DatePicker, Select, 
 import { UserOutlined, MailOutlined, PhoneOutlined, CalendarOutlined, ManOutlined, WomanOutlined, UploadOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { getProfile, updateProfile } from '../../../api/user'
+import { uploadImage } from '../../../api/file'
+import { getImageUrl } from '../../../utils/imageUrl'
 import { getUser } from '../../../utils/storage'
 import dayjs from 'dayjs'
 import './ProfileEdit.css'
@@ -24,8 +26,8 @@ function ProfileEdit() {
       form.setFieldsValue({
         nickname: result.nickname || '',
         realName: result.realName || '',
-        gender: result.gender || '',
-        birthday: result.birthday || null,
+        gender: result.gender,
+        birthDate: result.birthDate ? dayjs(result.birthDate) : null,
         phone: result.phone || '',
         email: result.email || '',
         experienceLevel: result.experienceLevel || 1,
@@ -45,13 +47,19 @@ function ProfileEdit() {
   const onFinish = async (values) => {
     setLoading(true)
     try {
-      await updateProfile(values)
+      // 处理日期格式并添加头像URL
+      const submitData = {
+        ...values,
+        avatar,
+        birthDate: values.birthDate ? values.birthDate.format('YYYY-MM-DD') : null
+      }
+      await updateProfile(submitData)
       message.success('资料更新成功')
-      
+
       // 更新本地存储的用户信息
-      const updatedUser = { ...user, ...values }
+      const updatedUser = { ...user, nickname: values.nickname, avatar }
       localStorage.setItem('user', JSON.stringify(updatedUser))
-      
+
       navigate('/user/profile')
     } catch (error) {
       console.error('更新资料失败:', error)
@@ -61,12 +69,18 @@ function ProfileEdit() {
     }
   }
 
-  const handleAvatarChange = (info) => {
-    if (info.file.status === 'done') {
-      const reader = new FileReader()
-      reader.readAsDataURL(info.file, (base64) => {
-        setAvatar(base64)
-      })
+  const handleAvatarChange = async (info) => {
+    if (info.file.status === 'uploading') {
+      return
+    }
+    // 使用真实上传
+    try {
+      const result = await uploadImage(info.file.originFileObj || info.file)
+      setAvatar(result.url)
+      message.success('头像上传成功')
+    } catch (error) {
+      console.error('头像上传失败:', error)
+      message.error('头像上传失败')
     }
   }
 
@@ -106,7 +120,7 @@ function ProfileEdit() {
                   className="avatar-upload"
                 >
                   {avatar ? (
-                    <img src={avatar} alt="头像" className="avatar-preview" />
+                    <img src={getImageUrl(avatar)} alt="头像" className="avatar-preview" />
                   ) : (
                     <div className="avatar-placeholder">
                       <UploadOutlined className="avatar-icon" />
@@ -159,13 +173,13 @@ function ProfileEdit() {
 
               <Form.Item
                 label="出生日期"
-                name="birthday"
+                name="birthDate"
               >
-                <DatePicker 
+                <DatePicker
                   placeholder="请选择出生日期"
                   size="large"
                   style={{ width: '100%' }}
-                  disabledDate={dayjs().subtract(18, 'year')}
+                  disabledDate={(current) => current && current > dayjs().subtract(18, 'year')}
                   suffixIcon={<CalendarOutlined />}
                 />
               </Form.Item>

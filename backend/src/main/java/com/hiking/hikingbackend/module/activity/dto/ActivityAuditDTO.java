@@ -14,9 +14,7 @@ import lombok.Data;
 @Schema(description = "活动审核请求")
 public class ActivityAuditDTO {
 
-    @Schema(description = "活动ID", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "活动ID不能为空")
-    @Positive(message = "活动ID必须为正数")
+    @Schema(description = "活动ID（从URL路径参数获取，请求体中可不传）", example = "1")
     private Long activityId;
 
     @Schema(description = "审核结果：true通过，false驳回", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)

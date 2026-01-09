@@ -155,6 +155,9 @@ public class ActivityController {
             throw new RuntimeException("无法获取当前用户ID");
         }
 
+        // 将路径参数中的活动ID设置到DTO中
+        auditDTO.setActivityId(activityId);
+
         activityService.auditActivity(auditorId, auditDTO);
         return Result.success("审核成功");
     }
@@ -242,9 +245,9 @@ public class ActivityController {
             throw new RuntimeException("无法获取当前用户ID");
         }
 
-        // TODO: 查询当前用户参与的活动
-        // 目前先返回空结果，后续实现
-        throw new RuntimeException("功能开发中");
+        // 查询当前用户参与的活动
+        IPage<ActivityListVO> result = activityService.getJoinedActivities(userId, query);
+        return Result.success(result);
     }
 
     /**

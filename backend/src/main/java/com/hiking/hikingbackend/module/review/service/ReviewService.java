@@ -40,5 +40,40 @@ public interface ReviewService {
      * @return 评分统计
      */
     ReviewStatsVO getRatingStats(Long activityId);
+
+    /**
+     * 获取用户的评价列表
+     *
+     * @param userId 用户ID
+     * @param pageNum 页码
+     * @param pageSize 每页大小
+     * @return 分页结果
+     */
+    IPage<ReviewVO> getUserReviews(Long userId, Integer pageNum, Integer pageSize);
+
+    /**
+     * 获取用户的评价统计
+     *
+     * @param userId 用户ID
+     * @return 评价统计
+     */
+    ReviewStatsVO getUserReviewStats(Long userId);
+
+    /**
+     * 删除评价
+     *
+     * @param userId 用户ID
+     * @param reviewId 评价ID
+     */
+    void deleteReview(Long userId, Long reviewId);
+
+    /**
+     * 更新评价
+     *
+     * @param userId 用户ID
+     * @param reviewId 评价ID
+     * @param createDTO 更新信息
+     */
+    void updateReview(Long userId, Long reviewId, ReviewCreateDTO createDTO);
 }
 

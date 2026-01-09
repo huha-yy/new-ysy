@@ -2,6 +2,7 @@ import { Card, Avatar, Descriptions, Button, Space } from 'antd'
 import { UserOutlined, EditOutlined, EnvironmentOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../hooks/useAuth'
+import { getImageUrl } from '../../../utils/imageUrl'
 import './Profile.css'
 
 function Profile() {
@@ -15,7 +16,7 @@ function Profile() {
           <div className="profile-header">
             <Avatar
               size={100}
-              src={user?.avatar}
+              src={user?.avatar ? getImageUrl(user.avatar) : null}
               icon={<UserOutlined />}
             />
             <div className="user-info">

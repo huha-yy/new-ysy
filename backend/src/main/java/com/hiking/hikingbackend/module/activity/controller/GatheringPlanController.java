@@ -39,7 +39,7 @@ public class GatheringPlanController {
      */
     @Operation(summary = "创建集合方案", description = "组织者为活动创建集合方案，需要登录，仅限活动组织者")
     @SecurityRequirement(name = "Bearer Authentication")
-    @PostMapping("/{activityId}/gathering-plan")
+    @PostMapping("/{activityId}/gathering")
     public Result<Long> createGatheringPlan(
             @Parameter(description = "活动ID", required = true, example = "1")
             @PathVariable("activityId") Long activityId,
@@ -64,7 +64,7 @@ public class GatheringPlanController {
      */
     @Operation(summary = "更新集合方案", description = "组织者更新集合方案，需要登录，仅限活动组织者且方案未发布")
     @SecurityRequirement(name = "Bearer Authentication")
-    @PutMapping("/{activityId}/gathering-plan")
+    @PutMapping("/{activityId}/gathering")
     public Result<Void> updateGatheringPlan(
             @Parameter(description = "活动ID", required = true, example = "1")
             @PathVariable("activityId") Long activityId,
@@ -88,7 +88,7 @@ public class GatheringPlanController {
      */
     @Operation(summary = "发布集合方案", description = "组织者发布集合方案，向参与者发送通知，需要登录，仅限活动组织者")
     @SecurityRequirement(name = "Bearer Authentication")
-    @PutMapping("/{activityId}/gathering-plan/publish")
+    @PutMapping("/{activityId}/gathering/publish")
     public Result<Void> publishGatheringPlan(
             @Parameter(description = "活动ID", required = true, example = "1")
             @PathVariable("activityId") Long activityId) {
@@ -111,7 +111,7 @@ public class GatheringPlanController {
      */
     @Operation(summary = "获取集合方案", description = "查询活动的集合方案，需要登录")
     @SecurityRequirement(name = "Bearer Authentication")
-    @GetMapping("/{activityId}/gathering-plan")
+    @GetMapping("/{activityId}/gathering")
     public Result<GatheringPlanVO> getGatheringPlan(
             @Parameter(description = "活动ID", required = true, example = "1")
             @PathVariable("activityId") Long activityId) {

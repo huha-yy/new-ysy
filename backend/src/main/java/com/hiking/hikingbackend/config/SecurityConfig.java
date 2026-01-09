@@ -135,6 +135,10 @@ public class SecurityConfig {
                         // 放行字典数据（公开接口）
                         .requestMatchers("/dict/data/**").permitAll()
 
+                        // 放行文件上传和访问
+                        .requestMatchers("/file/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
+
                         // 其他所有请求都需要认证
                         .anyRequest().authenticated()
                 );

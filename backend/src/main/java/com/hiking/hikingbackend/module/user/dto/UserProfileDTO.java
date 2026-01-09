@@ -21,6 +21,18 @@ import java.time.LocalDate;
 public class UserProfileDTO {
 
     /**
+     * 昵称
+     */
+    @Size(max = 32, message = "昵称长度不能超过32个字符")
+    private String nickname;
+
+    /**
+     * 头像URL
+     */
+    @Size(max = 256, message = "头像URL长度不能超过256个字符")
+    private String avatar;
+
+    /**
      * 真实姓名
      */
     @Size(max = 32, message = "真实姓名长度不能超过32个字符")

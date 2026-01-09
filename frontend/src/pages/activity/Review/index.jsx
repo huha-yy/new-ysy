@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Card, Form, Rate, Input, Button, Upload, Switch, message, Modal, Space, Avatar } from 'antd'
-import { StarOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons'
+import { Card, Form, Rate, Input, Button, Upload, Switch, message, Modal, Space, Avatar, Popconfirm } from 'antd'
+import { StarOutlined, UploadOutlined, UserOutlined, LoadingOutlined } from '@ant-design/icons'
 import { submitReview } from '../../../api/activity'
+import { uploadImage } from '../../../api/file'
+import { getImageUrl } from '../../../utils/imageUrl'
 import dayjs from 'dayjs'
 import './Review.css'
 
@@ -10,6 +12,7 @@ function Review() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [form] = Form.useForm()
   const [uploadedImages, setUploadedImages] = useState([])
   const [previewVisible, setPreviewVisible] = useState(false)
@@ -32,7 +35,12 @@ function Review() {
   const handleSubmit = async (values) => {
     setLoading(true)
     try {
-      await submitReview(id, values)
+      // 将图片URL数组转换为逗号分隔的字符串
+      const submitData = {
+        ...values,
+        images: uploadedImages.join(',')
+      }
+      await submitReview(id, submitData)
       message.success('评价提交成功')
       navigate(`/activities/${id}`)
     } catch (error) {
@@ -43,18 +51,24 @@ function Review() {
     }
   }
 
-  const handleImageChange = (info) => {
-    if (info.file.status === 'done') {
-      const reader = new FileReader()
-      reader.readAsDataURL(info.file)
-      reader.onload = (e) => {
-        const newImages = [...uploadedImages, e.target.result]
-        if (newImages.length > 6) {
-          message.warning('最多上传6张图片')
-          return
-        }
-        setUploadedImages(newImages)
-      }
+  const handleImageChange = async (info) => {
+    if (uploadedImages.length >= 6) {
+      message.warning('最多上传6张图片')
+      return
+    }
+
+    // 使用真实上传
+    setUploading(true)
+    try {
+      const result = await uploadImage(info.file)
+      const newImages = [...uploadedImages, result.url]
+      setUploadedImages(newImages)
+      message.success('图片上传成功')
+    } catch (error) {
+      console.error('图片上传失败:', error)
+      message.error('图片上传失败')
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -217,22 +231,28 @@ function Review() {
                 {uploadedImages.map((image, index) => (
                   <div className="upload-item" key={index}>
                     <img
-                      src={image}
+                      src={getImageUrl(image)}
                       alt={`评价图片${index}`}
                       className="upload-preview"
                     />
-                    <Button
-                      type="text"
-                      danger
-                      size="small"
-                      onClick={() => handleImageRemove(index)}
+                    <Popconfirm
+                      title="确认删除这张图片？"
+                      onConfirm={() => handleImageRemove(index)}
+                      okText="确定"
+                      cancelText="取消"
                     >
-                      删除
-                    </Button>
+                      <Button
+                        type="text"
+                        danger
+                        size="small"
+                      >
+                        删除
+                      </Button>
+                    </Popconfirm>
                     <Button
                       type="link"
                       size="small"
-                      onClick={() => handlePreview(image)}
+                      onClick={() => handlePreview(getImageUrl(image))}
                     >
                       预览
                     </Button>
@@ -244,9 +264,10 @@ function Review() {
                 showUploadList={false}
                 beforeUpload={() => false}
                 onChange={handleImageChange}
+                disabled={uploading}
               >
-                <Button icon={<UploadOutlined />}>
-                  上传图片
+                <Button icon={uploading ? <LoadingOutlined /> : <UploadOutlined />} disabled={uploading}>
+                  {uploading ? '上传中...' : '上传图片'}
                 </Button>
               </Upload>
             </div>

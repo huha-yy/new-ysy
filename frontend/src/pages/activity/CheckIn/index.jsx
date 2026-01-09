@@ -10,7 +10,7 @@ import {
   ReloadOutlined
 } from '@ant-design/icons'
 import MapView from '../../../components/MapView/MapView'
-import { getCheckpoints, getCheckinStatus, checkin } from '../../../api/checkin'
+import { getCheckpoints, getCheckinStatus, checkin as checkinApi, reportTrack } from '../../../api/checkin'
 import { getLocation, checkIn, TrackRecorder } from '../../../utils/location'
 import { formatDistance } from '../../../utils/map'
 import dayjs from 'dayjs'
@@ -114,7 +114,15 @@ function CheckIn() {
     trackRecorder.start(
       (track) => {
         console.log('轨迹记录:', track)
-        // 可以在这里实时更新轨迹显示
+        // 上报轨迹到后端
+        reportTrack({
+          activityId: Number(id),
+          latitude: track.latitude,
+          longitude: track.longitude,
+          timestamp: track.timestamp
+        }).catch(error => {
+          console.error('轨迹上报失败:', error)
+        })
       },
       (error) => {
         console.error('轨迹记录错误:', error)
@@ -153,12 +161,10 @@ function CheckIn() {
       }
 
       // 提交签到
-      await checkin({
-        activityId: id,
+      await checkinApi(id, {
         checkpointId: checkpointId,
         latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude,
-        timestamp: Date.now()
+        longitude: currentLocation.longitude
       })
 
       message.success('签到成功！')
