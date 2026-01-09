@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Card, Form, Rate, Input, Button, Upload, Switch, message, Modal, Space, Avatar } from 'antd'
+import { Card, Form, Rate, Input, Button, Upload, Switch, message, Modal, Space, Avatar, Popconfirm } from 'antd'
 import { StarOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons'
 import { submitReview } from '../../../api/activity'
 import dayjs from 'dayjs'
@@ -221,14 +221,20 @@ function Review() {
                       alt={`评价图片${index}`}
                       className="upload-preview"
                     />
-                    <Button
-                      type="text"
-                      danger
-                      size="small"
-                      onClick={() => handleImageRemove(index)}
+                    <Popconfirm
+                      title="确认删除这张图片？"
+                      onConfirm={() => handleImageRemove(index)}
+                      okText="确定"
+                      cancelText="取消"
                     >
-                      删除
-                    </Button>
+                      <Button
+                        type="text"
+                        danger
+                        size="small"
+                      >
+                        删除
+                      </Button>
+                    </Popconfirm>
                     <Button
                       type="link"
                       size="small"

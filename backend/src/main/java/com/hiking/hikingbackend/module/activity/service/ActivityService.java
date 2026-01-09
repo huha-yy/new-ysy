@@ -102,5 +102,14 @@ public interface ActivityService {
      * @return 分页结果
      */
     IPage<ActivityListVO> getMyActivities(Long organizerId, ActivityQuery query);
+
+    /**
+     * 获取我参与的活动（用户）
+     *
+     * @param userId 用户ID
+     * @param query 查询条件
+     * @return 分页结果
+     */
+    IPage<ActivityListVO> getJoinedActivities(Long userId, ActivityQuery query);
 }
 
