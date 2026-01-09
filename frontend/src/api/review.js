@@ -25,7 +25,7 @@ export const getActivityReviews = (activityId, params) => {
  * @param {number} data.organizationRating - 组织评分（1-5星）
  * @param {number} data.safetyRating - 安全评分（1-5星）
  * @param {string} data.content - 评价内容
- * @param {boolean} data.isAnonymous - 是否匿名
+ * @param {number} data.isAnonymous - 是否匿名（0：否，1：是）
  * @param {Array} data.images - 评价图片（Base64）
  * @returns {Promise}
  */

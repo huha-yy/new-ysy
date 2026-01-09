@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getActivityList } from '../../../api/activity'
 import { DIFFICULTY_MAP } from '../../../utils/constants'
+import { getImageUrl } from '../../../utils/imageUrl'
 import './List.css'
 
 function ActivityList() {
@@ -78,7 +79,7 @@ function ActivityList() {
                     className="activity-card"
                     cover={
                       activity.coverImage && (
-                        <div className="card-cover" style={{ backgroundImage: `url(${activity.coverImage})` }}>
+                        <div className="card-cover" style={{ backgroundImage: `url(${getImageUrl(activity.coverImage)})` }}>
                           {activity.isFull && (
                             <div className="card-tag">已满员</div>
                           )}

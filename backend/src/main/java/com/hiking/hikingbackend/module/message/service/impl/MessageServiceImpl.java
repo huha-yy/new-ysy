@@ -147,8 +147,38 @@ public class MessageServiceImpl implements MessageService {
         LambdaQueryWrapper<Message> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Message::getUserId, userId)
                     .eq(Message::getIsRead, MESSAGE_UNREAD);
-        
+
         return messageMapper.selectCount(queryWrapper);
+    }
+
+    /**
+     * 发送消息给指定用户
+     *
+     * @param userId 接收用户ID
+     * @param title 消息标题
+     * @param content 消息内容
+     * @param messageType 消息类型
+     * @param relatedId 关联业务ID
+     * @param relatedType 关联业务类型
+     * @return 消息ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long sendMessage(Long userId, String title, String content, Integer messageType, Long relatedId, String relatedType) {
+        Message message = Message.builder()
+                .userId(userId)
+                .title(title)
+                .content(content)
+                .messageType(messageType)
+                .relatedId(relatedId)
+                .relatedType(relatedType)
+                .isRead(MESSAGE_UNREAD)
+                .build();
+
+        messageMapper.insert(message);
+        log.info("发送消息成功，接收者ID：{}，消息类型：{}，标题：{}", userId, messageType, title);
+
+        return message.getId();
     }
 
     /**

@@ -2,6 +2,7 @@ package com.hiking.hikingbackend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 户外徒步活动管理系统 - 启动类
@@ -10,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @since 2024-12-23
  */
 @SpringBootApplication
+@EnableScheduling
 public class HikingApplication {
 
     public static void main(String[] args) {

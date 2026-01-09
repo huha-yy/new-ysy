@@ -44,7 +44,7 @@ export const updateProfile = (data) => {
  * @returns {Promise} 用户档案信息
  */
 export const getProfile = () => {
-  return request.get('/user/profile')
+  return request.get('/user/profile/info')
 }
 
 /**

@@ -19,6 +19,7 @@ import {
   CompassOutlined
 } from '@ant-design/icons'
 import { ROLE } from '../../utils/constants'
+import { getImageUrl } from '../../utils/imageUrl'
 import './MainLayout.css'
 
 const { Header, Content, Footer } = Layout
@@ -217,7 +218,7 @@ function MainLayout() {
             {isLoggedIn ? (
               <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
                 <div className="user-info">
-                  <Avatar icon={<UserOutlined />} src={currentUser?.avatar} />
+                  <Avatar icon={<UserOutlined />} src={currentUser?.avatar ? getImageUrl(currentUser.avatar) : null} />
                   <div className="user-text">
                     <span className="username">{currentUser?.nickname || currentUser?.username}</span>
                     {getRoleBadge()}

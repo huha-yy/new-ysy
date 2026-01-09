@@ -43,5 +43,18 @@ public interface MessageService {
      * @return 未读数量
      */
     Long getUnreadCount(Long userId);
+
+    /**
+     * 发送消息给指定用户
+     *
+     * @param userId 接收用户ID
+     * @param title 消息标题
+     * @param content 消息内容
+     * @param messageType 消息类型：1系统通知 2报名通知 3活动通知 4预警通知
+     * @param relatedId 关联业务ID（如活动ID）
+     * @param relatedType 关联业务类型（如activity）
+     * @return 消息ID
+     */
+    Long sendMessage(Long userId, String title, String content, Integer messageType, Long relatedId, String relatedType);
 }
 

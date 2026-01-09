@@ -46,7 +46,11 @@ const MapView = ({
 
   useEffect(() => {
     if (mapInstance.current && center) {
-      mapInstance.current.setCenter([center.lng, center.lat])
+      const lng = parseFloat(center.lng)
+      const lat = parseFloat(center.lat)
+      if (!isNaN(lng) && !isNaN(lat) && lng !== 0 && lat !== 0) {
+        mapInstance.current.setCenter([lng, lat])
+      }
     }
   }, [center])
 
@@ -85,10 +89,17 @@ const MapView = ({
 
       if (!mapRef.current) return
 
+      // 验证并设置地图中心
+      const lng = parseFloat(center.lng)
+      const lat = parseFloat(center.lat)
+      const mapCenter = (!isNaN(lng) && !isNaN(lat) && lng !== 0 && lat !== 0)
+        ? [lng, lat]
+        : [116.397428, 39.90923] // 默认北京坐标
+
       // 创建地图实例
       mapInstance.current = new AMap.Map(mapRef.current, {
         zoom,
-        center: [center.lng, center.lat],
+        center: mapCenter,
         viewMode: '2D',
         mapStyle: 'amap://styles/normal'
       })
@@ -161,14 +172,23 @@ const MapView = ({
 
     // 渲染新的标记点
     markers.forEach((markerData, index) => {
+      // 验证坐标有效性
+      const lng = parseFloat(markerData.lng)
+      const lat = parseFloat(markerData.lat)
+
+      if (isNaN(lng) || isNaN(lat) || lng === 0 || lat === 0) {
+        console.warn(`⚠️ 标记点 ${index + 1} 坐标无效:`, markerData)
+        return
+      }
+
       console.log(`✓ 渲染标记点 ${index + 1}:`, {
-        position: [markerData.lng, markerData.lat],
+        position: [lng, lat],
         title: markerData.title
       })
 
       try {
         const marker = new AMap.Marker({
-          position: [markerData.lng, markerData.lat],
+          position: [lng, lat],
           title: markerData.title || `标记${index + 1}`,
           content: markerData.content,
           offset: markerData.offset || new AMap.Pixel(-10, -10),
@@ -210,9 +230,20 @@ const MapView = ({
     if (routePoints && routePoints.length >= 2) {
       try {
         const path = routePoints.map(point => {
-          console.log(`  路线点: [${point.lng}, ${point.lat}]`)
-          return [point.lng, point.lat]
-        })
+          const lng = parseFloat(point.lng)
+          const lat = parseFloat(point.lat)
+          if (isNaN(lng) || isNaN(lat) || lng === 0 || lat === 0) {
+            console.warn(`⚠️ 路线点坐标无效:`, point)
+            return null
+          }
+          console.log(`  路线点: [${lng}, ${lat}]`)
+          return [lng, lat]
+        }).filter(point => point !== null) // 过滤掉无效点
+
+        if (path.length < 2) {
+          console.warn('⚠️ 有效路线点少于2个，无法绘制路线')
+          return
+        }
 
         routeLineRef.current = new AMap.Polyline({
           path: path,

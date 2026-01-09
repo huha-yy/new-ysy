@@ -7,6 +7,8 @@ import com.hiking.hikingbackend.module.checkin.dto.TrackRecordDTO;
 import com.hiking.hikingbackend.module.checkin.service.CheckInService;
 import com.hiking.hikingbackend.module.checkin.vo.CheckInVO;
 import com.hiking.hikingbackend.module.checkin.vo.CheckInProgressVO;
+import com.hiking.hikingbackend.module.checkin.vo.CheckpointStatsVO;
+import com.hiking.hikingbackend.module.checkin.vo.ParticipantCheckInVO;
 import com.hiking.hikingbackend.module.route.entity.Checkpoint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -147,6 +149,52 @@ public class CheckInController {
 
         List<CheckInProgressVO> participantsStatus = checkInService.getParticipantsCheckInStatus(organizerId, activityId);
         return Result.success(participantsStatus);
+    }
+
+    /**
+     * 参与者签到状态（含用户信息，用于签到监控）
+     * 需校验：当前用户是活动组织者
+     *
+     * @param activityId 活动ID
+     * @return 参与者签到状态列表（含用户信息）
+     */
+    @Operation(summary = "参与者签到状态（签到监控）", description = "查询活动所有参与者的签到状态（含用户信息），需要登录，仅限活动组织者")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @GetMapping("/activities/{activityId}/participants-checkin")
+    public Result<List<ParticipantCheckInVO>> getParticipantsCheckInWithUser(
+            @Parameter(description = "活动ID", required = true, example = "1")
+            @PathVariable("activityId") Long activityId) {
+        // 获取当前用户ID
+        Long organizerId = SecurityUtils.getCurrentUserId();
+        if (organizerId == null) {
+            throw new RuntimeException("无法获取当前用户ID");
+        }
+
+        List<ParticipantCheckInVO> participantsStatus = checkInService.getParticipantsCheckInWithUser(organizerId, activityId);
+        return Result.success(participantsStatus);
+    }
+
+    /**
+     * 签到点统计信息（用于签到监控）
+     * 需校验：当前用户是活动组织者
+     *
+     * @param activityId 活动ID
+     * @return 签到点统计列表
+     */
+    @Operation(summary = "签到点统计信息", description = "查询活动各签到点的签到统计，需要登录，仅限活动组织者")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @GetMapping("/activities/{activityId}/checkpoint-stats")
+    public Result<List<CheckpointStatsVO>> getCheckpointStats(
+            @Parameter(description = "活动ID", required = true, example = "1")
+            @PathVariable("activityId") Long activityId) {
+        // 获取当前用户ID
+        Long organizerId = SecurityUtils.getCurrentUserId();
+        if (organizerId == null) {
+            throw new RuntimeException("无法获取当前用户ID");
+        }
+
+        List<CheckpointStatsVO> checkpointStats = checkInService.getCheckpointStats(organizerId, activityId);
+        return Result.success(checkpointStats);
     }
 }
 

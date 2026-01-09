@@ -26,6 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * 活动服务实现类
  *
@@ -746,7 +749,101 @@ public class ActivityServiceImpl implements ActivityService {
                     vo.setRouteName(route.getName());
                 }
             }
-            
+
+            return vo;
+        });
+    }
+
+    /**
+     * 获取用户参与的活动列表
+     * 查询用户报名且审核通过的活动
+     *
+     * @param userId 用户ID
+     * @param query 查询条件
+     * @return 分页结果
+     */
+    @Override
+    public IPage<ActivityListVO> getJoinedActivities(Long userId, ActivityQuery query) {
+        // 1. 查询用户报名且审核通过的活动ID（状态为1-已通过）
+        LambdaQueryWrapper<Registration> regQueryWrapper = new LambdaQueryWrapper<>();
+        regQueryWrapper.eq(Registration::getUserId, userId)
+                .eq(Registration::getStatus, 1); // 只查询已通过报名的
+
+        List<Registration> registrations = registrationMapper.selectList(regQueryWrapper);
+        if (registrations.isEmpty()) {
+            // 没有参与任何活动，返回空结果
+            return new Page<>(query.getPageNum() != null ? query.getPageNum() : 1,
+                              query.getPageSize() != null ? query.getPageSize() : 10);
+        }
+
+        List<Long> activityIds = registrations.stream()
+                .map(Registration::getActivityId)
+                .collect(Collectors.toList());
+
+        // 2. 构建活动查询条件
+        LambdaQueryWrapper<Activity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(Activity::getId, activityIds);
+
+        // 关键词搜索（标题）
+        if (query.getKeyword() != null && !query.getKeyword().isEmpty()) {
+            queryWrapper.like(Activity::getTitle, query.getKeyword());
+        }
+
+        // 状态筛选
+        if (query.getStatus() != null) {
+            queryWrapper.eq(Activity::getStatus, query.getStatus());
+        }
+
+        // 按创建时间倒序
+        queryWrapper.orderByDesc(Activity::getCreateTime);
+
+        // 3. 分页查询
+        int pageNum = query.getPageNum() != null ? query.getPageNum() : 1;
+        int pageSize = query.getPageSize() != null ? query.getPageSize() : 10;
+        Page<Activity> page = new Page<>(pageNum, pageSize);
+
+        IPage<Activity> activityPage = activityMapper.selectPage(page, queryWrapper);
+
+        // 4. 转换为VO
+        return activityPage.convert(activity -> {
+            ActivityListVO vo = new ActivityListVO();
+            vo.setId(activity.getId());
+            vo.setTitle(activity.getTitle());
+            vo.setCoverImage(activity.getCoverImage());
+            vo.setDescription(activity.getDescription());
+            vo.setDifficultyLevel(activity.getDifficultyLevel());
+            vo.setDifficultyText(getDifficultyText(activity.getDifficultyLevel()));
+            vo.setActivityDate(activity.getActivityDate());
+            vo.setStartTime(activity.getStartTime() != null ? activity.getStartTime().toString() : null);
+            vo.setMaxParticipants(activity.getMaxParticipants());
+            vo.setCurrentParticipants(activity.getCurrentParticipants());
+            vo.setIsFull(activity.getCurrentParticipants() != null &&
+                        activity.getMaxParticipants() != null &&
+                        activity.getCurrentParticipants() >= activity.getMaxParticipants());
+            vo.setRegistrationDeadline(activity.getRegistrationDeadline());
+            vo.setFee(activity.getFee());
+            vo.setStatus(activity.getStatus());
+            vo.setStatusText(getStatusText(activity.getStatus()));
+            vo.setViewCount(activity.getViewCount());
+            vo.setCreateTime(activity.getCreateTime());
+            vo.setRouteId(activity.getRouteId());
+
+            // 获取组织者信息
+            User organizer = userMapper.selectById(activity.getOrganizerId());
+            if (organizer != null) {
+                vo.setOrganizerId(organizer.getId());
+                vo.setOrganizerNickname(organizer.getNickname() != null ? organizer.getNickname() : organizer.getUsername());
+                vo.setOrganizerAvatar(organizer.getAvatar());
+            }
+
+            // 获取路线名称
+            if (activity.getRouteId() != null) {
+                Route route = routeMapper.selectById(activity.getRouteId());
+                if (route != null) {
+                    vo.setRouteName(route.getName());
+                }
+            }
+
             return vo;
         });
     }

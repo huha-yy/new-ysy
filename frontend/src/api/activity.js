@@ -99,7 +99,7 @@ export const getMyActivities = (params) => {
  * @returns {Promise} 活动列表
  */
 export const getJoinedActivities = (params) => {
-  return request.get('/user/registrations', params)
+  return request.get('/user/joined-activities', params)
 }
 
 /**
@@ -115,14 +115,11 @@ export const submitReview = (activityId, data) => {
 /**
  * 提交活动报名
  * @param {number} activityId - 活动ID
- * @param {Object} data - 报名数据 { activityId, remark, emergencyContact, emergencyPhone, equipmentConfirm, healthConfirm }
+ * @param {Object} data - 报名数据 { remark, emergencyContact, emergencyPhone, equipmentConfirm, healthConfirm }
  * @returns {Promise}
  */
 export const registerActivity = (activityId, data) => {
-  return request.post('/registrations', {
-    activityId: activityId,
-    ...data
-  })
+  return request.post(`/activities/${activityId}/register`, data)
 }
 
 /**
@@ -152,13 +149,23 @@ export const getGatheringPlan = (id) => {
 }
 
 /**
- * 创建/更新集合方案（组织者）
+ * 创建集合方案（组织者）
  * @param {number} activityId - 活动ID
  * @param {Object} data - 集合方案数据
  * @returns {Promise}
  */
 export const createGatheringPlan = (activityId, data) => {
   return request.post(`/activities/${activityId}/gathering`, data)
+}
+
+/**
+ * 更新集合方案（组织者）
+ * @param {number} activityId - 活动ID
+ * @param {Object} data - 集合方案数据
+ * @returns {Promise}
+ */
+export const updateGatheringPlan = (activityId, data) => {
+  return request.put(`/activities/${activityId}/gathering`, data)
 }
 
 /**

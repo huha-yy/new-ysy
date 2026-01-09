@@ -14,9 +14,7 @@ import lombok.Data;
 @Schema(description = "报名审核请求")
 public class RegistrationAuditDTO {
 
-    @Schema(description = "报名ID", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "报名ID不能为空")
-    @Positive(message = "报名ID必须为正数")
+    @Schema(description = "报名ID（从URL路径参数获取，请求体中可不传）", example = "1")
     private Long registrationId;
 
     @Schema(description = "审核结果：true通过，false拒绝", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)

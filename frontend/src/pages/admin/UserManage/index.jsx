@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { 
-  Card, Table, Button, Tag, Space, Input, message, 
-  Avatar, Tabs, Modal, Descriptions, Badge, Switch, Tooltip, Row, Col, Statistic
+import {
+  Card, Table, Button, Tag, Space, Input, message,
+  Avatar, Tabs, Modal, Descriptions, Badge, Switch, Tooltip, Row, Col, Statistic, Select
 } from 'antd'
 import {
   UserOutlined,
@@ -15,9 +15,10 @@ import {
   TeamOutlined,
   CrownOutlined,
   SafetyCertificateOutlined,
-  ExclamationCircleOutlined
+  ExclamationCircleOutlined,
+  EditOutlined
 } from '@ant-design/icons'
-import { getUserList, updateUserStatus, getUserStats } from '../../../api/admin'
+import { getUserList, updateUserStatus, updateUserRole, getUserStats } from '../../../api/admin'
 import { ROLE } from '../../../utils/constants'
 import dayjs from 'dayjs'
 import './UserManage.css'
@@ -42,6 +43,7 @@ function UserManage() {
   const [activeTab, setActiveTab] = useState('all')
   const [keyword, setKeyword] = useState('')
   const [detailModal, setDetailModal] = useState({ visible: false, record: null })
+  const [roleModal, setRoleModal] = useState({ visible: false, record: null, newRole: null })
 
   // 统计数据
   const [stats, setStats] = useState({
@@ -214,6 +216,31 @@ function UserManage() {
     })
   }
 
+  // 修改角色
+  const handleChangeRole = (record) => {
+    setRoleModal({ visible: true, record, newRole: record.role })
+  }
+
+  // 确认修改角色
+  const handleRoleModalOk = async () => {
+    const { record, newRole } = roleModal
+
+    if (newRole === record.role) {
+      message.warning('角色未发生变化')
+      return
+    }
+
+    try {
+      await updateUserRole(record.id, { role: newRole })
+      message.success('角色修改成功')
+      setRoleModal({ visible: false, record: null, newRole: null })
+      fetchUsers()
+      fetchStats()
+    } catch (error) {
+      message.error('角色修改失败')
+    }
+  }
+
   // 查看详情
   const showDetail = (record) => {
     setDetailModal({ visible: true, record })
@@ -312,16 +339,24 @@ function UserManage() {
     {
       title: '操作',
       key: 'actions',
-      width: 150,
+      width: 200,
       fixed: 'right',
       render: (_, record) => (
         <Space>
           <Tooltip title="查看详情">
-            <Button 
-              type="text" 
+            <Button
+              type="text"
               size="small"
               icon={<UserOutlined />}
               onClick={() => showDetail(record)}
+            />
+          </Tooltip>
+          <Tooltip title="修改角色">
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => handleChangeRole(record)}
             />
           </Tooltip>
           {record.role !== 2 && ( // 管理员不能被禁用
@@ -519,6 +554,59 @@ function UserManage() {
                 </Descriptions.Item>
               )}
             </Descriptions>
+          </div>
+        )}
+      </Modal>
+
+      {/* 角色修改弹窗 */}
+      <Modal
+        title="修改用户角色"
+        open={roleModal.visible}
+        onOk={handleRoleModalOk}
+        onCancel={() => setRoleModal({ visible: false, record: null, newRole: null })}
+        okText="确认修改"
+        cancelText="取消"
+      >
+        {roleModal.record && (
+          <div>
+            <p>
+              <strong>用户：</strong>
+              {roleModal.record.nickname || roleModal.record.username}
+              （@{roleModal.record.username}）
+            </p>
+            <p>
+              <strong>当前角色：</strong>
+              <Tag color={ROLE_MAP[roleModal.record.role]?.color}>
+                {ROLE_MAP[roleModal.record.role]?.text}
+              </Tag>
+            </p>
+            <div style={{ marginTop: 16 }}>
+              <strong>选择新角色：</strong>
+              <Select
+                style={{ width: '100%', marginTop: 8 }}
+                value={roleModal.newRole}
+                onChange={(value) => setRoleModal({ ...roleModal, newRole: value })}
+              >
+                <Select.Option value={0}>
+                  <Space>
+                    <UserOutlined />
+                    普通用户
+                  </Space>
+                </Select.Option>
+                <Select.Option value={1}>
+                  <Space>
+                    <TeamOutlined />
+                    组织者
+                  </Space>
+                </Select.Option>
+                <Select.Option value={2}>
+                  <Space>
+                    <CrownOutlined />
+                    管理员
+                  </Space>
+                </Select.Option>
+              </Select>
+            </div>
           </div>
         )}
       </Modal>

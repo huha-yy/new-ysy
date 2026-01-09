@@ -251,7 +251,6 @@ function RegistrationReview() {
           />
           <div className="user-info">
             <div className="user-nickname">{record.userNickname || `用户${record.userId}`}</div>
-            <div className="user-username">ID: {record.userId}</div>
           </div>
         </div>
       )

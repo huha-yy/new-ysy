@@ -4,6 +4,8 @@ import com.hiking.hikingbackend.module.checkin.dto.CheckInDTO;
 import com.hiking.hikingbackend.module.checkin.dto.TrackRecordDTO;
 import com.hiking.hikingbackend.module.checkin.vo.CheckInVO;
 import com.hiking.hikingbackend.module.checkin.vo.CheckInProgressVO;
+import com.hiking.hikingbackend.module.checkin.vo.CheckpointStatsVO;
+import com.hiking.hikingbackend.module.checkin.vo.ParticipantCheckInVO;
 import com.hiking.hikingbackend.module.route.entity.Checkpoint;
 
 import java.util.List;
@@ -59,4 +61,22 @@ public interface CheckInService {
      * @return 参与者签到状态列表
      */
     List<CheckInProgressVO> getParticipantsCheckInStatus(Long organizerId, Long activityId);
+
+    /**
+     * 获取活动所有参与者的签到状态（含用户信息，用于签到监控）
+     *
+     * @param organizerId 组织者ID
+     * @param activityId 活动ID
+     * @return 参与者签到状态列表（含用户信息）
+     */
+    List<ParticipantCheckInVO> getParticipantsCheckInWithUser(Long organizerId, Long activityId);
+
+    /**
+     * 获取活动各签到点的统计信息
+     *
+     * @param organizerId 组织者ID
+     * @param activityId 活动ID
+     * @return 签到点统计列表
+     */
+    List<CheckpointStatsVO> getCheckpointStats(Long organizerId, Long activityId);
 }

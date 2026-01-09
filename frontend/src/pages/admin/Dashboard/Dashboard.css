@@ -1,13 +1,12 @@
-/* 🌞 管理后台首页样式 */
+/* 🌞 管理后台首页样式 - 所有选择器都使用 .admin-dashboard-page 前缀避免样式污染 */
 .admin-dashboard-page {
   padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
-  animation: fadeInUp 0.6s ease;
 }
 
 /* 欢迎横幅 */
-.welcome-banner {
+.admin-dashboard-page .welcome-banner {
   background: linear-gradient(135deg, var(--primary-color) 0%, #FF8B4F 50%, var(--secondary-color) 100%);
   border-radius: 20px;
   padding: 32px;
@@ -16,56 +15,55 @@
   box-shadow: 0 8px 32px rgba(255, 167, 38, 0.3);
 }
 
-.banner-content {
+.admin-dashboard-page .banner-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.banner-text h1 {
+.admin-dashboard-page .banner-text h1 {
   font-size: 28px;
   font-weight: 700;
   margin: 0 0 8px 0;
   color: white;
 }
 
-.banner-text p {
+.admin-dashboard-page .banner-text p {
   font-size: 14px;
   margin: 0;
   opacity: 0.9;
 }
 
-.banner-stats .ant-btn-primary {
+.admin-dashboard-page .banner-stats .ant-btn-primary {
   background: rgba(255, 255, 255, 0.2);
   border: 2px solid rgba(255, 255, 255, 0.4);
   box-shadow: none;
 }
 
-.banner-stats .ant-btn-primary:hover {
+.admin-dashboard-page .banner-stats .ant-btn-primary:hover {
   background: rgba(255, 255, 255, 0.3);
   border-color: white;
 }
 
 /* 统计卡片 */
-.stats-row {
+.admin-dashboard-page .stats-row {
   margin-bottom: 24px;
 }
 
-.stat-card {
+.admin-dashboard-page .stat-card {
   border-radius: 16px;
   box-shadow: var(--shadow-sm);
   border: none;
   overflow: visible;
-  transition: all 0.3s ease;
   height: 100%;
 }
 
-.stat-card:hover {
+.admin-dashboard-page .stat-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
 }
 
-.stat-card .ant-card-body {
+.admin-dashboard-page .stat-card .ant-card-body {
   padding: 20px;
   display: flex;
   align-items: flex-start;
@@ -73,7 +71,7 @@
   min-height: 100px;
 }
 
-.stat-icon-wrapper {
+.admin-dashboard-page .stat-icon-wrapper {
   flex-shrink: 0;
   width: 52px;
   height: 52px;
@@ -84,113 +82,113 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.stat-icon {
+.admin-dashboard-page .stat-icon {
   font-size: 24px;
   color: white;
 }
 
-.stat-card.users .stat-icon-wrapper {
+.admin-dashboard-page .stat-card.users .stat-icon-wrapper {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.stat-card.activities .stat-icon-wrapper {
+.admin-dashboard-page .stat-card.activities .stat-icon-wrapper {
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
 }
 
-.stat-card.registrations .stat-icon-wrapper {
+.admin-dashboard-page .stat-card.registrations .stat-icon-wrapper {
   background: linear-gradient(135deg, var(--success-color) 0%, #2ECC71 100%);
 }
 
-.stat-card.active .stat-icon-wrapper {
+.admin-dashboard-page .stat-card.active .stat-icon-wrapper {
   background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
 }
 
-.stat-card .ant-statistic {
+.admin-dashboard-page .stat-card .ant-statistic {
   flex: 1;
   min-width: 0;
 }
 
-.stat-card .ant-statistic-title {
+.admin-dashboard-page .stat-card .ant-statistic-title {
   color: var(--text-secondary);
   font-size: 13px;
   margin-bottom: 4px;
 }
 
-.stat-card .ant-statistic-content-value {
+.admin-dashboard-page .stat-card .ant-statistic-content-value {
   font-size: 28px;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;
 }
 
-.stat-card .ant-statistic-content-suffix {
+.admin-dashboard-page .stat-card .ant-statistic-content-suffix {
   font-size: 12px;
   margin-left: 0;
   display: block;
 }
 
-.stat-change {
+.admin-dashboard-page .stat-change {
   display: block;
   font-size: 11px;
   margin-top: 4px;
   font-weight: 500;
 }
 
-.stat-change.positive {
+.admin-dashboard-page .stat-change.positive {
   color: var(--success-color);
 }
 
-.stat-change.negative {
+.admin-dashboard-page .stat-change.negative {
   color: var(--danger-color);
 }
 
 /* 内容区域 */
-.content-row {
+.admin-dashboard-page .content-row {
   margin-bottom: 24px;
 }
 
 /* 待审核卡片 */
-.pending-card {
+.admin-dashboard-page .pending-card {
   border-radius: 20px;
   box-shadow: var(--shadow-md);
   height: 100%;
 }
 
-.pending-card .ant-card-head {
+.admin-dashboard-page .pending-card .ant-card-head {
   background: linear-gradient(135deg, #FFF9E6 0%, white 100%);
   border-bottom: 2px solid #FFE8CC;
 }
 
-.card-title {
+.admin-dashboard-page .card-title {
   display: flex;
   align-items: center;
   gap: 8px;
   font-weight: 600;
 }
 
-.card-title .anticon {
+.admin-dashboard-page .card-title .anticon {
   color: var(--primary-color);
 }
 
 /* 快捷入口卡片 */
-.shortcuts-card {
+.admin-dashboard-page .shortcuts-card {
   border-radius: 20px;
   box-shadow: var(--shadow-md);
   height: 100%;
 }
 
-.shortcuts-card .ant-card-head {
+.admin-dashboard-page .shortcuts-card .ant-card-head {
   background: linear-gradient(135deg, #FFF9E6 0%, white 100%);
   border-bottom: 2px solid #FFE8CC;
 }
 
-.shortcuts-grid {
+.admin-dashboard-page .shortcuts-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
 
-.shortcut-item {
+.admin-dashboard-page .shortcut-item {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -199,18 +197,18 @@
   background: #FFFAF5;
   border-radius: 16px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
   border: 2px solid transparent;
 }
 
-.shortcut-item:hover {
+.admin-dashboard-page .shortcut-item:hover {
   background: white;
   border-color: var(--primary-color);
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
 }
 
-.shortcut-icon {
+.admin-dashboard-page .shortcut-icon {
   width: 48px;
   height: 48px;
   border-radius: 12px;
@@ -221,89 +219,89 @@
   color: white;
 }
 
-.shortcut-icon.audit {
+.admin-dashboard-page .shortcut-icon.audit {
   background: linear-gradient(135deg, var(--success-color) 0%, #2ECC71 100%);
 }
 
-.shortcut-icon.users {
+.admin-dashboard-page .shortcut-icon.users {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.shortcut-icon.activities {
+.admin-dashboard-page .shortcut-icon.activities {
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
 }
 
-.shortcut-icon.stats {
+.admin-dashboard-page .shortcut-icon.stats {
   background: linear-gradient(135deg, var(--accent-color) 0%, #00A8CC 100%);
 }
 
-.shortcut-icon.registrations {
+.admin-dashboard-page .shortcut-icon.registrations {
   background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
 }
 
-.shortcut-item span {
+.admin-dashboard-page .shortcut-item span {
   font-weight: 500;
   color: var(--text-primary);
 }
 
 /* 最近活动卡片 */
-.recent-card {
+.admin-dashboard-page .recent-card {
   border-radius: 20px;
   box-shadow: var(--shadow-md);
   margin-bottom: 24px;
 }
 
-.recent-card .ant-card-head {
+.admin-dashboard-page .recent-card .ant-card-head {
   background: linear-gradient(135deg, #FFF9E6 0%, white 100%);
   border-bottom: 2px solid #FFE8CC;
 }
 
 /* 系统提示卡片 */
-.tips-card {
+.admin-dashboard-page .tips-card {
   border-radius: 16px;
   background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
   border: none;
 }
 
-.tips-content {
+.admin-dashboard-page .tips-content {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.tips-icon {
+.admin-dashboard-page .tips-icon {
   font-size: 36px;
   color: var(--success-color);
 }
 
-.tips-text h4 {
+.admin-dashboard-page .tips-text h4 {
   margin: 0 0 4px 0;
   font-size: 16px;
   font-weight: 600;
   color: #2E7D32;
 }
 
-.tips-text p {
+.admin-dashboard-page .tips-text p {
   margin: 0;
   color: #558B2F;
   font-size: 14px;
 }
 
 /* 表格样式 */
-.pending-card .ant-table-thead > tr > th,
-.recent-card .ant-table-thead > tr > th {
+.admin-dashboard-page .pending-card .ant-table-thead > tr > th,
+.admin-dashboard-page .recent-card .ant-table-thead > tr > th {
   background: #FFFAF5;
   font-weight: 600;
 }
 
-.pending-card .ant-table-tbody > tr:hover > td,
-.recent-card .ant-table-tbody > tr:hover > td {
+.admin-dashboard-page .pending-card .ant-table-tbody > tr:hover > td,
+.admin-dashboard-page .recent-card .ant-table-tbody > tr:hover > td {
   background: #FFF9E6;
 }
 
 /* 响应式 */
 @media (max-width: 1200px) {
-  .content-row .ant-col {
+  .admin-dashboard-page .content-row .ant-col {
     margin-bottom: 24px;
   }
 }
@@ -313,39 +311,21 @@
     padding: 16px;
   }
 
-  .welcome-banner {
+  .admin-dashboard-page .welcome-banner {
     padding: 24px;
   }
 
-  .banner-content {
+  .admin-dashboard-page .banner-content {
     flex-direction: column;
     gap: 16px;
     text-align: center;
   }
 
-  .stats-row .ant-col {
+  .admin-dashboard-page .stats-row .ant-col {
     margin-bottom: 16px;
   }
 
-  .shortcuts-grid {
+  .admin-dashboard-page .shortcuts-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
-
-/* 动画 */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.stat-card:nth-child(1) { animation: fadeInUp 0.4s ease 0.1s both; }
-.stat-card:nth-child(2) { animation: fadeInUp 0.4s ease 0.15s both; }
-.stat-card:nth-child(3) { animation: fadeInUp 0.4s ease 0.2s both; }
-.stat-card:nth-child(4) { animation: fadeInUp 0.4s ease 0.25s both; }
-

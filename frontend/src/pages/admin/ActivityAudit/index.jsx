@@ -22,6 +22,7 @@ import {
 import { getPendingActivities, getAllActivities } from '../../../api/admin'
 import { auditActivity } from '../../../api/activity'
 import { DIFFICULTY_MAP, ACTIVITY_STATUS } from '../../../utils/constants'
+import { getActivityCoverUrl } from '../../../utils/imageUrl'
 import dayjs from 'dayjs'
 import './ActivityAudit.css'
 
@@ -195,9 +196,9 @@ function ActivityAudit() {
       width: 320,
       render: (_, record) => (
         <div className="activity-info-cell">
-          <img 
-            src={record.coverImage || 'https://via.placeholder.com/100x70?text=活动'} 
-            alt={record.title} 
+          <img
+            src={getActivityCoverUrl(record)}
+            alt={record.title}
             className="activity-cover"
           />
           <div className="activity-text">
@@ -498,8 +499,8 @@ function ActivityAudit() {
         {detailModal.record && (
           <div className="detail-content">
             <div className="detail-cover">
-              <Image 
-                src={detailModal.record.coverImage || 'https://via.placeholder.com/600x300?text=活动封面'} 
+              <Image
+                src={getActivityCoverUrl(detailModal.record)}
                 alt={detailModal.record.title}
                 style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 12 }}
               />
