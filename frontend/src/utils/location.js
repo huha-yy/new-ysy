@@ -36,7 +36,7 @@ export const getBrowserLocation = () => {
  * 使用高德地图插件获取位置（更精确）
  * @returns {Promise<{latitude, longitude, address}>}
  */
-export const getAmapLocation = getAmapLocation
+export { getAmapLocation } from './map'
 
 /**
  * 获取位置（自动选择最佳方案）

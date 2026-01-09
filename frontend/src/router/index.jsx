@@ -10,7 +10,7 @@ const Home = lazy(() => import('../pages/Home'))
 const Login = lazy(() => import('../pages/user/Login'))
 const Register = lazy(() => import('../pages/user/Register'))
 const ActivityList = lazy(() => import('../pages/activity/List'))
-const ActivityDetail = lazy(() => import('../pages/activity/Detail'))
+const ActivityDetail = lazy(() => import('../pages/activity/Detail/detail'))
 const NotFound = lazy(() => import('../pages/NotFound'))
 
 // 懒加载页面组件 - 用户页面
@@ -34,6 +34,7 @@ const OrganizerRoutes = lazy(() => import('../pages/organizer/Routes'))
 const OrganizerRouteCreate = lazy(() => import('../pages/organizer/RouteCreate'))
 const OrganizerRouteEdit = lazy(() => import('../pages/organizer/RouteEdit'))
 const OrganizerGatheringPlan = lazy(() => import('../pages/organizer/GatheringPlan'))
+const OrganizerAlertMonitor = lazy(() => import('../pages/organizer/AlertMonitor'))
 
 // 懒加载页面组件 - 管理员页面
 const AdminDashboard = lazy(() => import('../pages/admin/Dashboard'))
@@ -223,6 +224,14 @@ const router = createBrowserRouter([
         element: lazyWrapper(() => (
           <AuthRoute>
             <OrganizerGatheringPlan />
+          </AuthRoute>
+        ))
+      },
+      {
+        path: 'organizer/activities/:id/alerts',
+        element: lazyWrapper(() => (
+          <AuthRoute>
+            <OrganizerAlertMonitor />
           </AuthRoute>
         ))
       },

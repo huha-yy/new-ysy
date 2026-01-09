@@ -113,6 +113,110 @@
   margin-bottom: 24px;
 }
 
+/* 地图监控卡片 */
+.map-monitor-card {
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 24px;
+}
+
+.map-monitor-card .ant-card-head {
+  background: linear-gradient(135deg, #E6F7FF 0%, white 100%);
+  border-bottom: 2px solid #BAE7FF;
+}
+
+.map-monitor-content {
+  position: relative;
+}
+
+.map-legend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  display: flex;
+  gap: 16px;
+  z-index: 10;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.legend-marker {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.legend-marker.checkpoint {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+
+.legend-marker.completed {
+  background: linear-gradient(135deg, var(--success-color) 0%, #95DE64 100%);
+}
+
+.legend-marker.route {
+  height: 4px;
+  margin-top: 10px;
+  background: var(--primary-color);
+}
+
+/* 地图标记样式（由JS动态注入） */
+.checkpoint-marker {
+  background: white;
+  border-radius: 12px;
+  padding: 8px 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  min-width: 80px;
+  border: 2px solid var(--primary-color);
+}
+
+.checkpoint-marker.completed {
+  border-color: var(--success-color);
+  background: linear-gradient(135deg, #F6FFED 0%, white 100%);
+}
+
+.checkpoint-marker .marker-order {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.checkpoint-marker.completed .marker-order {
+  background: var(--success-color);
+}
+
+.checkpoint-marker .marker-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.checkpoint-marker .marker-count {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
 .checkpoints-card .ant-card-head {
   background: linear-gradient(135deg, #FFF9E6 0%, white 100%);
   border-bottom: 2px solid #FFE8CC;

@@ -5,14 +5,13 @@ import {
   EnvironmentOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
-  LocationOutlined,
   WarningOutlined,
   ReloadOutlined
 } from '@ant-design/icons'
 import MapView from '../../../components/MapView/MapView'
-import { getCheckpoints, getCheckinStatus, checkin } from '../../../api/checkin'
+import { getCheckpoints, getCheckinStatus, checkin as checkinApi, reportTrack } from '../../../api/checkin'
 import { getLocation, checkIn, TrackRecorder } from '../../../utils/location'
-import { formatDistance } from '../../../utils/map'
+import { formatDistance, calculateDistance } from '../../../utils/map'
 import dayjs from 'dayjs'
 import './CheckIn.css'
 
@@ -114,7 +113,15 @@ function CheckIn() {
     trackRecorder.start(
       (track) => {
         console.log('轨迹记录:', track)
-        // 可以在这里实时更新轨迹显示
+        // 上报轨迹到后端
+        reportTrack([{
+          activityId: Number(id),
+          latitude: track.latitude,
+          longitude: track.longitude,
+          recordTime: new Date(track.timestamp).toISOString().slice(0, 19).replace('T', ' ')
+        }]).catch(error => {
+          console.error('轨迹上报失败:', error)
+        })
       },
       (error) => {
         console.error('轨迹记录错误:', error)
@@ -153,12 +160,10 @@ function CheckIn() {
       }
 
       // 提交签到
-      await checkin({
-        activityId: id,
+      await checkinApi(id, {
         checkpointId: checkpointId,
         latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude,
-        timestamp: Date.now()
+        longitude: currentLocation.longitude
       })
 
       message.success('签到成功！')
@@ -183,14 +188,14 @@ function CheckIn() {
   const getDistanceToCheckpoint = (checkpoint) => {
     if (!currentLocation) return null
 
-    const distance = Math.round(
-      Math.sqrt(
-        Math.pow(currentLocation.latitude - checkpoint.latitude, 2) +
-        Math.pow(currentLocation.longitude - checkpoint.longitude, 2)
-      ) * 111000
+    const distance = calculateDistance(
+      currentLocation.latitude,
+      currentLocation.longitude,
+      checkpoint.latitude,
+      checkpoint.longitude
     )
 
-    return distance
+    return Math.round(distance)
   }
 
   if (loading && !checkinStatus) {
@@ -263,7 +268,7 @@ function CheckIn() {
               message="当前位置"
               description={
                 <Space>
-                  <LocationOutlined />
+                  <EnvironmentOutlined />
                   <span>
                     纬度: {currentLocation.latitude.toFixed(6)}，
                     经度: {currentLocation.longitude.toFixed(6)}
@@ -327,7 +332,7 @@ function CheckIn() {
                       <Space direction="vertical" style={{ width: '100%' }}>
                         {distance !== null && status === 'pending' && (
                           <div className="checkpoint-distance">
-                            <LocationOutlined />
+                            <EnvironmentOutlined />
                             <span>距离: {formatDistance(distance)}</span>
                           </div>
                         )}

@@ -30,6 +30,16 @@ public class UserProfileVO implements Serializable {
     private Long userId;
 
     /**
+     * 昵称
+     */
+    private String nickname;
+
+    /**
+     * 头像URL
+     */
+    private String avatar;
+
+    /**
      * 真实姓名
      */
     private String realName;

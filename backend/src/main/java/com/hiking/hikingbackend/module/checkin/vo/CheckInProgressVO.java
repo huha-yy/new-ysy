@@ -33,6 +33,12 @@ public class CheckInProgressVO {
     @Schema(description = "签到进度（百分比）")
     private Integer progress;
 
+    @Schema(description = "是否可以签到")
+    private Boolean canCheckIn;
+
+    @Schema(description = "状态消息")
+    private String message;
+
     @Schema(description = "签到点列表")
     private List<CheckInStatusVO> checkpointStatusList;
 }

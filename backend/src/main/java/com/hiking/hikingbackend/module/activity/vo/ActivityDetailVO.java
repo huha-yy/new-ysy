@@ -119,6 +119,10 @@ public class ActivityDetailVO {
     @Schema(description = "是否已报满", example = "false")
     private Boolean isFull;
 
+    // ========== 用户相关 ==========
+    @Schema(description = "当前用户是否已报名", example = "false")
+    private Boolean isRegistered;
+
     // ========== 报名 ==========
     @Schema(description = "报名截止时间", example = "2024-12-26 23:59:59")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

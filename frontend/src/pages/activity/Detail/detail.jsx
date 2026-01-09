@@ -17,7 +17,9 @@ import {
 import { getActivityDetail, registerActivity } from '../../../api/activity'
 import { getActivityReviews, getActivityRatingStats } from '../../../api/review'
 import { DIFFICULTY_MAP } from '../../../utils/constants'
+import { getImageUrl } from '../../../utils/imageUrl'
 import ReviewStats from '../../../components/ReviewStats/ReviewStats'
+import dayjs from 'dayjs'
 import './Detail.css'
 
 function ActivityDetail() {
@@ -252,7 +254,7 @@ function ActivityDetail() {
           )}
           {activity.coverImage ? (
             <img
-              src={activity.coverImage}
+              src={getImageUrl(activity.coverImage)}
               alt={activity.title}
               className={`cover-image ${imageLoading ? 'loading' : ''} ${imageError ? 'error' : ''}`}
               onLoad={handleImageLoad}
@@ -455,16 +457,16 @@ function ActivityDetail() {
                                     <div className="review-content-text">
                                       {review.content}
                                     </div>
-                                    {review.images && (
+                                    {review.images && review.images.length > 0 && (
                                       <div className="review-images">
-                                        {review.images.split(',').map((img, idx) => (
+                                        {(Array.isArray(review.images) ? review.images : review.images.split(',')).map((img, idx) => (
                                           img && (
                                             <img
                                               key={idx}
-                                              src={img}
+                                              src={getImageUrl(img)}
                                               alt={`评价图片${idx + 1}`}
                                               className="review-image"
-                                              onClick={() => window.open(img, '_blank')}
+                                              onClick={() => window.open(getImageUrl(img), '_blank')}
                                             />
                                           )
                                         ))}
@@ -588,7 +590,7 @@ function ActivityDetail() {
                 onClick={() => navigate(`/activities/${id}/checkin`)}
                 icon={<EnvironmentOutlined />}
               >
-                <EnvironmentOutlined /> 活动签到
+                活动签到
               </Button>
             )}
             {activity.status === 4 && (
@@ -603,11 +605,11 @@ function ActivityDetail() {
             <Button
               type="primary"
               size="large"
-              onClick={handleRegister}
-              disabled={activity.isFull || ![2, 3].includes(activity.status)}
+              onClick={activity.isRegistered ? undefined : handleRegister}
+              disabled={activity.isFull || ![2, 3].includes(activity.status) || activity.isRegistered}
               loading={registerLoading}
             >
-              {activity.isFull ? '已报满' : '立即报名'}
+              {activity.isRegistered ? '已报名' : (activity.isFull ? '已报满' : '立即报名')}
             </Button>
           </Space>
         </div>

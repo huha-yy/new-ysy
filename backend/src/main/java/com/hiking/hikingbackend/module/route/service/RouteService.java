@@ -48,5 +48,30 @@ public interface RouteService {
      * @return 签到点ID
      */
     Long addCheckpoint(Long userId, Long routeId, CheckpointCreateDTO createDTO);
+
+    /**
+     * 更新路线（组织者）
+     *
+     * @param userId 用户ID
+     * @param routeId 路线ID
+     * @param createDTO 更新信息
+     */
+    void updateRoute(Long userId, Long routeId, RouteCreateDTO createDTO);
+
+    /**
+     * 删除路线（组织者）
+     *
+     * @param userId 用户ID
+     * @param routeId 路线ID
+     */
+    void deleteRoute(Long userId, Long routeId);
+
+    /**
+     * 获取路线的签到点列表
+     *
+     * @param routeId 路线ID
+     * @return 签到点列表
+     */
+    java.util.List<com.hiking.hikingbackend.module.route.entity.Checkpoint> getRouteCheckpoints(Long routeId);
 }
 

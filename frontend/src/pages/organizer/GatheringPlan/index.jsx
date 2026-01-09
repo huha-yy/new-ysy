@@ -275,7 +275,7 @@ function GatheringPlan() {
   }
 
   const handleBack = () => {
-    navigate(`/organizer/activities/${id}`)
+    navigate('/organizer/activities')
   }
 
   const isPublished = gathering?.isPublished

@@ -50,7 +50,7 @@ public class RegistrationController {
         }
 
         Long registrationId = registrationService.submitRegistration(userId, createDTO);
-        return Result.success("报名成功", registrationId);
+        return Result.success("报名申请已提交，等待审核", registrationId);
     }
 
     /**
@@ -73,6 +73,9 @@ public class RegistrationController {
         if (organizerId == null) {
             throw new RuntimeException("无法获取当前用户ID");
         }
+
+        // 将路径参数中的报名ID设置到DTO中
+        auditDTO.setRegistrationId(registrationId);
 
         registrationService.auditRegistration(organizerId, auditDTO);
         return Result.success("审核成功");

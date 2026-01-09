@@ -199,7 +199,8 @@
 
 /* 卡片悬停动画 */
 .activity-item {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* 只对 transform 添加过渡，避免 transition: all 导致页面切换时的异常 */
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .activity-item:hover {

@@ -105,5 +105,69 @@ public class RouteController {
         Long checkpointId = routeService.addCheckpoint(userId, routeId, createDTO);
         return Result.success("签到点添加成功", checkpointId);
     }
+
+    /**
+     * 更新路线（需登录，路线创建者）
+     * 需要校验：当前用户是路线创建者、路线未被使用
+     *
+     * @param routeId 路线ID
+     * @param createDTO 更新信息
+     * @return 操作结果
+     */
+    @Operation(summary = "更新路线", description = "更新路线信息，需要登录，仅限路线创建者且路线未被使用", security = {@SecurityRequirement(name = "Bearer Authentication")})
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PutMapping("/routes/{id}")
+    public Result<Void> updateRoute(
+            @Parameter(description = "路线ID", required = true, example = "1")
+            @PathVariable("id") Long routeId,
+            @Valid @RequestBody RouteCreateDTO createDTO) {
+        // 获取当前用户ID
+        Long userId = SecurityUtils.getCurrentUserId();
+        if (userId == null) {
+            throw new RuntimeException("无法获取当前用户ID");
+        }
+
+        routeService.updateRoute(userId, routeId, createDTO);
+        return Result.success("路线更新成功");
+    }
+
+    /**
+     * 删除路线（需登录，路线创建者）
+     * 需要校验：当前用户是路线创建者、路线未被使用
+     *
+     * @param routeId 路线ID
+     * @return 操作结果
+     */
+    @Operation(summary = "删除路线", description = "删除路线，需要登录，仅限路线创建者且路线未被使用", security = {@SecurityRequirement(name = "Bearer Authentication")})
+    @SecurityRequirement(name = "Bearer Authentication")
+    @DeleteMapping("/routes/{id}")
+    public Result<Void> deleteRoute(
+            @Parameter(description = "路线ID", required = true, example = "1")
+            @PathVariable("id") Long routeId) {
+        // 获取当前用户ID
+        Long userId = SecurityUtils.getCurrentUserId();
+        if (userId == null) {
+            throw new RuntimeException("无法获取当前用户ID");
+        }
+
+        routeService.deleteRoute(userId, routeId);
+        return Result.success("路线删除成功");
+    }
+
+    /**
+     * 获取路线的签到点列表
+     *
+     * @param routeId 路线ID
+     * @return 签到点列表
+     */
+    @Operation(summary = "路线签到点列表", description = "查询路线的所有签到点")
+    @GetMapping("/routes/{id}/checkpoints")
+    public Result<java.util.List<com.hiking.hikingbackend.module.route.entity.Checkpoint>> getRouteCheckpoints(
+            @Parameter(description = "路线ID", required = true, example = "1")
+            @PathVariable("id") Long routeId) {
+        java.util.List<com.hiking.hikingbackend.module.route.entity.Checkpoint> checkpoints =
+                routeService.getRouteCheckpoints(routeId);
+        return Result.success(checkpoints);
+    }
 }
 

@@ -129,7 +129,38 @@ public class AdminServiceImpl implements AdminService {
             throw new BusinessException("状态更新失败");
         }
     }
-    
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserRole(Long userId, Integer role, Long operatorId) {
+        // 查询用户是否存在
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+
+        // 不能修改自己的角色
+        if (userId.equals(operatorId)) {
+            throw new BusinessException("不能修改自己的角色");
+        }
+
+        // 角色值校验
+        if (role < 0 || role > 2) {
+            throw new BusinessException("角色值无效");
+        }
+
+        // 更新用户角色
+        LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(User::getId, userId)
+            .set(User::getRole, role)
+            .set(User::getUpdateBy, operatorId);
+
+        int rows = userMapper.update(null, updateWrapper);
+        if (rows == 0) {
+            throw new BusinessException("角色更新失败");
+        }
+    }
+
     @Override
     public IPage<ActivityAuditVO> getPendingActivities(ActivityAuditQuery query) {
         Page<ActivityAuditVO> page = new Page<>(query.getPageNum(), query.getPageSize());

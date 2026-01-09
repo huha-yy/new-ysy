@@ -5,6 +5,7 @@ import com.hiking.hikingbackend.common.result.Result;
 import com.hiking.hikingbackend.common.utils.SecurityUtils;
 import com.hiking.hikingbackend.module.admin.dto.ActivityAuditQuery;
 import com.hiking.hikingbackend.module.admin.dto.UserListQuery;
+import com.hiking.hikingbackend.module.admin.dto.UserRoleUpdateDTO;
 import com.hiking.hikingbackend.module.admin.dto.UserStatusUpdateDTO;
 import com.hiking.hikingbackend.module.admin.service.AdminService;
 import com.hiking.hikingbackend.module.admin.vo.ActivityAuditVO;
@@ -77,15 +78,40 @@ public class AdminController {
             @Parameter(description = "用户ID", required = true, example = "1")
             @PathVariable("userId") Long userId,
             @Valid @RequestBody UserStatusUpdateDTO dto) {
-        
+
         // 获取当前操作人ID
         Long operatorId = SecurityUtils.getCurrentUserId();
         if (operatorId == null) {
             throw new RuntimeException("无法获取当前用户ID");
         }
-        
+
         adminService.updateUserStatus(userId, dto.getStatus(), operatorId);
         return Result.success("状态更新成功");
+    }
+
+    /**
+     * 更新用户角色
+     *
+     * @param userId 用户ID
+     * @param dto 角色更新DTO
+     * @return 操作结果
+     */
+    @Operation(summary = "更新用户角色", description = "修改用户的角色权限", security = {@SecurityRequirement(name = "Bearer Authentication")})
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PutMapping("/users/{userId}/role")
+    public Result<Void> updateUserRole(
+            @Parameter(description = "用户ID", required = true, example = "1")
+            @PathVariable("userId") Long userId,
+            @Valid @RequestBody UserRoleUpdateDTO dto) {
+
+        // 获取当前操作人ID
+        Long operatorId = SecurityUtils.getCurrentUserId();
+        if (operatorId == null) {
+            throw new RuntimeException("无法获取当前用户ID");
+        }
+
+        adminService.updateUserRole(userId, dto.getRole(), operatorId);
+        return Result.success("角色更新成功");
     }
 
     /**

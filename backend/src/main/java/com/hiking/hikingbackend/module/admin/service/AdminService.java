@@ -36,13 +36,22 @@ public interface AdminService {
     
     /**
      * 更新用户状态（启用/禁用）
-     * 
+     *
      * @param userId 用户ID
      * @param status 状态：0禁用 1正常
      * @param operatorId 操作人ID
      */
     void updateUserStatus(Long userId, Integer status, Long operatorId);
-    
+
+    /**
+     * 更新用户角色
+     *
+     * @param userId 用户ID
+     * @param role 角色：0普通用户 1组织者 2管理员
+     * @param operatorId 操作人ID
+     */
+    void updateUserRole(Long userId, Integer role, Long operatorId);
+
     /**
      * 分页查询待审核活动列表
      * 

@@ -81,7 +81,7 @@ public class MessageController {
      */
     @Operation(summary = "批量标记已读", description = "将当前用户的所有未读消息标记为已读，需要登录")
     @SecurityRequirement(name = "Bearer Authentication")
-    @PutMapping("/messages/read-all")
+    @PutMapping("/user/messages/read-all")
     public Result<Void> markAllAsRead() {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
