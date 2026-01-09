@@ -90,5 +90,87 @@ public class ReviewController {
         com.hiking.hikingbackend.module.review.vo.ReviewStatsVO statsVO = reviewService.getRatingStats(activityId);
         return Result.success(statsVO);
     }
+
+    /**
+     * 获取我的评价列表（需登录）
+     *
+     * @param pageNum 页码
+     * @param pageSize 每页大小
+     * @return 评价列表
+     */
+    @Operation(summary = "我的评价列表", description = "查询当前用户的评价记录，需要登录")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @GetMapping("/user/reviews")
+    public Result<IPage<ReviewVO>> getMyReviews(
+            @Parameter(description = "页码", example = "1")
+            @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+            @Parameter(description = "每页大小", example = "10")
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        if (userId == null) {
+            throw new RuntimeException("无法获取当前用户ID");
+        }
+        IPage<ReviewVO> page = reviewService.getUserReviews(userId, pageNum, pageSize);
+        return Result.success(page);
+    }
+
+    /**
+     * 获取我的评价统计（需登录）
+     *
+     * @return 评价统计
+     */
+    @Operation(summary = "我的评价统计", description = "查询当前用户的评价统计，需要登录")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @GetMapping("/user/reviews/stats")
+    public Result<com.hiking.hikingbackend.module.review.vo.ReviewStatsVO> getMyReviewStats() {
+        Long userId = SecurityUtils.getCurrentUserId();
+        if (userId == null) {
+            throw new RuntimeException("无法获取当前用户ID");
+        }
+        com.hiking.hikingbackend.module.review.vo.ReviewStatsVO statsVO = reviewService.getUserReviewStats(userId);
+        return Result.success(statsVO);
+    }
+
+    /**
+     * 删除评价（需登录，仅评价作者）
+     *
+     * @param reviewId 评价ID
+     * @return 操作结果
+     */
+    @Operation(summary = "删除评价", description = "删除自己的评价，需要登录，仅限评价作者")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @DeleteMapping("/user/reviews/{reviewId}")
+    public Result<Void> deleteReview(
+            @Parameter(description = "评价ID", required = true, example = "1")
+            @PathVariable("reviewId") Long reviewId) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        if (userId == null) {
+            throw new RuntimeException("无法获取当前用户ID");
+        }
+        reviewService.deleteReview(userId, reviewId);
+        return Result.success("删除成功");
+    }
+
+    /**
+     * 更新评价（需登录，仅评价作者）
+     *
+     * @param reviewId 评价ID
+     * @param createDTO 更新信息
+     * @return 操作结果
+     */
+    @Operation(summary = "更新评价", description = "更新自己的评价，需要登录，仅限评价作者")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PutMapping("/user/reviews/{reviewId}")
+    public Result<Void> updateReview(
+            @Parameter(description = "评价ID", required = true, example = "1")
+            @PathVariable("reviewId") Long reviewId,
+            @Valid @RequestBody ReviewCreateDTO createDTO) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        if (userId == null) {
+            throw new RuntimeException("无法获取当前用户ID");
+        }
+        reviewService.updateReview(userId, reviewId, createDTO);
+        return Result.success("更新成功");
+    }
 }
 

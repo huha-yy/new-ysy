@@ -17,6 +17,7 @@ import {
 import { getActivityDetail, registerActivity } from '../../../api/activity'
 import { getActivityReviews, getActivityRatingStats } from '../../../api/review'
 import { DIFFICULTY_MAP } from '../../../utils/constants'
+import { getImageUrl } from '../../../utils/imageUrl'
 import ReviewStats from '../../../components/ReviewStats/ReviewStats'
 import './Detail.css'
 
@@ -252,7 +253,7 @@ function ActivityDetail() {
           )}
           {activity.coverImage ? (
             <img
-              src={activity.coverImage}
+              src={getImageUrl(activity.coverImage)}
               alt={activity.title}
               className={`cover-image ${imageLoading ? 'loading' : ''} ${imageError ? 'error' : ''}`}
               onLoad={handleImageLoad}

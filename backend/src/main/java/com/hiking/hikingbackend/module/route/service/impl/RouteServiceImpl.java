@@ -414,5 +414,189 @@ public class RouteServiceImpl implements RouteService {
             default -> "未知";
         };
     }
+
+    /**
+     * 更新路线（组织者）
+     *
+     * @param userId 用户ID
+     * @param routeId 路线ID
+     * @param createDTO 更新信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateRoute(Long userId, Long routeId, RouteCreateDTO createDTO) {
+        // 1. 校验用户是否存在
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+
+        // 2. 校验路线是否存在
+        Route route = routeMapper.selectById(routeId);
+        if (route == null) {
+            throw new BusinessException(ResultCode.ROUTE_NOT_FOUND);
+        }
+
+        // 3. 校验权限（必须是路线创建者）
+        if (!route.getCreatorId().equals(userId)) {
+            throw new BusinessException(ResultCode.FORBIDDEN, "只有路线创建者可以修改路线");
+        }
+
+        // 4. 检查路线是否被使用中
+        if (route.getUseCount() != null && route.getUseCount() > 0) {
+            throw new BusinessException(ResultCode.ROUTE_IN_USE);
+        }
+
+        // 5. 从路线点中提取起点和终点信息
+        if (createDTO.getRoutePoints() != null && !createDTO.getRoutePoints().isEmpty()) {
+            List<RouteCreateDTO.RoutePointDTO> points = createDTO.getRoutePoints();
+            RouteCreateDTO.RoutePointDTO startPoint = points.get(0);
+            RouteCreateDTO.RoutePointDTO endPoint = points.get(points.size() - 1);
+
+            route.setStartLatitude(BigDecimal.valueOf(startPoint.getLat()));
+            route.setStartLongitude(BigDecimal.valueOf(startPoint.getLng()));
+            route.setEndLatitude(BigDecimal.valueOf(endPoint.getLat()));
+            route.setEndLongitude(BigDecimal.valueOf(endPoint.getLng()));
+        }
+
+        // 6. 更新路线信息
+        route.setName(createDTO.getName());
+        route.setDescription(createDTO.getDescription());
+        route.setDifficultyLevel(createDTO.getDifficultyLevel());
+        route.setTotalDistance(createDTO.getTotalDistance());
+        route.setElevationGain(createDTO.getElevationGain());
+        route.setElevationLoss(createDTO.getElevationLoss());
+        route.setMaxElevation(createDTO.getMaxElevation());
+        route.setMinElevation(createDTO.getMinElevation());
+        route.setEstimatedHours(createDTO.getEstimatedHours());
+        route.setStartPointName(createDTO.getStartPointName());
+        route.setEndPointName(createDTO.getEndPointName());
+        route.setRegion(createDTO.getRegion());
+        route.setIsPublic(createDTO.getIsPublic() != null ? createDTO.getIsPublic() : ROUTE_PUBLIC);
+
+        // 更新起点和终点信息（如果有手动设置）
+        if (createDTO.getStartLatitude() != null) {
+            route.setStartLatitude(createDTO.getStartLatitude());
+        }
+        if (createDTO.getStartLongitude() != null) {
+            route.setStartLongitude(createDTO.getStartLongitude());
+        }
+        if (createDTO.getEndLatitude() != null) {
+            route.setEndLatitude(createDTO.getEndLatitude());
+        }
+        if (createDTO.getEndLongitude() != null) {
+            route.setEndLongitude(createDTO.getEndLongitude());
+        }
+
+        routeMapper.updateById(route);
+        log.info("更新路线成功，路线ID：{}，操作者ID：{}", routeId, userId);
+
+        // 7. 删除原有的路线点和签到点
+        LambdaQueryWrapper<RoutePoint> pointWrapper = new LambdaQueryWrapper<>();
+        pointWrapper.eq(RoutePoint::getRouteId, routeId);
+        routePointMapper.delete(pointWrapper);
+
+        LambdaQueryWrapper<Checkpoint> checkpointWrapper = new LambdaQueryWrapper<>();
+        checkpointWrapper.eq(Checkpoint::getRouteId, routeId);
+        checkpointMapper.delete(checkpointWrapper);
+
+        // 8. 保存新的路线点
+        if (createDTO.getRoutePoints() != null && !createDTO.getRoutePoints().isEmpty()) {
+            List<RoutePoint> routePoints = createDTO.getRoutePoints().stream()
+                    .map(point -> RoutePoint.builder()
+                            .routeId(routeId)
+                            .latitude(BigDecimal.valueOf(point.getLat()))
+                            .longitude(BigDecimal.valueOf(point.getLng()))
+                            .pointType(1)
+                            .sequence(createDTO.getRoutePoints().indexOf(point) + 1)
+                            .build())
+                    .toList();
+            routePoints.forEach(routePointMapper::insert);
+        }
+
+        // 9. 保存新的签到点
+        if (createDTO.getCheckpoints() != null && !createDTO.getCheckpoints().isEmpty()) {
+            List<Checkpoint> checkpoints = createDTO.getCheckpoints().stream()
+                    .map(cp -> Checkpoint.builder()
+                            .routeId(routeId)
+                            .name(cp.getName())
+                            .latitude(BigDecimal.valueOf(cp.getLatitude()))
+                            .longitude(BigDecimal.valueOf(cp.getLongitude()))
+                            .radius(cp.getRadius() != null ? cp.getRadius() : CHECKPOINT_RADIUS_DEFAULT)
+                            .sequence(cp.getSequence() != null ? cp.getSequence() : createDTO.getCheckpoints().indexOf(cp) + 1)
+                            .checkpointType(cp.getType() != null ? cp.getType() : CHECKPOINT_TYPE_WAY)
+                            .isRequired(cp.getIsRequired() != null && cp.getIsRequired() ? CHECKPOINT_REQUIRED : 0)
+                            .build())
+                    .toList();
+            checkpoints.forEach(checkpointMapper::insert);
+        }
+    }
+
+    /**
+     * 删除路线（组织者）
+     *
+     * @param userId 用户ID
+     * @param routeId 路线ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteRoute(Long userId, Long routeId) {
+        // 1. 校验用户是否存在
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+
+        // 2. 校验路线是否存在
+        Route route = routeMapper.selectById(routeId);
+        if (route == null) {
+            throw new BusinessException(ResultCode.ROUTE_NOT_FOUND);
+        }
+
+        // 3. 校验权限（必须是路线创建者）
+        if (!route.getCreatorId().equals(userId)) {
+            throw new BusinessException(ResultCode.FORBIDDEN, "只有路线创建者可以删除路线");
+        }
+
+        // 4. 检查路线是否被使用中
+        if (route.getUseCount() != null && route.getUseCount() > 0) {
+            throw new BusinessException(ResultCode.ROUTE_IN_USE);
+        }
+
+        // 5. 删除路线点
+        LambdaQueryWrapper<RoutePoint> pointWrapper = new LambdaQueryWrapper<>();
+        pointWrapper.eq(RoutePoint::getRouteId, routeId);
+        routePointMapper.delete(pointWrapper);
+
+        // 6. 删除签到点
+        LambdaQueryWrapper<Checkpoint> checkpointWrapper = new LambdaQueryWrapper<>();
+        checkpointWrapper.eq(Checkpoint::getRouteId, routeId);
+        checkpointMapper.delete(checkpointWrapper);
+
+        // 7. 删除路线
+        routeMapper.deleteById(routeId);
+        log.info("删除路线成功，路线ID：{}，操作者ID：{}", routeId, userId);
+    }
+
+    /**
+     * 获取路线的签到点列表
+     *
+     * @param routeId 路线ID
+     * @return 签到点列表
+     */
+    @Override
+    public List<Checkpoint> getRouteCheckpoints(Long routeId) {
+        // 校验路线是否存在
+        Route route = routeMapper.selectById(routeId);
+        if (route == null) {
+            throw new BusinessException(ResultCode.ROUTE_NOT_FOUND);
+        }
+
+        // 查询签到点列表
+        LambdaQueryWrapper<Checkpoint> checkpointWrapper = new LambdaQueryWrapper<>();
+        checkpointWrapper.eq(Checkpoint::getRouteId, routeId)
+                .orderByAsc(Checkpoint::getSequence);
+        return checkpointMapper.selectList(checkpointWrapper);
+    }
 }
 

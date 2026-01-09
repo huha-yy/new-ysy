@@ -106,18 +106,11 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(0);
 }
 
-.ant-card {
-  border-radius: 16px;
-  box-shadow: var(--shadow-md);
-  border: 2px solid rgba(255, 167, 38, 0.1);
-  transition: all 0.3s ease;
-}
-
-.ant-card:hover {
-  border-color: rgba(255, 167, 38, 0.3);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-}
+/*
+ * 注意：移除了全局 .ant-card 样式覆盖，避免样式污染
+ * 各页面应在自己的 CSS 文件中使用带页面前缀的选择器定义卡片样式
+ * 例如：.admin-dashboard-page .stat-card { ... }
+ */
 
 .ant-menu {
   background: transparent !important;

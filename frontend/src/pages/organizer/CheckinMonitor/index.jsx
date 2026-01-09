@@ -20,6 +20,7 @@ import { getActivityDetail } from '../../../api/activity'
 import { getCheckinStatus, getCheckpoints } from '../../../api/checkin'
 import { getActivityRegistrations } from '../../../api/registration'
 import dayjs from 'dayjs'
+import MapView from '../../../components/MapView/MapView'
 import './CheckinMonitor.css'
 
 function CheckinMonitor() {
@@ -31,6 +32,7 @@ function CheckinMonitor() {
   const [checkpoints, setCheckpoints] = useState([])
   const [participants, setParticipants] = useState([])
   const [refreshing, setRefreshing] = useState(false)
+  const [mapCenter, setMapCenter] = useState({ lng: 116.397428, lat: 39.90923 })
 
   useEffect(() => {
     fetchData()
@@ -271,6 +273,53 @@ function CheckinMonitor() {
     }
   ]
 
+  // 生成地图标记点
+  const generateMapMarkers = () => {
+    const markers = []
+
+    // 添加签到点标记
+    checkpoints.forEach((cp, index) => {
+      const checkedCount = cp.checkedCount || 0
+      const totalCount = cp.totalCount || 0
+      const isCompleted = checkedCount === totalCount
+
+      // 创建签到点标记内容
+      const markerContent = `
+        <div class="checkpoint-marker ${isCompleted ? 'completed' : ''}">
+          <div class="marker-order">${index + 1}</div>
+          <div class="marker-info">
+            <div class="marker-name">${cp.name}</div>
+            <div class="marker-count">${checkedCount}/${totalCount}人</div>
+          </div>
+        </div>
+      `
+
+      markers.push({
+        lng: cp.longitude,
+        lat: cp.latitude,
+        title: cp.name,
+        content: markerContent
+      })
+
+      // 更新地图中心为第一个签到点
+      if (index === 0 && cp.longitude && cp.latitude) {
+        setMapCenter({ lng: cp.longitude, lat: cp.latitude })
+      }
+    })
+
+    return markers
+  }
+
+  // 生成路线点（用于绘制签到点之间的连线）
+  const generateRoutePoints = () => {
+    return checkpoints
+      .filter(cp => cp.longitude && cp.latitude)
+      .map(cp => ({
+        lng: cp.longitude,
+        lat: cp.latitude
+      }))
+  }
+
   return (
     <div className="checkin-monitor-page">
       {/* 页面头部 */}
@@ -362,6 +411,33 @@ function CheckinMonitor() {
           </Card>
         </Col>
       </Row>
+
+      {/* 地图监控 */}
+      <Card className="map-monitor-card" title="实时地图监控">
+        <div className="map-monitor-content">
+          <MapView
+            center={mapCenter}
+            zoom={14}
+            height="500px"
+            markers={generateMapMarkers()}
+            routePoints={generateRoutePoints()}
+          />
+          <div className="map-legend">
+            <div className="legend-item">
+              <span className="legend-marker checkpoint"></span>
+              <span>签到点</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-marker completed"></span>
+              <span>已完成签到点</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-marker route"></span>
+              <span>活动路线</span>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       {/* 签到点进度 */}
       <Card className="checkpoints-card" title="签到点进度">

@@ -1,11 +1,12 @@
 import { Card, Tag, Button } from 'antd'
-import { 
-  CalendarOutlined, 
-  UserOutlined, 
+import {
+  CalendarOutlined,
+  UserOutlined,
   EnvironmentOutlined,
   FireOutlined
 } from '@ant-design/icons'
 import { DIFFICULTY_MAP, DIFFICULTY } from '../utils/constants'
+import { getActivityCoverUrl } from '../utils/imageUrl'
 import { useNavigate } from 'react-router-dom'
 import './ActivityCard.css'
 
@@ -63,16 +64,6 @@ function ActivityCard({ activity }) {
     return activity.difficultyText || DIFFICULTY_MAP[activity.difficultyLevel] || '未知'
   }
 
-  // 处理活动图片
-  const getImageUrl = () => {
-    if (activity.coverImage) {
-      return activity.coverImage
-    }
-    // 使用随机山地图片作为默认
-    const randomId = activity.id ? activity.id % 9 + 1 : 1
-    return `/public/images/activities/activity-${randomId}.jpg`
-  }
-
   const fee = getFee()
 
   return (
@@ -81,9 +72,9 @@ function ActivityCard({ activity }) {
       className="activity-card"
       cover={
         <div className="activity-cover">
-          <img 
-            alt={activity.title || '活动图片'} 
-            src={getImageUrl()}
+          <img
+            alt={activity.title || '活动图片'}
+            src={getActivityCoverUrl(activity)}
             loading="lazy"
           />
           {activity.isHot && (

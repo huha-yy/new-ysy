@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import { Card, Button, Space, Input, InputNumber, Tag, message, Modal } from 'antd'
+import { Card, Button, Space, Input, InputNumber, Tag, message, Modal, Popconfirm } from 'antd'
 import { PlusOutlined, MinusCircleOutlined, EnvironmentOutlined, FlagOutlined } from '@ant-design/icons'
 import MapView from './MapView'
 import { calculateRouteDistance, formatDistance } from '../../utils/map'
@@ -494,15 +494,21 @@ const RouteEditor = ({
                       ({startPoint.lng?.toFixed(4)}, {startPoint.lat?.toFixed(4)})
                     </span>
                     {!readOnly && (
-                      <Button
-                        type="text"
-                        danger
-                        size="small"
-                        icon={<MinusCircleOutlined />}
-                        onClick={clearStartPoint}
+                      <Popconfirm
+                        title="确认删除起点？"
+                        onConfirm={clearStartPoint}
+                        okText="确定"
+                        cancelText="取消"
                       >
-                        删除
-                      </Button>
+                        <Button
+                          type="text"
+                          danger
+                          size="small"
+                          icon={<MinusCircleOutlined />}
+                        >
+                          删除
+                        </Button>
+                      </Popconfirm>
                     )}
                   </Space>
                 </div>
@@ -516,15 +522,21 @@ const RouteEditor = ({
                       ({endPoint.lng?.toFixed(4)}, {endPoint.lat?.toFixed(4)})
                     </span>
                     {!readOnly && (
-                      <Button
-                        type="text"
-                        danger
-                        size="small"
-                        icon={<MinusCircleOutlined />}
-                        onClick={clearEndPoint}
+                      <Popconfirm
+                        title="确认删除终点？"
+                        onConfirm={clearEndPoint}
+                        okText="确定"
+                        cancelText="取消"
                       >
-                        删除
-                      </Button>
+                        <Button
+                          type="text"
+                          danger
+                          size="small"
+                          icon={<MinusCircleOutlined />}
+                        >
+                          删除
+                        </Button>
+                      </Popconfirm>
                     )}
                   </Space>
                 </div>
@@ -542,15 +554,21 @@ const RouteEditor = ({
                     <span>{cp.name}</span>
                     <span className="checkpoint-radius">半径{cp.radius}m</span>
                     {!readOnly && (
-                      <Button
-                        type="text"
-                        danger
-                        size="small"
-                        icon={<MinusCircleOutlined />}
-                        onClick={() => removeCheckpoint(index)}
+                      <Popconfirm
+                        title="确认删除该签到点？"
+                        onConfirm={() => removeCheckpoint(index)}
+                        okText="确定"
+                        cancelText="取消"
                       >
-                        删除
-                      </Button>
+                        <Button
+                          type="text"
+                          danger
+                          size="small"
+                          icon={<MinusCircleOutlined />}
+                        >
+                          删除
+                        </Button>
+                      </Popconfirm>
                     )}
                   </Space>
                 </div>
@@ -566,15 +584,21 @@ const RouteEditor = ({
                   <Space>
                     <span>{wp.name}</span>
                     {!readOnly && (
-                      <Button
-                        type="text"
-                        danger
-                        size="small"
-                        icon={<MinusCircleOutlined />}
-                        onClick={() => removeWaypoint(index)}
+                      <Popconfirm
+                        title="确认删除该途经点？"
+                        onConfirm={() => removeWaypoint(index)}
+                        okText="确定"
+                        cancelText="取消"
                       >
-                        删除
-                      </Button>
+                        <Button
+                          type="text"
+                          danger
+                          size="small"
+                          icon={<MinusCircleOutlined />}
+                        >
+                          删除
+                        </Button>
+                      </Popconfirm>
                     )}
                   </Space>
                 </div>

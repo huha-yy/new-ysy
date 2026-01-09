@@ -32,6 +32,16 @@ export const updateUserStatus = (id, data) => {
 }
 
 /**
+ * 更新用户角色
+ * @param {number} id - 用户ID
+ * @param {Object} data - { role: 0-普通用户, 1-组织者, 2-管理员 }
+ * @returns {Promise}
+ */
+export const updateUserRole = (id, data) => {
+  return request.put(`/admin/users/${id}/role`, data)
+}
+
+/**
  * 获取待审核活动列表
  * @param {Object} params - 查询参数
  * @returns {Promise} 活动列表

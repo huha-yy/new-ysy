@@ -4,7 +4,10 @@
   height: 100%;
   border-radius: 20px;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* 只对需要动画的属性添加过渡，避免 transition: all 导致页面切换时的异常 */
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid rgba(255, 167, 38, 0.1);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   cursor: pointer;

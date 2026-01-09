@@ -1,5 +1,5 @@
 /* =============================================
-   报名管理页面样式
+   报名管理页面样式 - 所有选择器都使用 .registration-manage-page 前缀避免样式污染
    ============================================= */
 
 .registration-manage-page {
@@ -12,7 +12,7 @@
    页面头部
    ============================================= */
 
-.page-header {
+.registration-manage-page .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -23,7 +23,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.page-title {
+.registration-manage-page .page-title {
   font-size: 24px;
   font-weight: 700;
   color: #1a1a1a;
@@ -33,7 +33,7 @@
   gap: 12px;
 }
 
-.title-icon {
+.registration-manage-page .title-icon {
   font-size: 28px;
   color: #1890ff;
 }
@@ -42,28 +42,27 @@
    统计卡片
    ============================================= */
 
-.stats-row {
+.registration-manage-page .stats-row {
   margin-bottom: 24px;
 }
 
-.stats-row .ant-card {
+.registration-manage-page .stats-row .ant-card {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
 }
 
-.stats-row .ant-card:hover {
+.registration-manage-page .stats-row .ant-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
-.stats-row .ant-statistic-title {
+.registration-manage-page .stats-row .ant-statistic-title {
   font-size: 14px;
   color: #8c8c8c;
   margin-bottom: 8px;
 }
 
-.stats-row .ant-statistic-content {
+.registration-manage-page .stats-row .ant-statistic-content {
   font-size: 28px;
   font-weight: 700;
 }
@@ -72,17 +71,17 @@
    搜索卡片
    ============================================= */
 
-.search-card {
+.registration-manage-page .search-card {
   margin-bottom: 24px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.search-card .ant-card-body {
+.registration-manage-page .search-card .ant-card-body {
   padding: 20px 24px;
 }
 
-.search-label {
+.registration-manage-page .search-label {
   display: inline-block;
   width: 70px;
   text-align: right;
@@ -95,20 +94,20 @@
    表格卡片
    ============================================= */
 
-.table-card {
+.registration-manage-page .table-card {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.table-card .ant-card-body {
+.registration-manage-page .table-card .ant-card-body {
   padding: 20px 24px;
 }
 
-.table-card .ant-tabs {
+.registration-manage-page .table-card .ant-tabs {
   margin-bottom: 16px;
 }
 
-.table-card .ant-tabs-nav {
+.registration-manage-page .table-card .ant-tabs-nav {
   margin-bottom: 20px;
 }
 
@@ -116,36 +115,36 @@
    表格样式
    ============================================= */
 
-.user-cell {
+.registration-manage-page .user-cell {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.user-avatar {
+.registration-manage-page .user-avatar {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: 2px solid #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.user-info {
+.registration-manage-page .user-info {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.user-nickname {
+.registration-manage-page .user-nickname {
   font-size: 14px;
   font-weight: 600;
   color: #262626;
 }
 
-.user-username {
+.registration-manage-page .user-username {
   font-size: 12px;
   color: #8c8c8c;
 }
 
-.contact-cell {
+.registration-manage-page .contact-cell {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -153,13 +152,13 @@
   color: #595959;
 }
 
-.contact-cell span {
+.registration-manage-page .contact-cell span {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.remark-text {
+.registration-manage-page .remark-text {
   color: #595959;
   font-size: 13px;
 }
@@ -168,29 +167,29 @@
    详情弹窗
    ============================================= */
 
-.detail-modal {
+.registration-manage-page .detail-modal {
   padding: 12px 0;
 }
 
-.detail-item {
+.registration-manage-page .detail-item {
   display: flex;
   align-items: flex-start;
   padding: 12px 0;
   border-bottom: 1px solid #f0f0f0;
 }
 
-.detail-item:last-child {
+.registration-manage-page .detail-item:last-child {
   border-bottom: none;
 }
 
-.detail-item .label {
+.registration-manage-page .detail-item .label {
   width: 120px;
   color: #8c8c8c;
   font-size: 14px;
   flex-shrink: 0;
 }
 
-.detail-item .value {
+.registration-manage-page .detail-item .value {
   flex: 1;
   color: #262626;
   font-size: 14px;
@@ -202,7 +201,7 @@
    ============================================= */
 
 @media (max-width: 1400px) {
-  .stats-row .ant-col {
+  .registration-manage-page .stats-row .ant-col {
     margin-bottom: 16px;
   }
 }
@@ -212,85 +211,55 @@
     padding: 16px;
   }
 
-  .page-header {
+  .registration-manage-page .page-header {
     padding: 16px 20px;
   }
 
-  .search-card .ant-card-body {
+  .registration-manage-page .search-card .ant-card-body {
     padding: 16px 20px;
   }
 
-  .table-card .ant-card-body {
+  .registration-manage-page .table-card .ant-card-body {
     padding: 16px 20px;
   }
 }
 
 @media (max-width: 768px) {
-  .stats-row {
+  .registration-manage-page .stats-row {
     display: none;
   }
 
-  .page-header {
+  .registration-manage-page .page-header {
     flex-direction: column;
     gap: 12px;
     align-items: flex-start;
   }
 
-  .page-title {
+  .registration-manage-page .page-title {
     font-size: 20px;
   }
 
-  .search-card .ant-row {
+  .registration-manage-page .search-card .ant-row {
     flex-direction: column;
   }
 
-  .search-card .ant-col {
+  .registration-manage-page .search-card .ant-col {
     width: 100% !important;
     margin-bottom: 12px;
   }
 
-  .search-label {
+  .registration-manage-page .search-label {
     text-align: left;
     width: auto;
     display: block;
     margin-bottom: 8px;
   }
 
-  .table-card {
+  .registration-manage-page .table-card {
     overflow-x: auto;
   }
 
-  .table-card .ant-table-wrapper {
+  .registration-manage-page .table-card .ant-table-wrapper {
     min-width: 800px;
   }
 }
-
-/* =============================================
-   动画效果
-   ============================================= */
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.page-header,
-.stats-row,
-.search-card,
-.table-card {
-  animation: fadeIn 0.3s ease;
-}
-
-.stats-row .ant-card:nth-child(1) { animation-delay: 0.1s; }
-.stats-row .ant-card:nth-child(2) { animation-delay: 0.15s; }
-.stats-row .ant-card:nth-child(3) { animation-delay: 0.2s; }
-.stats-row .ant-card:nth-child(4) { animation-delay: 0.25s; }
-.stats-row .ant-card:nth-child(5) { animation-delay: 0.3s; }
-.stats-row .ant-card:nth-child(6) { animation-delay: 0.35s; }
-

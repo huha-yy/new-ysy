@@ -276,5 +276,142 @@ public class ReviewServiceImpl implements ReviewService {
 
         return java.math.BigDecimal.valueOf(sum / count).setScale(1, java.math.RoundingMode.HALF_UP);
     }
+
+    /**
+     * 获取用户的评价列表
+     *
+     * @param userId 用户ID
+     * @param pageNum 页码
+     * @param pageSize 每页大小
+     * @return 分页结果
+     */
+    @Override
+    public IPage<ReviewVO> getUserReviews(Long userId, Integer pageNum, Integer pageSize) {
+        // 构建查询条件
+        LambdaQueryWrapper<Review> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Review::getUserId, userId)
+                .orderByDesc(Review::getCreateTime);
+
+        // 分页查询
+        Page<Review> page = new Page<>(pageNum, pageSize);
+        IPage<Review> reviewPage = reviewMapper.selectPage(page, queryWrapper);
+
+        // 转换为VO
+        return reviewPage.convert(this::convertToVO);
+    }
+
+    /**
+     * 获取用户的评价统计
+     *
+     * @param userId 用户ID
+     * @return 评价统计
+     */
+    @Override
+    public ReviewStatsVO getUserReviewStats(Long userId) {
+        // 查询用户所有评价
+        LambdaQueryWrapper<Review> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Review::getUserId, userId);
+        java.util.List<Review> reviews = reviewMapper.selectList(queryWrapper);
+
+        if (reviews == null || reviews.isEmpty()) {
+            return ReviewStatsVO.builder()
+                    .overallRating(java.math.BigDecimal.ZERO)
+                    .routeRating(java.math.BigDecimal.ZERO)
+                    .organizationRating(java.math.BigDecimal.ZERO)
+                    .safetyRating(java.math.BigDecimal.ZERO)
+                    .totalReviews(0L)
+                    .ratingDistribution(java.util.Collections.emptyList())
+                    .build();
+        }
+
+        // 计算各项评分平均值
+        java.math.BigDecimal overallAvg = calculateAverage(reviews, Review::getOverallRating);
+        java.math.BigDecimal routeAvg = calculateAverage(reviews, Review::getRouteRating);
+        java.math.BigDecimal organizationAvg = calculateAverage(reviews, Review::getOrganizationRating);
+        java.math.BigDecimal safetyAvg = calculateAverage(reviews, Review::getSafetyRating);
+
+        // 统计评分分布
+        java.util.List<ReviewStatsVO.RatingDistribution> distribution = new java.util.ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            final int rating = i;
+            long count = reviews.stream()
+                    .filter(r -> r.getOverallRating() != null && r.getOverallRating().intValue() == rating)
+                    .count();
+            distribution.add(ReviewStatsVO.RatingDistribution.builder()
+                    .rating(rating)
+                    .count(count)
+                    .build());
+        }
+
+        return ReviewStatsVO.builder()
+                .overallRating(overallAvg)
+                .routeRating(routeAvg)
+                .organizationRating(organizationAvg)
+                .safetyRating(safetyAvg)
+                .totalReviews((long) reviews.size())
+                .ratingDistribution(distribution)
+                .build();
+    }
+
+    /**
+     * 删除评价
+     *
+     * @param userId 用户ID
+     * @param reviewId 评价ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteReview(Long userId, Long reviewId) {
+        // 查询评价
+        Review review = reviewMapper.selectById(reviewId);
+        if (review == null) {
+            throw new BusinessException(ResultCode.REVIEW_NOT_FOUND);
+        }
+
+        // 校验是否是评价作者
+        if (!review.getUserId().equals(userId)) {
+            throw new BusinessException(ResultCode.FORBIDDEN);
+        }
+
+        // 删除评价
+        reviewMapper.deleteById(reviewId);
+        log.info("评价删除成功，评价ID：{}，用户ID：{}", reviewId, userId);
+    }
+
+    /**
+     * 更新评价
+     *
+     * @param userId 用户ID
+     * @param reviewId 评价ID
+     * @param createDTO 更新信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateReview(Long userId, Long reviewId, ReviewCreateDTO createDTO) {
+        // 查询评价
+        Review review = reviewMapper.selectById(reviewId);
+        if (review == null) {
+            throw new BusinessException(ResultCode.REVIEW_NOT_FOUND);
+        }
+
+        // 校验是否是评价作者
+        if (!review.getUserId().equals(userId)) {
+            throw new BusinessException(ResultCode.FORBIDDEN);
+        }
+
+        // 更新评价
+        review.setOverallRating(createDTO.getOverallRating());
+        review.setRouteRating(createDTO.getRouteRating());
+        review.setOrganizationRating(createDTO.getOrganizationRating());
+        review.setSafetyRating(createDTO.getSafetyRating());
+        review.setContent(createDTO.getContent());
+        review.setImages(createDTO.getImages());
+        if (createDTO.getIsAnonymous() != null) {
+            review.setIsAnonymous(createDTO.getIsAnonymous());
+        }
+
+        reviewMapper.updateById(review);
+        log.info("评价更新成功，评价ID：{}，用户ID：{}", reviewId, userId);
+    }
 }
 
