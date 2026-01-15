@@ -44,6 +44,8 @@ function RouteEdit() {
   const [routePoints, setRoutePoints] = useState([])
   const [checkpoints, setCheckpoints] = useState([])
   const [waypoints, setWaypoints] = useState([])
+  const [startPoint, setStartPoint] = useState(null)
+  const [endPoint, setEndPoint] = useState(null)
   const [routeData, setRouteData] = useState({
     difficultyLevel: 1,
     isPublic: true
@@ -58,7 +60,9 @@ function RouteEdit() {
     try {
       setFetching(true)
       const data = await getRouteDetail(id)
-      
+
+      console.log('🔍 获取到的路线数据：', data)
+
       // 设置表单数据
       const formData = {
         name: data.name,
@@ -73,21 +77,24 @@ function RouteEdit() {
         totalDistance: data.totalDistance
       }
       form.setFieldsValue(formData)
-      
+
       // 设置路线数据
       setRouteData(formData)
-      
+
       // 转换路线点格式
       if (data.routePoints && data.routePoints.length > 0) {
+        console.log('🔍 原始路线点数据：', data.routePoints)
         const points = data.routePoints.map(point => ({
           lat: point.latitude,
           lng: point.longitude
         }))
+        console.log('🔍 转换后路线点：', points)
         setRoutePoints(points)
       }
-      
+
       // 转换签到点格式
       if (data.checkpoints && data.checkpoints.length > 0) {
+        console.log('🔍 原始签到点数据：', data.checkpoints)
         const cps = data.checkpoints.map(cp => ({
           lat: cp.latitude,
           lng: cp.longitude,
@@ -97,11 +104,13 @@ function RouteEdit() {
           type: cp.type,
           isRequired: cp.isRequired
         }))
+        console.log('🔍 转换后签到点：', cps)
         setCheckpoints(cps)
       }
-      
+
       // 转换途经点格式
       if (data.waypoints && data.waypoints.length > 0) {
+        console.log('🔍 原始途经点数据：', data.waypoints)
         const wps = data.waypoints.map(wp => ({
           lat: wp.latitude,
           lng: wp.longitude,
@@ -109,7 +118,36 @@ function RouteEdit() {
           pointType: wp.pointType,
           sequence: wp.sequence
         }))
+        console.log('🔍 转换后途经点：', wps)
         setWaypoints(wps)
+      }
+
+      // 设置起点
+      if (data.startPoint) {
+        console.log('🔍 原始起点数据：', data.startPoint)
+        const startPt = {
+          lat: data.startPoint.latitude,
+          lng: data.startPoint.longitude,
+          name: data.startPoint.name || '起点'
+        }
+        console.log('🔍 转换后起点：', startPt)
+        setStartPoint(startPt)
+      } else {
+        console.log('🔍 没有起点数据')
+      }
+
+      // 设置终点
+      if (data.endPoint) {
+        console.log('🔍 原始终点数据：', data.endPoint)
+        const endPt = {
+          lat: data.endPoint.latitude,
+          lng: data.endPoint.longitude,
+          name: data.endPoint.name || '终点'
+        }
+        console.log('🔍 转换后终点：', endPt)
+        setEndPoint(endPt)
+      } else {
+        console.log('🔍 没有终点数据')
       }
     } catch (error) {
       console.error('获取路线详情失败:', error)
@@ -154,7 +192,20 @@ function RouteEdit() {
       const submitData = {
         ...routeData,
         ...await form.validateFields(),
-        routePoints,
+        routePoints: routePoints.map(point => ({
+          latitude: point.lat,
+          longitude: point.lng
+        })),
+        startPoint: startPoint ? {
+          latitude: startPoint.lat,
+          longitude: startPoint.lng,
+          name: startPoint.name
+        } : null,
+        endPoint: endPoint ? {
+          latitude: endPoint.lat,
+          longitude: endPoint.lng,
+          name: endPoint.name
+        } : null,
         checkpoints: checkpoints.map((cp, index) => ({
           name: cp.name,
           latitude: cp.lat,
@@ -172,6 +223,8 @@ function RouteEdit() {
           sequence: wp.sequence
         }))
       }
+
+      console.log('🚀 提交的数据：', submitData)
 
       await updateRoute(id, submitData)
       message.success('路线更新成功！')
@@ -200,6 +253,14 @@ function RouteEdit() {
 
   const handleWaypointsChange = useCallback((waypoints) => {
     setWaypoints(waypoints)
+  }, [])
+
+  const handleStartPointChange = useCallback((startPoint) => {
+    setStartPoint(startPoint)
+  }, [])
+
+  const handleEndPointChange = useCallback((endPoint) => {
+    setEndPoint(endPoint)
   }, [])
 
   const calculateRouteDistance = (points) => {
@@ -385,14 +446,35 @@ function RouteEdit() {
               showIcon
               style={{ marginBottom: 24 }}
             />
-            <RouteEditor
-              initialRoute={routePoints}
-              initialCheckpoints={checkpoints}
-              initialWaypoints={waypoints}
-              onRouteChange={handleRouteChange}
-              onCheckpointsChange={handleCheckpointsChange}
-              onWaypointsChange={handleWaypointsChange}
-            />
+            {fetching ? (
+              <div style={{ textAlign: 'center', padding: '50px' }}>
+                <div>加载中...</div>
+              </div>
+            ) : (
+              <>
+                <RouteEditor
+                  initialRoute={routePoints}
+                  initialCheckpoints={checkpoints}
+                  initialWaypoints={waypoints}
+                  initialStartPoint={startPoint}
+                  initialEndPoint={endPoint}
+                  onRouteChange={handleRouteChange}
+                  onCheckpointsChange={handleCheckpointsChange}
+                  onWaypointsChange={handleWaypointsChange}
+                  onStartPointChange={handleStartPointChange}
+                  onEndPointChange={handleEndPointChange}
+                />
+                {/* 调试信息 */}
+                <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f0f0f0', fontSize: '12px' }}>
+                  <strong>调试信息：</strong>
+                  <div>routePoints: {JSON.stringify(routePoints)}</div>
+                  <div>checkpoints: {JSON.stringify(checkpoints)}</div>
+                  <div>waypoints: {JSON.stringify(waypoints)}</div>
+                  <div>startPoint: {JSON.stringify(startPoint)}</div>
+                  <div>endPoint: {JSON.stringify(endPoint)}</div>
+                </div>
+              </>
+            )}
           </div>
         )
 

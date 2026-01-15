@@ -18,13 +18,252 @@
   margin-top: 8px;
 }
 
-.route-stats {
-  padding: 12px;
-  background-color: #f0f2f5;
-  border-radius: 4px;
-  font-size: 14px;
+/* 新增：统计信息卡片样式 */
+.route-stats-card {
+  background: linear-gradient(135deg, #f6f9fc 0%, #ffffff 100%);
+  border: 1px solid #e8f4fd;
 }
 
+.route-stats {
+  padding: 0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 80px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.total-distance {
+  background: linear-gradient(135deg, #fff2e8 0%, #fff7e6 100%);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ffd591;
+}
+
+.distance-icon {
+  font-size: 16px;
+  margin-right: 4px;
+}
+
+.distance-value {
+  font-weight: bold;
+  color: #d46b08;
+  margin-right: 4px;
+}
+
+/* 起点终点卡片样式 */
+.start-end-card {
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+  border: 1px solid #bae7ff;
+}
+
+.point-item {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #e6f7ff;
+  border-radius: 6px;
+  padding: 12px;
+  transition: all 0.3s ease;
+}
+
+.point-item:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.point-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.point-header {
+  flex: 1;
+}
+
+.point-icon {
+  font-size: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+}
+
+.start-icon {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  color: white;
+}
+
+.end-icon {
+  background: linear-gradient(135deg, #f5222d 0%, #ff4d4f 100%);
+  color: white;
+}
+
+.point-info {
+  flex: 1;
+}
+
+.point-title {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.point-coordinates {
+  font-size: 12px;
+  color: #999;
+  font-family: monospace;
+}
+
+.point-action {
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.point-action:hover {
+  opacity: 1;
+}
+
+/* 签到点卡片样式 */
+.checkpoints-card {
+  background: linear-gradient(135deg, #fff1f0 0%, #ffffff 100%);
+  border: 1px solid #ffccc7;
+}
+
+.checkpoint-item {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ffecec;
+  border-radius: 6px;
+  padding: 12px;
+  transition: all 0.3s ease;
+}
+
+.checkpoint-item:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.checkpoint-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.checkpoint-header {
+  flex: 1;
+}
+
+.checkpoint-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.checkpoint-info {
+  flex: 1;
+  margin-left: 8px;
+}
+
+.checkpoint-name {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.checkpoint-details {
+  display: flex;
+  gap: 4px;
+}
+
+.checkpoint-action {
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.checkpoint-action:hover {
+  opacity: 1;
+}
+
+/* 途经点卡片样式 */
+.waypoints-card {
+  background: linear-gradient(135deg, #f6ffed 0%, #ffffff 100%);
+  border: 1px solid #b7eb8f;
+}
+
+.waypoint-item {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #eef9e8;
+  border-radius: 6px;
+  padding: 12px;
+  transition: all 0.3s ease;
+}
+
+.waypoint-item:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.waypoint-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.waypoint-header {
+  flex: 1;
+}
+
+.waypoint-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  color: white;
+  margin-right: 8px;
+}
+
+.waypoint-info {
+  flex: 1;
+}
+
+.waypoint-name {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.waypoint-details {
+  display: flex;
+  gap: 4px;
+}
+
+.waypoint-action {
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.waypoint-action:hover {
+  opacity: 1;
+}
+
+/* 旧样式保持兼容 */
 .checkpoints-list,
 .waypoints-list {
   margin-top: 16px;
@@ -36,13 +275,6 @@
   font-weight: bold;
   margin-bottom: 8px;
   color: #333;
-}
-
-.checkpoint-item,
-.waypoint-item {
-  padding: 8px;
-  border-bottom: 1px solid #f0f0f0;
-  font-size: 14px;
 }
 
 .checkpoint-radius {

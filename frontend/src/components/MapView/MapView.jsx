@@ -15,6 +15,8 @@ import './MapView.css'
  * @param {Array} props.routePoints - 路线点数组（用于绘制连线）
  * @param {boolean} props.showCurrentLocation - 是否显示当前位置
  * @param {Function} props.onMarkerClick - 标记点击回调
+ * @param {boolean} props.autoFitView - 是否在绘制路线时自动调整视野（默认false，避免打断用户操作）
+ * @param {boolean} props.allowCenterChange - 是否允许动态改变地图中心（默认true）
  */
 const MapView = ({
   center = { lng: 116.397428, lat: 39.90923 },
@@ -26,6 +28,8 @@ const MapView = ({
   routePoints = [],
   showCurrentLocation = false,
   onMarkerClick,
+  autoFitView = false,
+  allowCenterChange = true,
   children
 }) => {
   const mapRef = useRef(null)
@@ -45,14 +49,14 @@ const MapView = ({
   }, [])
 
   useEffect(() => {
-    if (mapInstance.current && center) {
+    if (mapInstance.current && center && allowCenterChange) {
       const lng = parseFloat(center.lng)
       const lat = parseFloat(center.lat)
       if (!isNaN(lng) && !isNaN(lat) && lng !== 0 && lat !== 0) {
         mapInstance.current.setCenter([lng, lat])
       }
     }
-  }, [center])
+  }, [center, allowCenterChange])
 
   useEffect(() => {
     if (mapInstance.current && zoom) {
@@ -187,13 +191,21 @@ const MapView = ({
       })
 
       try {
-        const marker = new AMap.Marker({
+        // 构建标记配置对象
+        const markerConfig = {
           position: [lng, lat],
           title: markerData.title || `标记${index + 1}`,
-          content: markerData.content,
-          offset: markerData.offset || new AMap.Pixel(-10, -10),
-          icon: markerData.icon
-        })
+          offset: markerData.offset || new AMap.Pixel(-10, -10)
+        }
+
+        // 如果有自定义content，使用content；否则使用icon
+        if (markerData.content) {
+          markerConfig.content = markerData.content
+        } else if (markerData.icon) {
+          markerConfig.icon = markerData.icon
+        }
+
+        const marker = new AMap.Marker(markerConfig)
 
         if (onMarkerClick) {
           marker.on('click', () => {
@@ -256,10 +268,12 @@ const MapView = ({
 
         routeLineRef.current.setMap(mapInstance.current)
 
-        // 自动调整地图视野以显示完整路线
-        const bounds = new AMap.Bounds()
-        path.forEach(point => bounds.extend(point))
-        mapInstance.current.setBounds(bounds)
+        // 只在启用自动适应视野时才调整地图视野
+        if (autoFitView) {
+          const bounds = new AMap.Bounds()
+          path.forEach(point => bounds.extend(point))
+          mapInstance.current.setBounds(bounds)
+        }
 
         console.log('✓ 路线绘制成功')
       } catch (error) {
