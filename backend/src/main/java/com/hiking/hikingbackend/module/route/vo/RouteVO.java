@@ -102,6 +102,9 @@ public class RouteVO {
     @Schema(description = "签到点列表")
     private List<CheckpointVO> checkpoints;
 
+    @Schema(description = "当前用户是否可以编辑此路线", example = "true")
+    private Boolean canEdit;
+
     @Schema(description = "创建时间", example = "2024-12-24 20:00:00")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime createTime;

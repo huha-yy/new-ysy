@@ -67,6 +67,26 @@ public class RouteController {
     }
 
     /**
+     * 我的路线列表（组织者专用）
+     *
+     * @param query 查询条件
+     * @return 路线列表
+     */
+    @Operation(summary = "我的路线列表", description = "查询当前用户创建的所有路线（包括私有），需要登录", security = {@SecurityRequirement(name = "Bearer Authentication")})
+    @SecurityRequirement(name = "Bearer Authentication")
+    @GetMapping("/organizer/routes")
+    public Result<IPage<RouteVO>> getMyRoutes(RouteQuery query) {
+        // 获取当前用户ID
+        Long userId = SecurityUtils.getCurrentUserId();
+        if (userId == null) {
+            throw new RuntimeException("无法获取当前用户ID");
+        }
+
+        IPage<RouteVO> page = routeService.getMyRoutes(userId, query);
+        return Result.success(page);
+    }
+
+    /**
      * 路线详情（含点位信息）
      *
      * @param routeId 路线ID

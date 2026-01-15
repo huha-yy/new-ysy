@@ -32,6 +32,15 @@ public interface RouteService {
     IPage<RouteVO> getRouteList(RouteQuery query);
 
     /**
+     * 我的路线列表（组织者专用）
+     *
+     * @param userId 用户ID
+     * @param query 查询条件
+     * @return 分页结果
+     */
+    IPage<RouteVO> getMyRoutes(Long userId, RouteQuery query);
+
+    /**
      * 路线详情（含点位信息）
      *
      * @param routeId 路线ID

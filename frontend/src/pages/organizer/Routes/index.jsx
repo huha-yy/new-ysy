@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Card, Table, Button, Space, Tag, Input, Select, message, Modal, Popconfirm } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
-import { getRouteList, deleteRoute } from '../../../api/route'
+import { getMyRoutes, deleteRoute } from '../../../api/route'
 import dayjs from 'dayjs'
 import './Routes.css'
 
@@ -52,7 +52,7 @@ function Routes() {
         ...filters
       }
 
-      const result = await getRouteList(params)
+      const result = await getMyRoutes(params)
       setRoutes(result.records || [])
       setPagination({
         ...pagination,
@@ -100,6 +100,28 @@ function Routes() {
     }
   }
 
+  const handleCopy = (route) => {
+    // 复制路线：导航到路线创建页面，并预填充数据
+    const routeData = {
+      name: `${route.name} - 副本`,
+      description: route.description,
+      difficultyLevel: route.difficultyLevel,
+      totalDistance: route.totalDistance,
+      elevationGain: route.elevationGain,
+      elevationLoss: route.elevationLoss,
+      maxElevation: route.maxElevation,
+      minElevation: route.minElevation,
+      estimatedHours: route.estimatedHours,
+      region: route.region,
+      isPublic: 1  // 复制的路线默认为公开
+    }
+
+    // 将路线数据存储到sessionStorage，供创建页面使用
+    sessionStorage.setItem('copyRouteData', JSON.stringify(routeData))
+    navigate('/organizer/route/create?copy=true')
+    message.info('已复制路线信息，请在创建页面中完善路径和签到点')
+  }
+
   const handleView = (route) => {
     // 查看路线详情
     Modal.info({
@@ -128,6 +150,9 @@ function Routes() {
       render: (text, record) => (
         <Space>
           <span className="route-name">{text}</span>
+          {record.canEdit && (
+            <Tag size="small" color="blue">我的</Tag>
+          )}
         </Space>
       )
     },
@@ -176,6 +201,17 @@ function Routes() {
       render: (count) => <span className="use-count">{count || 0}</span>
     },
     {
+      title: '可见性',
+      dataIndex: 'isPublic',
+      key: 'isPublic',
+      width: 100,
+      render: (isPublic) => (
+        <Tag color={isPublic === 1 ? 'green' : 'orange'}>
+          {isPublic === 1 ? '公开' : '私有'}
+        </Tag>
+      )
+    },
+    {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
@@ -207,30 +243,43 @@ function Routes() {
           >
             查看
           </Button>
-          <Button
-            type="link"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          >
-            编辑
-          </Button>
-          <Popconfirm
-            title="确认删除"
-            description="确定要删除这条路线吗？"
-            onConfirm={() => handleDelete(record.id)}
-            okText="确定"
-            cancelText="取消"
-          >
+          {record.canEdit && (
+            <>
+              <Button
+                type="link"
+                size="small"
+                icon={<EditOutlined />}
+                onClick={() => handleEdit(record)}
+              >
+                编辑
+              </Button>
+              <Popconfirm
+                title="确认删除"
+                description="确定要删除这条路线吗？"
+                onConfirm={() => handleDelete(record.id)}
+                okText="确定"
+                cancelText="取消"
+              >
+                <Button
+                  type="link"
+                  size="small"
+                  danger
+                  icon={<DeleteOutlined />}
+                >
+                  删除
+                </Button>
+              </Popconfirm>
+            </>
+          )}
+          {!record.canEdit && record.isPublic === 1 && (
             <Button
               type="link"
               size="small"
-              danger
-              icon={<DeleteOutlined />}
+              onClick={() => handleCopy(record)}
             >
-              删除
+              复制
             </Button>
-          </Popconfirm>
+          )}
         </Space>
       )
     }

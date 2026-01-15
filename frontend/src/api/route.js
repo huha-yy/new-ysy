@@ -8,6 +8,13 @@ export const getRouteList = (params) => {
 }
 
 /**
+ * 获取我的路线列表（组织者专用）
+ */
+export const getMyRoutes = (params) => {
+  return request.get('/organizer/routes', { params })
+}
+
+/**
  * 获取路线详情
  */
 export const getRouteDetail = (id) => {

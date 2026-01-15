@@ -46,15 +46,40 @@ function RouteCreate() {
   const [endPoint, setEndPoint] = useState(null) // 终点
   const [routeData, setRouteData] = useState({
     difficultyLevel: 1,
-    isPublic: true
+    isPublic: 1
   })
 
-  // 初始化时计算一次总距离（如果已有数据）
-  useEffect(() => {
-    if (startPoint || endPoint || (routePoints && routePoints.length > 0)) {
-      updateTotalDistance()
+  // 计算完整路线距离的函数
+  const calculateTotalDistance = useCallback((startPt, endPt, routePts) => {
+    // 构建完整路径：起点 → 途经点 → 终点
+    const fullPath = []
+    if (startPt) {
+      fullPath.push(startPt)
     }
-  }, [])
+    if (routePts && routePts.length > 0) {
+      fullPath.push(...routePts)
+    }
+    if (endPt) {
+      fullPath.push(endPt)
+    }
+
+    // 如果至少有两个点，计算距离
+    if (fullPath.length >= 2) {
+      const distance = calculateRouteDistance(fullPath)
+      const distanceInKm = (distance / 1000).toFixed(2)
+      form.setFieldValue('totalDistance', distanceInKm)
+      // 同步更新到 routeData 中，供确认页面显示
+      setRouteData(prev => ({ ...prev, totalDistance: distanceInKm }))
+      console.log('✓ 路线总距离更新:', distanceInKm, 'km')
+      return distanceInKm
+    }
+    return '0.00'
+  }, [form])
+
+  // 当关键路线数据变化时自动重算总距离
+  useEffect(() => {
+    calculateTotalDistance(startPoint, endPoint, routePoints)
+  }, [startPoint, endPoint, routePoints, calculateTotalDistance])
 
   const handlePrev = () => {
     setCurrentStep(currentStep - 1)
@@ -110,8 +135,8 @@ function RouteCreate() {
       const submitData = {
         ...routeData,
         ...formData,
-        // 将 Boolean 类型的 isPublic 转换为 Integer（0 或 1）
-        isPublic: formData.isPublic ? 1 : 0,
+        // 直接使用 formData.isPublic（现在是数字类型）
+        isPublic: formData.isPublic,
         // 起点信息
         startPointName: startPoint?.name || '起点',
         startLatitude: startPoint?.lat,
@@ -154,9 +179,9 @@ function RouteCreate() {
   }
 
   const handleRouteChange = useCallback((points) => {
+    console.log('✓ 路线点更新:', points?.length, '个点')
     setRoutePoints(points)
-    // 触发重新计算总里程
-    updateTotalDistance()
+    // 删除立即调用 updateTotalDistance()，改由 useEffect 自动触发
   }, [])
 
   const handleCheckpointsChange = useCallback((checkpoints) => {
@@ -168,40 +193,16 @@ function RouteCreate() {
   }, [])
 
   const handleStartPointChange = useCallback((point) => {
-    setStartPoint(point)
     console.log('✓ 起点更新:', point)
-    // 触发重新计算总里程
-    updateTotalDistance()
+    setStartPoint(point)
+    // 删除立即调用 updateTotalDistance()，改由 useEffect 自动触发
   }, [])
 
   const handleEndPointChange = useCallback((point) => {
-    setEndPoint(point)
     console.log('✓ 终点更新:', point)
-    // 触发重新计算总里程
-    updateTotalDistance()
+    setEndPoint(point)
+    // 删除立即调用 updateTotalDistance()，改由 useEffect 自动触发
   }, [])
-
-  // 计算完整路线距离（起点 + 途经点 + 终点）
-  const updateTotalDistance = () => {
-    // 构建完整路径：起点 → 途经点 → 终点
-    const fullPath = []
-    if (startPoint) {
-      fullPath.push(startPoint)
-    }
-    if (routePoints && routePoints.length > 0) {
-      fullPath.push(...routePoints)
-    }
-    if (endPoint) {
-      fullPath.push(endPoint)
-    }
-
-    // 如果至少有两个点，计算距离
-    if (fullPath.length >= 2) {
-      const distance = calculateRouteDistance(fullPath)
-      form.setFieldValue('totalDistance', (distance / 1000).toFixed(2))
-      console.log('✓ 路线总距离更新:', (distance / 1000).toFixed(2), 'km')
-    }
-  }
 
   const calculateRouteDistance = (points) => {
     let totalDistance = 0
@@ -246,7 +247,8 @@ function RouteCreate() {
               layout="vertical"
               initialValues={{
                 difficultyLevel: 1,
-                isPublic: true
+                isPublic: 1,
+                totalDistance: '0.00'
               }}
             >
               <Form.Item
@@ -372,9 +374,17 @@ function RouteCreate() {
                 name="isPublic"
               >
                 <Select>
-                  <Option value={true}>公开（所有人可见）</Option>
-                  <Option value={false}>私有（仅自己可见）</Option>
+                  <Option value={1}>公开（所有人可见）</Option>
+                  <Option value={0}>私有（仅自己可见）</Option>
                 </Select>
+              </Form.Item>
+
+              {/* 隐藏的总里程字段，用于表单管理 */}
+              <Form.Item
+                name="totalDistance"
+                hidden
+              >
+                <Input />
               </Form.Item>
             </Form>
           </div>

@@ -215,6 +215,58 @@ public class RouteServiceImpl implements RouteService {
     }
 
     /**
+     * 我的路线列表（组织者专用）
+     * 包含：当前用户创建的所有路线（含私有） + 其他用户的公开路线
+     *
+     * @param userId 用户ID
+     * @param query 查询条件
+     * @return 分页结果
+     */
+    @Override
+    public IPage<RouteVO> getMyRoutes(Long userId, RouteQuery query) {
+        // 1. 构建查询条件
+        LambdaQueryWrapper<Route> queryWrapper = new LambdaQueryWrapper<>();
+
+        // 查询条件：(自己创建的所有路线) OR (其他人的公开路线)
+        queryWrapper.and(wrapper -> wrapper
+                .eq(Route::getCreatorId, userId)  // 自己创建的路线（包括私有）
+                .or(w -> w.eq(Route::getIsPublic, ROUTE_PUBLIC)  // 或者其他人的公开路线
+                        .ne(Route::getCreatorId, userId)))
+                .eq(Route::getStatus, ROUTE_STATUS_NORMAL);  // 只查询正常状态的路线
+
+        // 按名称模糊查询
+        if (StringUtils.hasText(query.getName())) {
+            queryWrapper.like(Route::getName, query.getName());
+        }
+
+        // 按地区模糊查询
+        if (StringUtils.hasText(query.getRegion())) {
+            queryWrapper.like(Route::getRegion, query.getRegion());
+        }
+
+        // 按难度等级筛选
+        if (query.getDifficultyLevel() != null) {
+            queryWrapper.eq(Route::getDifficultyLevel, query.getDifficultyLevel());
+        }
+
+        // 排序：先按使用次数降序，再按创建时间降序
+        queryWrapper.orderByDesc(Route::getUseCount)  // 使用次数高的优先
+                .orderByDesc(Route::getCreateTime);  // 创建时间新的优先
+
+        // 2. 分页查询
+        Page<Route> page = new Page<>(query.getPageNum(), query.getPageSize());
+        IPage<Route> routePage = routeMapper.selectPage(page, queryWrapper);
+
+        // 3. 转换为VO，添加权限标识
+        return routePage.convert(route -> {
+            RouteVO vo = convertToVOBasic(route);
+            // 添加权限标识：只有创建者可以编辑/删除
+            vo.setCanEdit(route.getCreatorId().equals(userId));
+            return vo;
+        });
+    }
+
+    /**
      * 路线详情（含点位信息）
      *
      * @param routeId 路线ID
