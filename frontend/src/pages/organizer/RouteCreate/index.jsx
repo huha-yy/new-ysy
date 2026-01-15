@@ -305,10 +305,9 @@ function RouteCreate() {
                 <Select placeholder="请选择难度等级">
                   {difficultyOptions.map(option => (
                     <Option key={option.value} value={option.value}>
-                      <div className="difficulty-option">
-                        <span className="difficulty-label">{option.label}</span>
-                        <span className="difficulty-desc">{option.desc}</span>
-                      </div>
+                      <span className="difficulty-label">{option.label}</span>
+                      <span className="difficulty-separator"> - </span>
+                      <span className="difficulty-desc">{option.desc}</span>
                     </Option>
                   ))}
                 </Select>

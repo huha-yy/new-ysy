@@ -30,19 +30,20 @@
   gap: 16px;
 }
 
-.difficulty-option {
-  display: flex;
-  flex-direction: column;
+/* 难度等级选项样式 */
+.difficulty-label {
+  font-weight: 500 !important;
+  color: #333 !important;
 }
 
-.difficulty-label {
-  font-weight: 500;
-  margin-bottom: 4px;
+.difficulty-separator {
+  color: #ccc !important;
+  margin: 0 8px !important;
 }
 
 .difficulty-desc {
-  font-size: 12px;
-  color: #999;
+  font-size: 12px !important;
+  color: #999 !important;
 }
 
 .confirm-content {
