@@ -1,0 +1,160 @@
+// 户外徒步活动管理系统 E-R 图
+// 使用网址：https://dbdiagram.io/
+// 复制下面的代码到 dbdiagram.io，生成后可以直接拖拽调整位置！
+
+Table user {
+  id bigint [pk, increment]
+  username varchar(32) [not null, unique]
+  password varchar(64) [not null]
+  phone varchar(16) [unique]
+  email varchar(64) [unique]
+  role tinyint [not null, default: 0, note: '0普通用户 1组织者 2管理员']
+  status tinyint [not null, default: 1]
+  
+  Note: '用户表'
+}
+
+Table user_profile {
+  id bigint [pk, increment]
+  user_id bigint [not null, unique, ref: - user.id]
+  real_name varchar(32)
+  gender tinyint
+  health_status varchar(256)
+  emergency_contact varchar(32)
+  emergency_phone varchar(16)
+  
+  Note: '用户档案表'
+}
+
+Table activity {
+  id bigint [pk, increment]
+  title varchar(128) [not null]
+  organizer_id bigint [not null, ref: > user.id]
+  route_id bigint [ref: > route.id]
+  activity_date date [not null]
+  start_time time [not null]
+  max_participants int [not null, default: 20]
+  difficulty_level tinyint [not null, default: 1]
+  status tinyint [not null, default: 0, note: '0草稿 1待审核 2已发布']
+  
+  Note: '活动表'
+}
+
+Table route {
+  id bigint [pk, increment]
+  name varchar(128) [not null]
+  creator_id bigint [not null, ref: > user.id]
+  difficulty_level tinyint [not null, default: 1]
+  total_distance decimal(6,2)
+  elevation_gain int
+  region varchar(64)
+  
+  Note: '路线表'
+}
+
+Table registration {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > user.id]
+  activity_id bigint [not null, ref: > activity.id]
+  status tinyint [not null, default: 0]
+  audit_by bigint
+  audit_time datetime
+  
+  indexes {
+    (user_id, activity_id) [unique]
+  }
+  
+  Note: '报名记录表'
+}
+
+Table gathering_plan {
+  id bigint [pk, increment]
+  activity_id bigint [not null, unique, ref: - activity.id]
+  gathering_time datetime [not null]
+  gathering_address varchar(256) [not null]
+  gathering_latitude decimal(10,7)
+  gathering_longitude decimal(10,7)
+  
+  Note: '集合方案表'
+}
+
+Table checkpoint {
+  id bigint [pk, increment]
+  route_id bigint [not null, ref: > route.id]
+  name varchar(64) [not null]
+  latitude decimal(10,7) [not null]
+  longitude decimal(10,7) [not null]
+  radius int [not null, default: 100]
+  checkpoint_type tinyint [not null]
+  
+  Note: '签到点表'
+}
+
+Table route_point {
+  id bigint [pk, increment]
+  route_id bigint [not null, ref: > route.id]
+  point_type tinyint [not null]
+  name varchar(64) [not null]
+  latitude decimal(10,7) [not null]
+  longitude decimal(10,7) [not null]
+  
+  Note: '路线点位表'
+}
+
+Table check_in_record {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > user.id]
+  activity_id bigint [not null, ref: > activity.id]
+  checkpoint_id bigint [not null, ref: > checkpoint.id]
+  check_in_time datetime [not null]
+  status tinyint [not null]
+  
+  Note: '签到记录表'
+}
+
+Table track_record {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > user.id]
+  activity_id bigint [not null, ref: > activity.id]
+  latitude decimal(10,7) [not null]
+  longitude decimal(10,7) [not null]
+  record_time datetime [not null]
+  
+  Note: '轨迹记录表'
+}
+
+Table alert_event {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > user.id]
+  activity_id bigint [not null, ref: > activity.id]
+  alert_type tinyint [not null]
+  alert_level tinyint [not null]
+  handle_status tinyint [not null, default: 0]
+  
+  Note: '预警事件表'
+}
+
+Table review {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > user.id]
+  activity_id bigint [not null, ref: > activity.id]
+  overall_rating tinyint [not null]
+  content varchar(512)
+  
+  indexes {
+    (user_id, activity_id) [unique]
+  }
+  
+  Note: '评价表'
+}
+
+Table message {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > user.id]
+  title varchar(128) [not null]
+  content varchar(512) [not null]
+  message_type tinyint [not null]
+  
+  Note: '消息表'
+}
+

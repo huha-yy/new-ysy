@@ -196,7 +196,7 @@ DROP TABLE IF EXISTS `route_point`;
 CREATE TABLE `route_point` (
     `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `route_id` BIGINT NOT NULL COMMENT '路线ID',
-    `point_type` TINYINT NOT NULL DEFAULT 1 COMMENT '点位类型：1途经点 2风险点 3休息点 4补给点',
+    `point_type` TINYINT NOT NULL DEFAULT 1 COMMENT '点位类型：1途经点 2风险点 3休息点 4补给点 5路线轨迹点',
     `name` VARCHAR(64) NOT NULL COMMENT '点位名称',
     `description` VARCHAR(256) DEFAULT NULL COMMENT '点位描述',
     `latitude` DECIMAL(10,7) NOT NULL COMMENT '纬度',

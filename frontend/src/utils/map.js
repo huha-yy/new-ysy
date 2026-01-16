@@ -1,9 +1,100 @@
 /**
- * 高德地图工具类
- * 提供地图初始化、路线绘制、定位等功能
+ * 坐标系转换工具
+ * 解决GPS定位偏差问题
  */
 
-// 高德地图JS API密钥 - 需要替换为实际的Key
+// 常量定义
+const X_PI = 3.14159265358979324 * 3000.0 / 180.0
+const PI = 3.1415926535897932384626
+const A = 6378245.0
+const EE = 0.00669342162296594323
+
+/**
+ * WGS84转GCJ02坐标系
+ * GPS坐标转换为中国标准坐标
+ * @param {number} lng WGS84经度
+ * @param {number} lat WGS84纬度
+ * @returns {{lng: number, lat: number}}
+ */
+export const wgs84ToGcj02 = (lng, lat) => {
+  if (outOfChina(lng, lat)) {
+    return { lng, lat }
+  }
+
+  let dlat = transformLat(lng - 105.0, lat - 35.0)
+  let dlng = transformLng(lng - 105.0, lat - 35.0)
+  const radlat = lat / 180.0 * PI
+  let magic = Math.sin(radlat)
+  magic = 1 - EE * magic * magic
+  const sqrtmagic = Math.sqrt(magic)
+  dlat = (dlat * 180.0) / ((A * (1 - EE)) / (magic * sqrtmagic) * PI)
+  dlng = (dlng * 180.0) / (A / sqrtmagic * Math.cos(radlat) * PI)
+  const mglat = lat + dlat
+  const mglng = lng + dlng
+
+  return { lng: mglng, lat: mglat }
+}
+
+/**
+ * GCJ02转BD09坐标系
+ * @param {number} lng GCJ02经度
+ * @param {number} lat GCJ02纬度
+ * @returns {{lng: number, lat: number}}
+ */
+export const gcj02ToBd09 = (lng, lat) => {
+  const z = Math.sqrt(lng * lng + lat * lat) + 0.00002 * Math.sin(lat * X_PI)
+  const theta = Math.atan2(lat, lng) + 0.000003 * Math.cos(lng * X_PI)
+  const bd_lng = z * Math.cos(theta) + 0.0065
+  const bd_lat = z * Math.sin(theta) + 0.006
+  return { lng: bd_lng, lat: bd_lat }
+}
+
+/**
+ * WGS84直接转BD09坐标系
+ * @param {number} lng WGS84经度
+ * @param {number} lat WGS84纬度
+ * @returns {{lng: number, lat: number}}
+ */
+export const wgs84ToBd09 = (lng, lat) => {
+  const gcj = wgs84ToGcj02(lng, lat)
+  return gcj02ToBd09(gcj.lng, gcj.lat)
+}
+
+/**
+ * 判断是否在中国境外
+ * @param {number} lng 经度
+ * @param {number} lat 纬度
+ * @returns {boolean}
+ */
+function outOfChina(lng, lat) {
+  return (lng < 72.004 || lng > 137.8347) || ((lat < 0.8293 || lat > 55.8271) || false)
+}
+
+/**
+ * 纬度转换
+ */
+function transformLat(lng, lat) {
+  let ret = -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + 0.1 * lng * lat + 0.2 * Math.sqrt(Math.abs(lng))
+  ret += (20.0 * Math.sin(6.0 * lng * PI) + 20.0 * Math.sin(2.0 * lng * PI)) * 2.0 / 3.0
+  ret += (20.0 * Math.sin(lat * PI) + 40.0 * Math.sin(lat / 3.0 * PI)) * 2.0 / 3.0
+  ret += (160.0 * Math.sin(lat / 12.0 * PI) + 320 * Math.sin(lat * PI / 30.0)) * 2.0 / 3.0
+  return ret
+}
+
+/**
+ * 经度转换
+ */
+function transformLng(lng, lat) {
+  let ret = 300.0 + lng + 2.0 * lat + 0.1 * lng * lng + 0.1 * lng * lat + 0.1 * Math.sqrt(Math.abs(lng))
+  ret += (20.0 * Math.sin(6.0 * lng * PI) + 20.0 * Math.sin(2.0 * lng * PI)) * 2.0 / 3.0
+  ret += (20.0 * Math.sin(lng * PI) + 40.0 * Math.sin(lng / 3.0 * PI)) * 2.0 / 3.0
+  ret += (150.0 * Math.sin(lng / 12.0 * PI) + 300.0 * Math.sin(lng / 30.0 * PI)) * 2.0 / 3.0
+  return ret
+}
+
+/**
+ * 高德地图JS API密钥 - 需要替换为实际的Key
+ */
 const AMAP_KEY = '4e498e7dde5c0916ebd506fb723f1706'
 
 /**
@@ -37,12 +128,33 @@ export const getCurrentLocation = () => {
       return
     }
 
+    // 更宽松的定位配置，提高成功率
+    const options = {
+      enableHighAccuracy: true,  // 启用高精度定位
+      timeout: 15000,            // 增加超时时间到15秒
+      maximumAge: 60000          // 允许使用1分钟内的缓存位置
+    }
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        const originalLat = position.coords.latitude
+        const originalLng = position.coords.longitude
+
+        // 进行坐标系转换（WGS84转GCJ02）
+        const converted = wgs84ToGcj02(originalLng, originalLat)
+
+        console.log('浏览器定位成功:')
+        console.log('原始坐标(WGS84):', { latitude: originalLat, longitude: originalLng })
+        console.log('转换坐标(GCJ02):', { latitude: converted.lat, longitude: converted.lng })
+        console.log('精度:', position.coords.accuracy + '米')
+
         resolve({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy
+          latitude: converted.lat,
+          longitude: converted.lng,
+          accuracy: position.coords.accuracy,
+          originalLatitude: originalLat,
+          originalLongitude: originalLng,
+          coordinateSystem: 'GCJ02 (已转换)'
         })
       },
       (error) => {
@@ -58,13 +170,10 @@ export const getCurrentLocation = () => {
             errorMessage = '定位请求超时'
             break
         }
+        console.error('浏览器定位失败:', error)
         reject(new Error(errorMessage))
       },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
-      }
+      options
     )
   })
 }
@@ -88,6 +197,12 @@ export const getAmapLocation = () => {
 
     geolocation.getCurrentPosition((status, result) => {
       if (status === 'complete') {
+        console.log('高德地图定位成功:', {
+          latitude: result.position.lat,
+          longitude: result.position.lng,
+          accuracy: result.accuracy,
+          address: result.formattedAddress
+        })
         resolve({
           latitude: result.position.lat,
           longitude: result.position.lng,
@@ -96,9 +211,11 @@ export const getAmapLocation = () => {
           province: result.addressComponent?.province,
           city: result.addressComponent?.city,
           district: result.addressComponent?.district,
-          street: result.addressComponent?.street
+          street: result.addressComponent?.street,
+          coordinateSystem: 'GCJ02 (高德原生)'
         })
       } else {
+        console.error('高德地图定位失败:', result.message)
         reject(new Error('定位失败: ' + result.message))
       }
     })

@@ -44,6 +44,9 @@ function RouteEdit() {
   const [routePoints, setRoutePoints] = useState([])
   const [checkpoints, setCheckpoints] = useState([])
   const [waypoints, setWaypoints] = useState([])
+  const [riskPoints, setRiskPoints] = useState([]) // 风险点
+  const [restPoints, setRestPoints] = useState([]) // 休息点
+  const [supplyPoints, setSupplyPoints] = useState([]) // 补给点
   const [startPoint, setStartPoint] = useState(null)
   const [endPoint, setEndPoint] = useState(null)
   const [routeData, setRouteData] = useState({
@@ -96,12 +99,12 @@ function RouteEdit() {
       if (data.checkpoints && data.checkpoints.length > 0) {
         console.log('🔍 原始签到点数据：', data.checkpoints)
         const cps = data.checkpoints.map(cp => ({
-          lat: cp.latitude,
-          lng: cp.longitude,
+          lat: parseFloat(cp.latitude),
+          lng: parseFloat(cp.longitude),
           name: cp.name,
           radius: cp.radius,
           sequence: cp.sequence,
-          type: cp.type,
+          type: cp.checkpointType, // 修复：使用 checkpointType 而不是 type
           isRequired: cp.isRequired
         }))
         console.log('🔍 转换后签到点：', cps)
@@ -112,8 +115,8 @@ function RouteEdit() {
       if (data.waypoints && data.waypoints.length > 0) {
         console.log('🔍 原始途经点数据：', data.waypoints)
         const wps = data.waypoints.map(wp => ({
-          lat: wp.latitude,
-          lng: wp.longitude,
+          lat: parseFloat(wp.latitude),
+          lng: parseFloat(wp.longitude),
           name: wp.name,
           pointType: wp.pointType,
           sequence: wp.sequence
@@ -126,8 +129,8 @@ function RouteEdit() {
       if (data.startPoint) {
         console.log('🔍 原始起点数据：', data.startPoint)
         const startPt = {
-          lat: data.startPoint.latitude,
-          lng: data.startPoint.longitude,
+          lat: parseFloat(data.startPoint.latitude),
+          lng: parseFloat(data.startPoint.longitude),
           name: data.startPoint.name || '起点'
         }
         console.log('🔍 转换后起点：', startPt)
@@ -140,14 +143,61 @@ function RouteEdit() {
       if (data.endPoint) {
         console.log('🔍 原始终点数据：', data.endPoint)
         const endPt = {
-          lat: data.endPoint.latitude,
-          lng: data.endPoint.longitude,
+          lat: parseFloat(data.endPoint.latitude),
+          lng: parseFloat(data.endPoint.longitude),
           name: data.endPoint.name || '终点'
         }
         console.log('🔍 转换后终点：', endPt)
         setEndPoint(endPt)
       } else {
         console.log('🔍 没有终点数据')
+      }
+
+      // 转换风险点格式
+      if (data.riskPoints && data.riskPoints.length > 0) {
+        console.log('🔍 原始风险点数据：', data.riskPoints)
+        const rps = data.riskPoints.map(rp => ({
+          lat: parseFloat(rp.latitude),
+          lng: parseFloat(rp.longitude),
+          name: rp.name,
+          description: rp.description,
+          riskLevel: rp.riskLevel,
+          riskTip: rp.riskTip,
+          pointType: rp.pointType,
+          sequence: rp.sequence
+        }))
+        console.log('🔍 转换后风险点：', rps)
+        setRiskPoints(rps)
+      }
+
+      // 转换休息点格式
+      if (data.restPoints && data.restPoints.length > 0) {
+        console.log('🔍 原始休息点数据：', data.restPoints)
+        const rps = data.restPoints.map(rp => ({
+          lat: parseFloat(rp.latitude),
+          lng: parseFloat(rp.longitude),
+          name: rp.name,
+          description: rp.description,
+          pointType: rp.pointType,
+          sequence: rp.sequence
+        }))
+        console.log('🔍 转换后休息点：', rps)
+        setRestPoints(rps)
+      }
+
+      // 转换补给点格式
+      if (data.supplyPoints && data.supplyPoints.length > 0) {
+        console.log('🔍 原始补给点数据：', data.supplyPoints)
+        const sps = data.supplyPoints.map(sp => ({
+          lat: parseFloat(sp.latitude),
+          lng: parseFloat(sp.longitude),
+          name: sp.name,
+          description: sp.description,
+          pointType: sp.pointType,
+          sequence: sp.sequence
+        }))
+        console.log('🔍 转换后补给点：', sps)
+        setSupplyPoints(sps)
       }
     } catch (error) {
       console.error('获取路线详情失败:', error)
@@ -221,6 +271,32 @@ function RouteEdit() {
           longitude: wp.lng,
           pointType: wp.pointType,
           sequence: wp.sequence
+        })),
+        riskPoints: riskPoints.map((rp) => ({
+          name: rp.name,
+          description: rp.description,
+          latitude: rp.lat,
+          longitude: rp.lng,
+          pointType: 2,
+          riskLevel: rp.riskLevel,
+          riskTip: rp.riskTip,
+          sequence: rp.sequence
+        })),
+        restPoints: restPoints.map((rp) => ({
+          name: rp.name,
+          description: rp.description,
+          latitude: rp.lat,
+          longitude: rp.lng,
+          pointType: 3,
+          sequence: rp.sequence
+        })),
+        supplyPoints: supplyPoints.map((sp) => ({
+          name: sp.name,
+          description: sp.description,
+          latitude: sp.lat,
+          longitude: sp.lng,
+          pointType: 4,
+          sequence: sp.sequence
         }))
       }
 
@@ -261,6 +337,21 @@ function RouteEdit() {
 
   const handleEndPointChange = useCallback((endPoint) => {
     setEndPoint(endPoint)
+  }, [])
+
+  const handleRiskPointsChange = useCallback((points) => {
+    console.log('✓ 风险点更新:', points?.length, '个点')
+    setRiskPoints(points)
+  }, [])
+
+  const handleRestPointsChange = useCallback((points) => {
+    console.log('✓ 休息点更新:', points?.length, '个点')
+    setRestPoints(points)
+  }, [])
+
+  const handleSupplyPointsChange = useCallback((points) => {
+    console.log('✓ 补给点更新:', points?.length, '个点')
+    setSupplyPoints(points)
   }, [])
 
   const calculateRouteDistance = (points) => {
@@ -456,11 +547,17 @@ function RouteEdit() {
                   initialRoute={routePoints}
                   initialCheckpoints={checkpoints}
                   initialWaypoints={waypoints}
+                  initialRiskPoints={riskPoints}
+                  initialRestPoints={restPoints}
+                  initialSupplyPoints={supplyPoints}
                   initialStartPoint={startPoint}
                   initialEndPoint={endPoint}
                   onRouteChange={handleRouteChange}
                   onCheckpointsChange={handleCheckpointsChange}
                   onWaypointsChange={handleWaypointsChange}
+                  onRiskPointsChange={handleRiskPointsChange}
+                  onRestPointsChange={handleRestPointsChange}
+                  onSupplyPointsChange={handleSupplyPointsChange}
                   onStartPointChange={handleStartPointChange}
                   onEndPointChange={handleEndPointChange}
                 />
@@ -470,6 +567,9 @@ function RouteEdit() {
                   <div>routePoints: {JSON.stringify(routePoints)}</div>
                   <div>checkpoints: {JSON.stringify(checkpoints)}</div>
                   <div>waypoints: {JSON.stringify(waypoints)}</div>
+                  <div>riskPoints: {JSON.stringify(riskPoints)}</div>
+                  <div>restPoints: {JSON.stringify(restPoints)}</div>
+                  <div>supplyPoints: {JSON.stringify(supplyPoints)}</div>
                   <div>startPoint: {JSON.stringify(startPoint)}</div>
                   <div>endPoint: {JSON.stringify(endPoint)}</div>
                 </div>
@@ -535,6 +635,15 @@ function RouteEdit() {
                   </div>
                   <div className="stat-item">
                     <span>途经点数：<b>{waypoints.length}</b></span>
+                  </div>
+                  <div className="stat-item">
+                    <span>风险点数：<b>{riskPoints.length}</b></span>
+                  </div>
+                  <div className="stat-item">
+                    <span>休息点数：<b>{restPoints.length}</b></span>
+                  </div>
+                  <div className="stat-item">
+                    <span>补给点数：<b>{supplyPoints.length}</b></span>
                   </div>
                   <div className="stat-item">
                     <span>总里程：<b>{routeData.totalDistance}km</b></span>

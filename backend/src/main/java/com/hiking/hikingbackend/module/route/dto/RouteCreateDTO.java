@@ -91,9 +91,7 @@ public class RouteCreateDTO {
     @Schema(description = "是否公开：0否 1是", example = "1")
     private Integer isPublic;
 
-    @Schema(description = "路线点列表", example = "[{\"lng\": 116.39, \"lat\": 39.90}, {\"lng\": 116.40, \"lat\": 39.91}]")
-    @NotEmpty(message = "路线点不能为空")
-    @Size(min = 2, message = "至少需要2个路线点（起点和终点）")
+    @Schema(description = "路线点列表（仅中间轨迹点，不包含起终点）", example = "[{\"lng\": 116.39, \"lat\": 39.90}, {\"lng\": 116.40, \"lat\": 39.91}]")
     private List<RoutePointDTO> routePoints;
 
     @Schema(description = "签到点列表")
@@ -101,6 +99,15 @@ public class RouteCreateDTO {
 
     @Schema(description = "途经点列表")
     private List<WaypointDTO> waypoints;
+
+    @Schema(description = "风险点列表")
+    private List<RiskPointDTO> riskPoints;
+
+    @Schema(description = "休息点列表")
+    private List<RestPointDTO> restPoints;
+
+    @Schema(description = "补给点列表")
+    private List<SupplyPointDTO> supplyPoints;
 
     /**
      * 路线点DTO
@@ -157,6 +164,96 @@ public class RouteCreateDTO {
         @Schema(description = "途经点名称", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotBlank(message = "途经点名称不能为空")
         private String name;
+
+        @Schema(description = "纬度", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "纬度不能为空")
+        private Double latitude;
+
+        @Schema(description = "经度", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "经度不能为空")
+        private Double longitude;
+
+        @Schema(description = "点位类型")
+        private Integer pointType;
+
+        @Schema(description = "序号")
+        private Integer sequence;
+    }
+
+    /**
+     * 风险点DTO
+     */
+    @Data
+    @Schema(description = "风险点")
+    public static class RiskPointDTO {
+        @Schema(description = "风险点名称", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "风险点名称不能为空")
+        private String name;
+
+        @Schema(description = "风险点描述")
+        private String description;
+
+        @Schema(description = "纬度", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "纬度不能为空")
+        private Double latitude;
+
+        @Schema(description = "经度", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "经度不能为空")
+        private Double longitude;
+
+        @Schema(description = "点位类型")
+        private Integer pointType;
+
+        @Schema(description = "风险等级：1低 2中 3高")
+        private Integer riskLevel;
+
+        @Schema(description = "风险提示")
+        private String riskTip;
+
+        @Schema(description = "序号")
+        private Integer sequence;
+    }
+
+    /**
+     * 休息点DTO
+     */
+    @Data
+    @Schema(description = "休息点")
+    public static class RestPointDTO {
+        @Schema(description = "休息点名称", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "休息点名称不能为空")
+        private String name;
+
+        @Schema(description = "休息点描述")
+        private String description;
+
+        @Schema(description = "纬度", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "纬度不能为空")
+        private Double latitude;
+
+        @Schema(description = "经度", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotNull(message = "经度不能为空")
+        private Double longitude;
+
+        @Schema(description = "点位类型")
+        private Integer pointType;
+
+        @Schema(description = "序号")
+        private Integer sequence;
+    }
+
+    /**
+     * 补给点DTO
+     */
+    @Data
+    @Schema(description = "补给点")
+    public static class SupplyPointDTO {
+        @Schema(description = "补给点名称", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "补给点名称不能为空")
+        private String name;
+
+        @Schema(description = "补给点描述")
+        private String description;
 
         @Schema(description = "纬度", requiredMode = Schema.RequiredMode.REQUIRED)
         @NotNull(message = "纬度不能为空")

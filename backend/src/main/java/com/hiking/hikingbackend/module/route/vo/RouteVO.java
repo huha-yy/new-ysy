@@ -102,6 +102,27 @@ public class RouteVO {
     @Schema(description = "签到点列表")
     private List<CheckpointVO> checkpoints;
 
+    @Schema(description = "路线轨迹点列表")
+    private List<RoutePointVO> routePoints;
+
+    @Schema(description = "途经点列表")
+    private List<RoutePointVO> waypoints;
+
+    @Schema(description = "风险点列表")
+    private List<RoutePointVO> riskPoints;
+
+    @Schema(description = "休息点列表")
+    private List<RoutePointVO> restPoints;
+
+    @Schema(description = "补给点列表")
+    private List<RoutePointVO> supplyPoints;
+
+    @Schema(description = "起点信息")
+    private PointVO startPoint;
+
+    @Schema(description = "终点信息")
+    private PointVO endPoint;
+
     @Schema(description = "当前用户是否可以编辑此路线", example = "true")
     private Boolean canEdit;
 
@@ -112,5 +133,64 @@ public class RouteVO {
     @Schema(description = "更新时间", example = "2024-12-25 10:00:00")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime updateTime;
+
+    /**
+     * 路线点VO
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "路线点信息")
+    public static class RoutePointVO {
+        @Schema(description = "点位ID")
+        private Long id;
+
+        @Schema(description = "点位名称")
+        private String name;
+
+        @Schema(description = "点位描述")
+        private String description;
+
+        @Schema(description = "纬度")
+        private BigDecimal latitude;
+
+        @Schema(description = "经度")
+        private BigDecimal longitude;
+
+        @Schema(description = "海拔（米）")
+        private Integer elevation;
+
+        @Schema(description = "点位类型：1途经点 2风险点 3休息点 4补给点 5路线轨迹点")
+        private Integer pointType;
+
+        @Schema(description = "序号")
+        private Integer sequence;
+
+        @Schema(description = "风险等级：1低 2中 3高（仅风险点）")
+        private Integer riskLevel;
+
+        @Schema(description = "风险提示（仅风险点）")
+        private String riskTip;
+    }
+
+    /**
+     * 简单点位VO（用于起点终点）
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "点位信息")
+    public static class PointVO {
+        @Schema(description = "点位名称")
+        private String name;
+
+        @Schema(description = "纬度")
+        private BigDecimal latitude;
+
+        @Schema(description = "经度")
+        private BigDecimal longitude;
+    }
 }
 

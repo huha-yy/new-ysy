@@ -42,6 +42,9 @@ function RouteCreate() {
   const [routePoints, setRoutePoints] = useState([])
   const [checkpoints, setCheckpoints] = useState([])
   const [waypoints, setWaypoints] = useState([])
+  const [riskPoints, setRiskPoints] = useState([]) // 风险点
+  const [restPoints, setRestPoints] = useState([]) // 休息点
+  const [supplyPoints, setSupplyPoints] = useState([]) // 补给点
   const [startPoint, setStartPoint] = useState(null) // 起点
   const [endPoint, setEndPoint] = useState(null) // 终点
   const [routeData, setRouteData] = useState({
@@ -114,22 +117,10 @@ function RouteCreate() {
       // 构建提交数据
       const formData = await form.validateFields()
 
-      // 构建 routePoints 数组（起点 + 途经点 + 终点）
-      const fullRoutePoints = []
-      if (startPoint) {
-        fullRoutePoints.push({
-          lng: startPoint.lng,
-          lat: startPoint.lat
-        })
-      }
-      if (routePoints && routePoints.length > 0) {
-        fullRoutePoints.push(...routePoints)
-      }
-      if (endPoint) {
-        fullRoutePoints.push({
-          lng: endPoint.lng,
-          lat: endPoint.lat
-        })
+      // 验证起点和终点必须存在
+      if (!startPoint || !endPoint) {
+        message.error('请设置起点和终点')
+        return
       }
 
       const submitData = {
@@ -137,16 +128,16 @@ function RouteCreate() {
         ...formData,
         // 直接使用 formData.isPublic（现在是数字类型）
         isPublic: formData.isPublic,
-        // 起点信息
+        // 起点信息（存储在route表）
         startPointName: startPoint?.name || '起点',
         startLatitude: startPoint?.lat,
         startLongitude: startPoint?.lng,
-        // 终点信息
+        // 终点信息（存储在route表）
         endPointName: endPoint?.name || '终点',
         endLatitude: endPoint?.lat,
         endLongitude: endPoint?.lng,
-        // 完整路线点（起点 + 途经点 + 终点），满足后端 @Size(min = 2) 要求
-        routePoints: fullRoutePoints,
+        // 只发送中间路线轨迹点，不包含起终点（存储在route_point表，point_type=5）
+        routePoints: routePoints || [],
         checkpoints: checkpoints.map((cp, index) => ({
           name: cp.name,
           latitude: cp.lat,
@@ -162,6 +153,32 @@ function RouteCreate() {
           longitude: wp.lng,
           pointType: wp.pointType,
           sequence: wp.sequence
+        })),
+        riskPoints: riskPoints.map((rp) => ({
+          name: rp.name,
+          description: rp.description,
+          latitude: rp.lat,
+          longitude: rp.lng,
+          pointType: 2,
+          riskLevel: rp.riskLevel,
+          riskTip: rp.riskTip,
+          sequence: rp.sequence
+        })),
+        restPoints: restPoints.map((rp) => ({
+          name: rp.name,
+          description: rp.description,
+          latitude: rp.lat,
+          longitude: rp.lng,
+          pointType: 3,
+          sequence: rp.sequence
+        })),
+        supplyPoints: supplyPoints.map((sp) => ({
+          name: sp.name,
+          description: sp.description,
+          latitude: sp.lat,
+          longitude: sp.lng,
+          pointType: 4,
+          sequence: sp.sequence
         }))
       }
 
@@ -202,6 +219,21 @@ function RouteCreate() {
     console.log('✓ 终点更新:', point)
     setEndPoint(point)
     // 删除立即调用 updateTotalDistance()，改由 useEffect 自动触发
+  }, [])
+
+  const handleRiskPointsChange = useCallback((points) => {
+    console.log('✓ 风险点更新:', points?.length, '个点')
+    setRiskPoints(points)
+  }, [])
+
+  const handleRestPointsChange = useCallback((points) => {
+    console.log('✓ 休息点更新:', points?.length, '个点')
+    setRestPoints(points)
+  }, [])
+
+  const handleSupplyPointsChange = useCallback((points) => {
+    console.log('✓ 补给点更新:', points?.length, '个点')
+    setSupplyPoints(points)
   }, [])
 
   const calculateRouteDistance = (points) => {
@@ -403,8 +435,14 @@ function RouteCreate() {
               onRouteChange={handleRouteChange}
               onCheckpointsChange={handleCheckpointsChange}
               onWaypointsChange={handleWaypointsChange}
+              onRiskPointsChange={handleRiskPointsChange}
+              onRestPointsChange={handleRestPointsChange}
+              onSupplyPointsChange={handleSupplyPointsChange}
               onStartPointChange={handleStartPointChange}
               onEndPointChange={handleEndPointChange}
+              initialRiskPoints={riskPoints}
+              initialRestPoints={restPoints}
+              initialSupplyPoints={supplyPoints}
             />
           </div>
         )
@@ -484,6 +522,15 @@ function RouteCreate() {
                   </div>
                   <div className="stat-item">
                     <span>途经点数：<b>{waypoints.length}</b></span>
+                  </div>
+                  <div className="stat-item">
+                    <span>风险点数：<b>{riskPoints.length}</b></span>
+                  </div>
+                  <div className="stat-item">
+                    <span>休息点数：<b>{restPoints.length}</b></span>
+                  </div>
+                  <div className="stat-item">
+                    <span>补给点数：<b>{supplyPoints.length}</b></span>
                   </div>
                   <div className="stat-item">
                     <span>总里程：<b>{routeData.totalDistance}km</b></span>

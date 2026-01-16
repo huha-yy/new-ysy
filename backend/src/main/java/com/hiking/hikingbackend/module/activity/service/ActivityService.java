@@ -111,5 +111,23 @@ public interface ActivityService {
      * @return 分页结果
      */
     IPage<ActivityListVO> getJoinedActivities(Long userId, ActivityQuery query);
+
+    /**
+     * 启动活动
+     * 将活动状态从已发布变更为进行中
+     *
+     * @param activityId 活动ID
+     * @param operatorId 操作人用户ID（组织者或管理员）
+     */
+    void startActivity(Long activityId, Long operatorId);
+
+    /**
+     * 结束活动
+     * 将活动状态从进行中变更为已结束
+     *
+     * @param activityId 活动ID
+     * @param operatorId 操作人用户ID（组织者或管理员）
+     */
+    void endActivity(Long activityId, Long operatorId);
 }
 

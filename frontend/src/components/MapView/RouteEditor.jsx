@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import { Card, Button, Space, Input, InputNumber, Tag, message, Modal, Popconfirm, Badge, Divider } from 'antd'
+import { Card, Button, Space, Input, InputNumber, Tag, message, Modal, Popconfirm, Badge, Divider, Select } from 'antd'
 import { PlusOutlined, MinusCircleOutlined, EnvironmentOutlined, FlagOutlined, EyeOutlined, AimOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import MapView from './MapView'
 import { calculateRouteDistance, formatDistance } from '../../utils/map'
@@ -7,31 +7,40 @@ import './RouteEditor.css'
 
 /**
  * 路线编辑地图组件
- * 支持在地图上绘制路线、添加签到点、途经点等
+ * 支持在地图上绘制路线、添加签到点、途经点、风险点、休息点、补给点等
  */
 const RouteEditor = ({
   initialRoute = [],
   initialCheckpoints = [],
   initialWaypoints = [],
+  initialRiskPoints = [],
+  initialRestPoints = [],
+  initialSupplyPoints = [],
   initialStartPoint = null,
   initialEndPoint = null,
   onRouteChange,
   onCheckpointsChange,
   onWaypointsChange,
+  onRiskPointsChange,
+  onRestPointsChange,
+  onSupplyPointsChange,
   onStartPointChange,
   onEndPointChange,
   readOnly = false
 }) => {
   const [map, setMap] = useState(null)
-  const [routePoints, setRoutePoints] = useState(initialRoute) // 路线点（途经点）
-  const [checkpoints, setCheckpoints] = useState(initialCheckpoints)
-  const [waypoints, setWaypoints] = useState(initialWaypoints)
+  const [routePoints, setRoutePoints] = useState(initialRoute) // 路线轨迹点
+  const [checkpoints, setCheckpoints] = useState(initialCheckpoints) // 签到点
+  const [waypoints, setWaypoints] = useState(initialWaypoints) // 途经点
+  const [riskPoints, setRiskPoints] = useState(initialRiskPoints) // 风险点
+  const [restPoints, setRestPoints] = useState(initialRestPoints) // 休息点
+  const [supplyPoints, setSupplyPoints] = useState(initialSupplyPoints) // 补给点
 
   // 独立的起点和终点状态
   const [startPoint, setStartPoint] = useState(initialStartPoint)
   const [endPoint, setEndPoint] = useState(initialEndPoint)
 
-  const [editingMode, setEditingMode] = useState(null) // 'route' | 'checkpoint' | 'waypoint' | 'setStart' | 'setEnd' | null
+  const [editingMode, setEditingMode] = useState(null) // 'route' | 'checkpoint' | 'waypoint' | 'riskPoint' | 'restPoint' | 'supplyPoint' | 'setStart' | 'setEnd' | null
 
   // 使用 ref 存储起点终点回调
   const onStartPointChangeRef = useRef(onStartPointChange)
@@ -41,6 +50,9 @@ const RouteEditor = ({
   const onRouteChangeRef = useRef(onRouteChange)
   const onCheckpointsChangeRef = useRef(onCheckpointsChange)
   const onWaypointsChangeRef = useRef(onWaypointsChange)
+  const onRiskPointsChangeRef = useRef(onRiskPointsChange)
+  const onRestPointsChangeRef = useRef(onRestPointsChange)
+  const onSupplyPointsChangeRef = useRef(onSupplyPointsChange)
 
   // 使用 ref 跟踪最新的 editingMode，解决闭包问题（必须在 useState 之后定义）
   const editingModeRef = useRef(null)
@@ -49,6 +61,9 @@ const RouteEditor = ({
   const waypointsRef = useRef(waypoints)
   const routePointsRef = useRef(routePoints)
   const checkpointsRef = useRef(checkpoints)
+  const riskPointsRef = useRef(riskPoints)
+  const restPointsRef = useRef(restPoints)
+  const supplyPointsRef = useRef(supplyPoints)
 
   useEffect(() => {
     console.log('✓ RouteEditor 渲染，当前 editingMode：', editingMode)
@@ -57,7 +72,12 @@ const RouteEditor = ({
     waypointsRef.current = waypoints
     routePointsRef.current = routePoints
     checkpointsRef.current = checkpoints
-  }, [editingMode, waypoints, routePoints, checkpoints])
+    riskPointsRef.current = riskPoints
+    restPointsRef.current = restPoints
+    supplyPointsRef.current = supplyPoints
+  }, [editingMode, waypoints, routePoints, checkpoints, riskPoints, restPoints, supplyPoints])
+
+  // 签到点Modal
   const [checkpointModalVisible, setCheckpointModalVisible] = useState(false)
   const [editingCheckpoint, setEditingCheckpoint] = useState(null)
   const [checkpointForm, setCheckpointForm] = useState({
@@ -68,10 +88,42 @@ const RouteEditor = ({
     type: 2 // 2=途中点
   })
 
+  // 风险点Modal
+  const [riskPointModalVisible, setRiskPointModalVisible] = useState(false)
+  const [editingRiskPoint, setEditingRiskPoint] = useState(null)
+  const [riskPointForm, setRiskPointForm] = useState({
+    name: '',
+    description: '',
+    riskLevel: 2, // 1低2中3高
+    riskTip: '',
+    sequence: 1
+  })
+
+  // 休息点Modal
+  const [restPointModalVisible, setRestPointModalVisible] = useState(false)
+  const [editingRestPoint, setEditingRestPoint] = useState(null)
+  const [restPointForm, setRestPointForm] = useState({
+    name: '',
+    description: '',
+    sequence: 1
+  })
+
+  // 补给点Modal
+  const [supplyPointModalVisible, setSupplyPointModalVisible] = useState(false)
+  const [editingSupplyPoint, setEditingSupplyPoint] = useState(null)
+  const [supplyPointForm, setSupplyPointForm] = useState({
+    name: '',
+    description: '',
+    sequence: 1
+  })
+
   // 使用 ref 存储初始值，避免空数组导致的无限循环
   const initialRouteRef = useRef(initialRoute)
   const initialCheckpointsRef = useRef(initialCheckpoints)
   const initialWaypointsRef = useRef(initialWaypoints)
+  const initialRiskPointsRef = useRef(initialRiskPoints)
+  const initialRestPointsRef = useRef(initialRestPoints)
+  const initialSupplyPointsRef = useRef(initialSupplyPoints)
   const initialStartPointRef = useRef(initialStartPoint)
   const initialEndPointRef = useRef(initialEndPoint)
   const isInitializedRef = useRef(false)
@@ -81,19 +133,25 @@ const RouteEditor = ({
     onRouteChangeRef.current = onRouteChange
     onCheckpointsChangeRef.current = onCheckpointsChange
     onWaypointsChangeRef.current = onWaypointsChange
+    onRiskPointsChangeRef.current = onRiskPointsChange
+    onRestPointsChangeRef.current = onRestPointsChange
+    onSupplyPointsChangeRef.current = onSupplyPointsChange
     onStartPointChangeRef.current = onStartPointChange
     onEndPointChangeRef.current = onEndPointChange
-  }, [onRouteChange, onCheckpointsChange, onWaypointsChange, onStartPointChange, onEndPointChange])
+  }, [onRouteChange, onCheckpointsChange, onWaypointsChange, onRiskPointsChange, onRestPointsChange, onSupplyPointsChange, onStartPointChange, onEndPointChange])
 
   // 初始化数据，只在真正有数据时更新
   useEffect(() => {
     console.log('🔄 RouteEditor useEffect 被触发')
     console.log('🔄 接收到的初始数据：', {
-      initialRoute: initialRoute,
-      initialCheckpoints: initialCheckpoints,
-      initialWaypoints: initialWaypoints,
-      initialStartPoint: initialStartPoint,
-      initialEndPoint: initialEndPoint
+      initialRoute,
+      initialCheckpoints,
+      initialWaypoints,
+      initialRiskPoints,
+      initialRestPoints,
+      initialSupplyPoints,
+      initialStartPoint,
+      initialEndPoint
     })
 
     if (!isInitializedRef.current) {
@@ -101,6 +159,9 @@ const RouteEditor = ({
       setRoutePoints(initialRoute || [])
       setCheckpoints(initialCheckpoints || [])
       setWaypoints(initialWaypoints || [])
+      setRiskPoints(initialRiskPoints || [])
+      setRestPoints(initialRestPoints || [])
+      setSupplyPoints(initialSupplyPoints || [])
       setStartPoint(initialStartPoint)
       setEndPoint(initialEndPoint)
       isInitializedRef.current = true
@@ -108,32 +169,39 @@ const RouteEditor = ({
       console.log('🔄 更新现有数据')
       // 已初始化后，只在外部数据真正变化时更新
       if (JSON.stringify(initialRoute) !== JSON.stringify(initialRouteRef.current)) {
-        console.log('🔄 更新 routePoints')
         setRoutePoints(initialRoute || [])
         initialRouteRef.current = initialRoute
       }
       if (JSON.stringify(initialCheckpoints) !== JSON.stringify(initialCheckpointsRef.current)) {
-        console.log('🔄 更新 checkpoints')
         setCheckpoints(initialCheckpoints || [])
         initialCheckpointsRef.current = initialCheckpoints
       }
       if (JSON.stringify(initialWaypoints) !== JSON.stringify(initialWaypointsRef.current)) {
-        console.log('🔄 更新 waypoints')
         setWaypoints(initialWaypoints || [])
         initialWaypointsRef.current = initialWaypoints
       }
+      if (JSON.stringify(initialRiskPoints) !== JSON.stringify(initialRiskPointsRef.current)) {
+        setRiskPoints(initialRiskPoints || [])
+        initialRiskPointsRef.current = initialRiskPoints
+      }
+      if (JSON.stringify(initialRestPoints) !== JSON.stringify(initialRestPointsRef.current)) {
+        setRestPoints(initialRestPoints || [])
+        initialRestPointsRef.current = initialRestPoints
+      }
+      if (JSON.stringify(initialSupplyPoints) !== JSON.stringify(initialSupplyPointsRef.current)) {
+        setSupplyPoints(initialSupplyPoints || [])
+        initialSupplyPointsRef.current = initialSupplyPoints
+      }
       if (JSON.stringify(initialStartPoint) !== JSON.stringify(initialStartPointRef.current)) {
-        console.log('🔄 更新 startPoint')
         setStartPoint(initialStartPoint)
         initialStartPointRef.current = initialStartPoint
       }
       if (JSON.stringify(initialEndPoint) !== JSON.stringify(initialEndPointRef.current)) {
-        console.log('🔄 更新 endPoint')
         setEndPoint(initialEndPoint)
         initialEndPointRef.current = initialEndPoint
       }
     }
-  }, [initialRoute, initialCheckpoints, initialWaypoints, initialStartPoint, initialEndPoint])
+  }, [initialRoute, initialCheckpoints, initialWaypoints, initialRiskPoints, initialRestPoints, initialSupplyPoints, initialStartPoint, initialEndPoint])
 
   useEffect(() => {
     console.log('✓ routePoints 更新，当前数量：', routePoints.length)
@@ -155,6 +223,27 @@ const RouteEditor = ({
       onWaypointsChangeRef.current(waypoints)
     }
   }, [waypoints])
+
+  useEffect(() => {
+    console.log('✓ riskPoints 更新，当前数量：', riskPoints.length)
+    if (onRiskPointsChangeRef.current) {
+      onRiskPointsChangeRef.current(riskPoints)
+    }
+  }, [riskPoints])
+
+  useEffect(() => {
+    console.log('✓ restPoints 更新，当前数量：', restPoints.length)
+    if (onRestPointsChangeRef.current) {
+      onRestPointsChangeRef.current(restPoints)
+    }
+  }, [restPoints])
+
+  useEffect(() => {
+    console.log('✓ supplyPoints 更新，当前数量：', supplyPoints.length)
+    if (onSupplyPointsChangeRef.current) {
+      onSupplyPointsChangeRef.current(supplyPoints)
+    }
+  }, [supplyPoints])
 
   useEffect(() => {
     console.log('✓ 起点更新:', startPoint)
@@ -195,8 +284,16 @@ const RouteEditor = ({
           showCheckpointModal(e.lnglat)
         } else if (currentMode === 'waypoint') {
           console.log('🎯 执行：添加途经点')
-          console.log('🎯 当前 waypoints 状态：', waypointsRef.current)
           addWaypoint(e.lnglat)
+        } else if (currentMode === 'riskPoint') {
+          console.log('⚠️ 执行：打开风险点对话框')
+          showRiskPointModal(e.lnglat)
+        } else if (currentMode === 'restPoint') {
+          console.log('☕ 执行：打开休息点对话框')
+          showRestPointModal(e.lnglat)
+        } else if (currentMode === 'supplyPoint') {
+          console.log('🏪 执行：打开补给点对话框')
+          showSupplyPointModal(e.lnglat)
         } else if (currentMode === 'setStart') {
           console.log('✓ 执行：设置起点')
           setStartPointHandler(e.lnglat)
@@ -291,6 +388,99 @@ const RouteEditor = ({
     message.success('签到点添加成功')
   }
 
+  // 风险点相关处理
+  const showRiskPointModal = useCallback((lnglat) => {
+    setEditingRiskPoint({
+      lng: lnglat.getLng(),
+      lat: lnglat.getLat()
+    })
+    setRiskPointForm({
+      ...riskPointForm,
+      sequence: riskPointsRef.current.length + 1
+    })
+    setRiskPointModalVisible(true)
+  }, [riskPointForm])
+
+  const handleAddRiskPoint = () => {
+    if (!riskPointForm.name) {
+      message.warning('请输入风险点名称')
+      return
+    }
+
+    const newRiskPoint = {
+      lng: editingRiskPoint.lng,
+      lat: editingRiskPoint.lat,
+      ...riskPointForm,
+      pointType: 2 // 风险点类型
+    }
+
+    setRiskPoints([...riskPoints, newRiskPoint])
+    setRiskPointModalVisible(false)
+    message.success('风险点添加成功')
+  }
+
+  // 休息点相关处理
+  const showRestPointModal = useCallback((lnglat) => {
+    setEditingRestPoint({
+      lng: lnglat.getLng(),
+      lat: lnglat.getLat()
+    })
+    setRestPointForm({
+      ...restPointForm,
+      sequence: restPointsRef.current.length + 1
+    })
+    setRestPointModalVisible(true)
+  }, [restPointForm])
+
+  const handleAddRestPoint = () => {
+    if (!restPointForm.name) {
+      message.warning('请输入休息点名称')
+      return
+    }
+
+    const newRestPoint = {
+      lng: editingRestPoint.lng,
+      lat: editingRestPoint.lat,
+      ...restPointForm,
+      pointType: 3 // 休息点类型
+    }
+
+    setRestPoints([...restPoints, newRestPoint])
+    setRestPointModalVisible(false)
+    message.success('休息点添加成功')
+  }
+
+  // 补给点相关处理
+  const showSupplyPointModal = useCallback((lnglat) => {
+    setEditingSupplyPoint({
+      lng: lnglat.getLng(),
+      lat: lnglat.getLat()
+    })
+    setSupplyPointForm({
+      ...supplyPointForm,
+      sequence: supplyPointsRef.current.length + 1
+    })
+    setSupplyPointModalVisible(true)
+  }, [supplyPointForm])
+
+  const handleAddSupplyPoint = () => {
+    if (!supplyPointForm.name) {
+      message.warning('请输入补给点名称')
+      return
+    }
+
+    const newSupplyPoint = {
+      lng: editingSupplyPoint.lng,
+      lat: editingSupplyPoint.lat,
+      ...supplyPointForm,
+      pointType: 4 // 补给点类型
+    }
+
+    setSupplyPoints([...supplyPoints, newSupplyPoint])
+    setSupplyPointModalVisible(false)
+    message.success('补给点添加成功')
+  }
+
   const removeRoutePoint = (index) => {
     const newPoints = routePoints.filter((_, i) => i !== index)
     setRoutePoints(newPoints)
@@ -304,6 +494,21 @@ const RouteEditor = ({
   const removeWaypoint = (index) => {
     const newWaypoints = waypoints.filter((_, i) => i !== index)
     setWaypoints(newWaypoints)
+  }
+
+  const removeRiskPoint = (index) => {
+    const newPoints = riskPoints.filter((_, i) => i !== index)
+    setRiskPoints(newPoints)
+  }
+
+  const removeRestPoint = (index) => {
+    const newPoints = restPoints.filter((_, i) => i !== index)
+    setRestPoints(newPoints)
+  }
+
+  const removeSupplyPoint = (index) => {
+    const newPoints = supplyPoints.filter((_, i) => i !== index)
+    setSupplyPoints(newPoints)
   }
 
   const clearStartPoint = () => {
@@ -362,6 +567,9 @@ const RouteEditor = ({
         setEndPoint(null)
         setCheckpoints([])
         setWaypoints([])
+        setRiskPoints([])
+        setRestPoints([])
+        setSupplyPoints([])
       }
     })
   }
@@ -468,6 +676,39 @@ const RouteEditor = ({
             .waypoint-marker${hoverStyle}
           </style>
         `
+      case 'riskPoint':
+        const shortRiskName = data.name.length > 8 ? data.name.substring(0, 8) + '…' : data.name
+        return `
+          <div class="custom-marker riskpoint-marker" style="${baseStyle} background: linear-gradient(135deg, #faad14 0%, #d48806 50%, #ffc53d 100%); max-width: 120px;">
+            <span style="margin-right: 3px;">⚠️</span><span style="overflow: hidden; text-overflow: ellipsis;">${shortRiskName}</span>
+          </div>
+          <style>
+            .riskpoint-marker${triangleStyle.replace('::after', '::after')} { border-top: 8px solid #faad14; }
+            .riskpoint-marker${hoverStyle}
+          </style>
+        `
+      case 'restPoint':
+        const shortRestName = data.name.length > 8 ? data.name.substring(0, 8) + '…' : data.name
+        return `
+          <div class="custom-marker restpoint-marker" style="${baseStyle} background: linear-gradient(135deg, #722ed1 0%, #531dab 50%, #9254de 100%); max-width: 120px;">
+            <span style="margin-right: 3px;">☕</span><span style="overflow: hidden; text-overflow: ellipsis;">${shortRestName}</span>
+          </div>
+          <style>
+            .restpoint-marker${triangleStyle.replace('::after', '::after')} { border-top: 8px solid #722ed1; }
+            .restpoint-marker${hoverStyle}
+          </style>
+        `
+      case 'supplyPoint':
+        const shortSupplyName = data.name.length > 8 ? data.name.substring(0, 8) + '…' : data.name
+        return `
+          <div class="custom-marker supplypoint-marker" style="${baseStyle} background: linear-gradient(135deg, #52c41a 0%, #389e0d 50%, #73d13d 100%); max-width: 120px;">
+            <span style="margin-right: 3px;">🏪</span><span style="overflow: hidden; text-overflow: ellipsis;">${shortSupplyName}</span>
+          </div>
+          <style>
+            .supplypoint-marker${triangleStyle.replace('::after', '::after')} { border-top: 8px solid #52c41a; }
+            .supplypoint-marker${hoverStyle}
+          </style>
+        `
       default:
         return `
           <div class="custom-marker default-marker" style="${baseStyle} background: linear-gradient(135deg, #666 0%, #999 100%);">
@@ -553,10 +794,55 @@ const RouteEditor = ({
       }
     })
 
+    // 风险点
+    console.log('🏗️ 开始构建风险点标记，riskPoints:', riskPoints)
+    riskPoints.forEach((rp, index) => {
+      if (window.AMap) {
+        console.log(`🏗️ 添加风险点 ${index + 1}:`, rp)
+        markers.push({
+          ...rp,
+          title: rp.name,
+          content: createCustomMarkerContent('riskPoint', rp, index),
+          offset: new window.AMap.Pixel(-60, -40),
+          anchor: 'bottom-center'
+        })
+      }
+    })
+
+    // 休息点
+    console.log('🏗️ 开始构建休息点标记，restPoints:', restPoints)
+    restPoints.forEach((rp, index) => {
+      if (window.AMap) {
+        console.log(`🏗️ 添加休息点 ${index + 1}:`, rp)
+        markers.push({
+          ...rp,
+          title: rp.name,
+          content: createCustomMarkerContent('restPoint', rp, index),
+          offset: new window.AMap.Pixel(-60, -40),
+          anchor: 'bottom-center'
+        })
+      }
+    })
+
+    // 补给点
+    console.log('🏗️ 开始构建补给点标记，supplyPoints:', supplyPoints)
+    supplyPoints.forEach((sp, index) => {
+      if (window.AMap) {
+        console.log(`🏗️ 添加补给点 ${index + 1}:`, sp)
+        markers.push({
+          ...sp,
+          title: sp.name,
+          content: createCustomMarkerContent('supplyPoint', sp, index),
+          offset: new window.AMap.Pixel(-60, -40),
+          anchor: 'bottom-center'
+        })
+      }
+    })
+
     console.log('🏗️ allMarkers 构建完成，数量：', markers.length)
     console.log('🏗️ 最终 markers 数组：', markers)
     return markers
-  }, [startPoint, endPoint, routePoints, checkpoints, waypoints])
+  }, [startPoint, endPoint, routePoints, checkpoints, waypoints, riskPoints, restPoints, supplyPoints])
 
   return (
     <div className="route-editor">
@@ -631,6 +917,48 @@ const RouteEditor = ({
               添加途经点
             </Button>
 
+            <Button
+              type={editingMode === 'riskPoint' ? 'primary' : 'default'}
+              icon={<EnvironmentOutlined />}
+              onClick={() => {
+                console.log('⚠️ 点击添加风险点按钮')
+                if (editingMode !== 'riskPoint') {
+                  setEditingMode('riskPoint')
+                }
+              }}
+              disabled={readOnly}
+            >
+              添加风险点
+            </Button>
+
+            <Button
+              type={editingMode === 'restPoint' ? 'primary' : 'default'}
+              icon={<PlusOutlined />}
+              onClick={() => {
+                console.log('☕ 点击添加休息点按钮')
+                if (editingMode !== 'restPoint') {
+                  setEditingMode('restPoint')
+                }
+              }}
+              disabled={readOnly}
+            >
+              添加休息点
+            </Button>
+
+            <Button
+              type={editingMode === 'supplyPoint' ? 'primary' : 'default'}
+              icon={<PlusOutlined />}
+              onClick={() => {
+                console.log('🏪 点击添加补给点按钮')
+                if (editingMode !== 'supplyPoint') {
+                  setEditingMode('supplyPoint')
+                }
+              }}
+              disabled={readOnly}
+            >
+              添加补给点
+            </Button>
+
             {/* 退出编辑模式按钮 */}
             {editingMode && editingMode !== 'setStart' && editingMode !== 'setEnd' && (
               <Button
@@ -670,6 +998,9 @@ const RouteEditor = ({
                 {editingMode === 'setEnd' && '点击地图设置终点'}
                 {editingMode === 'checkpoint' && '点击地图连续添加签到点，完成后点击"完成编辑"'}
                 {editingMode === 'waypoint' && '点击地图连续添加途经点，完成后点击"完成编辑"'}
+                {editingMode === 'riskPoint' && '点击地图连续添加风险点，完成后点击"完成编辑"'}
+                {editingMode === 'restPoint' && '点击地图连续添加休息点，完成后点击"完成编辑"'}
+                {editingMode === 'supplyPoint' && '点击地图连续添加补给点，完成后点击"完成编辑"'}
               </Tag>
             </div>
           )}
@@ -701,6 +1032,24 @@ const RouteEditor = ({
                       <PlusOutlined style={{ fontSize: '16px', color: '#52c41a' }} />
                     </Badge>
                     <span className="stat-label">途经点</span>
+                  </div>
+                  <div className="stat-item">
+                    <Badge count={riskPoints.length} color="#faad14">
+                      <EnvironmentOutlined style={{ fontSize: '16px', color: '#faad14' }} />
+                    </Badge>
+                    <span className="stat-label">风险点</span>
+                  </div>
+                  <div className="stat-item">
+                    <Badge count={restPoints.length} color="#722ed1">
+                      <PlusOutlined style={{ fontSize: '16px', color: '#722ed1' }} />
+                    </Badge>
+                    <span className="stat-label">休息点</span>
+                  </div>
+                  <div className="stat-item">
+                    <Badge count={supplyPoints.length} color="#52c41a">
+                      <PlusOutlined style={{ fontSize: '16px', color: '#52c41a' }} />
+                    </Badge>
+                    <span className="stat-label">补给点</span>
                   </div>
                   {routePoints.length > 1 && (
                     <div className="stat-item total-distance">
@@ -890,6 +1239,156 @@ const RouteEditor = ({
               </Space>
             </Card>
           )}
+
+          {/* 风险点列表 */}
+          {riskPoints.length > 0 && (
+            <Card size="small" title={
+              <Space>
+                <EnvironmentOutlined style={{ color: '#faad14' }} />
+                <span>风险点列表</span>
+                <Badge count={riskPoints.length} color="#faad14" />
+              </Space>
+            } className="riskpoints-card">
+              <Space direction="vertical" style={{ width: '100%' }} size={8}>
+                {riskPoints.map((rp, index) => (
+                  <div key={index} className="riskpoint-item">
+                    <div className="point-content">
+                      <div className="point-header">
+                        <Space>
+                          <div className="point-icon">
+                            <EnvironmentOutlined style={{ fontSize: '14px', color: '#faad14' }} />
+                          </div>
+                          <div className="point-info">
+                            <div className="point-name">{rp.name}</div>
+                            <div className="point-details">
+                              <Tag size="small" color="orange">
+                                {rp.riskLevel === 1 ? '低风险' : rp.riskLevel === 2 ? '中风险' : '高风险'}
+                              </Tag>
+                              {rp.riskTip && <Tag size="small" color="red">{rp.riskTip}</Tag>}
+                            </div>
+                          </div>
+                        </Space>
+                      </div>
+                      {!readOnly && (
+                        <Popconfirm
+                          title="确认删除该风险点？"
+                          onConfirm={() => removeRiskPoint(index)}
+                          okText="确定"
+                          cancelText="取消"
+                        >
+                          <Button
+                            type="text"
+                            danger
+                            size="small"
+                            icon={<DeleteOutlined />}
+                            className="point-action"
+                          />
+                        </Popconfirm>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </Space>
+            </Card>
+          )}
+
+          {/* 休息点列表 */}
+          {restPoints.length > 0 && (
+            <Card size="small" title={
+              <Space>
+                <PlusOutlined style={{ color: '#722ed1' }} />
+                <span>休息点列表</span>
+                <Badge count={restPoints.length} color="#722ed1" />
+              </Space>
+            } className="restpoints-card">
+              <Space direction="vertical" style={{ width: '100%' }} size={8}>
+                {restPoints.map((rp, index) => (
+                  <div key={index} className="restpoint-item">
+                    <div className="point-content">
+                      <div className="point-header">
+                        <Space>
+                          <div className="point-icon">
+                            <PlusOutlined style={{ fontSize: '14px', color: '#722ed1' }} />
+                          </div>
+                          <div className="point-info">
+                            <div className="point-name">{rp.name}</div>
+                            {rp.description && (
+                              <div className="point-desc">{rp.description}</div>
+                            )}
+                          </div>
+                        </Space>
+                      </div>
+                      {!readOnly && (
+                        <Popconfirm
+                          title="确认删除该休息点？"
+                          onConfirm={() => removeRestPoint(index)}
+                          okText="确定"
+                          cancelText="取消"
+                        >
+                          <Button
+                            type="text"
+                            danger
+                            size="small"
+                            icon={<DeleteOutlined />}
+                            className="point-action"
+                          />
+                        </Popconfirm>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </Space>
+            </Card>
+          )}
+
+          {/* 补给点列表 */}
+          {supplyPoints.length > 0 && (
+            <Card size="small" title={
+              <Space>
+                <PlusOutlined style={{ color: '#52c41a' }} />
+                <span>补给点列表</span>
+                <Badge count={supplyPoints.length} color="#52c41a" />
+              </Space>
+            } className="supplypoints-card">
+              <Space direction="vertical" style={{ width: '100%' }} size={8}>
+                {supplyPoints.map((sp, index) => (
+                  <div key={index} className="supplypoint-item">
+                    <div className="point-content">
+                      <div className="point-header">
+                        <Space>
+                          <div className="point-icon">
+                            <PlusOutlined style={{ fontSize: '14px', color: '#52c41a' }} />
+                          </div>
+                          <div className="point-info">
+                            <div className="point-name">{sp.name}</div>
+                            {sp.description && (
+                              <div className="point-desc">{sp.description}</div>
+                            )}
+                          </div>
+                        </Space>
+                      </div>
+                      {!readOnly && (
+                        <Popconfirm
+                          title="确认删除该补给点？"
+                          onConfirm={() => removeSupplyPoint(index)}
+                          okText="确定"
+                          cancelText="取消"
+                        >
+                          <Button
+                            type="text"
+                            danger
+                            size="small"
+                            icon={<DeleteOutlined />}
+                            className="point-action"
+                          />
+                        </Popconfirm>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </Space>
+            </Card>
+          )}
         </Space>
       </Card>
 
@@ -934,6 +1433,141 @@ const RouteEditor = ({
             <InputNumber
               value={checkpointForm.sequence}
               onChange={(value) => setCheckpointForm({ ...checkpointForm, sequence: value })}
+              min={1}
+            />
+          </div>
+        </Space>
+      </Modal>
+
+      {/* 风险点Modal */}
+      <Modal
+        title="添加风险点"
+        open={riskPointModalVisible}
+        onOk={handleAddRiskPoint}
+        onCancel={() => setRiskPointModalVisible(false)}
+        okText="确定"
+        cancelText="取消"
+      >
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <div>
+            <label>风险点名称：</label>
+            <Input
+              value={riskPointForm.name}
+              onChange={(e) => setRiskPointForm({ ...riskPointForm, name: e.target.value })}
+              placeholder="请输入风险点名称"
+            />
+          </div>
+          <div>
+            <label>风险描述：</label>
+            <Input.TextArea
+              value={riskPointForm.description}
+              onChange={(e) => setRiskPointForm({ ...riskPointForm, description: e.target.value })}
+              placeholder="请输入风险描述"
+              rows={3}
+            />
+          </div>
+          <div>
+            <label>风险等级：</label>
+            <Select
+              value={riskPointForm.riskLevel}
+              onChange={(value) => setRiskPointForm({ ...riskPointForm, riskLevel: value })}
+              style={{ width: '100%' }}
+            >
+              <Select.Option value={1}>低风险</Select.Option>
+              <Select.Option value={2}>中风险</Select.Option>
+              <Select.Option value={3}>高风险</Select.Option>
+            </Select>
+          </div>
+          <div>
+            <label>风险提示：</label>
+            <Input.TextArea
+              value={riskPointForm.riskTip}
+              onChange={(e) => setRiskPointForm({ ...riskPointForm, riskTip: e.target.value })}
+              placeholder="请输入风险提示"
+              rows={2}
+            />
+          </div>
+          <div>
+            <label>序号：</label>
+            <InputNumber
+              value={riskPointForm.sequence}
+              onChange={(value) => setRiskPointForm({ ...riskPointForm, sequence: value })}
+              min={1}
+            />
+          </div>
+        </Space>
+      </Modal>
+
+      {/* 休息点Modal */}
+      <Modal
+        title="添加休息点"
+        open={restPointModalVisible}
+        onOk={handleAddRestPoint}
+        onCancel={() => setRestPointModalVisible(false)}
+        okText="确定"
+        cancelText="取消"
+      >
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <div>
+            <label>休息点名称：</label>
+            <Input
+              value={restPointForm.name}
+              onChange={(e) => setRestPointForm({ ...restPointForm, name: e.target.value })}
+              placeholder="请输入休息点名称"
+            />
+          </div>
+          <div>
+            <label>休息点描述：</label>
+            <Input.TextArea
+              value={restPointForm.description}
+              onChange={(e) => setRestPointForm({ ...restPointForm, description: e.target.value })}
+              placeholder="请输入休息点描述"
+              rows={3}
+            />
+          </div>
+          <div>
+            <label>序号：</label>
+            <InputNumber
+              value={restPointForm.sequence}
+              onChange={(value) => setRestPointForm({ ...restPointForm, sequence: value })}
+              min={1}
+            />
+          </div>
+        </Space>
+      </Modal>
+
+      {/* 补给点Modal */}
+      <Modal
+        title="添加补给点"
+        open={supplyPointModalVisible}
+        onOk={handleAddSupplyPoint}
+        onCancel={() => setSupplyPointModalVisible(false)}
+        okText="确定"
+        cancelText="取消"
+      >
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <div>
+            <label>补给点名称：</label>
+            <Input
+              value={supplyPointForm.name}
+              onChange={(e) => setSupplyPointForm({ ...supplyPointForm, name: e.target.value })}
+              placeholder="请输入补给点名称"
+            />
+          </div>
+          <div>
+            <label>补给点描述：</label>
+            <Input.TextArea
+              value={supplyPointForm.description}
+              onChange={(e) => setSupplyPointForm({ ...supplyPointForm, description: e.target.value })}
+              placeholder="请输入补给点描述（如：可补充水、食物等）"
+              rows={3}
+            />
+          </div>
+          <div>
+            <label>序号：</label>
+            <InputNumber
+              value={supplyPointForm.sequence}
+              onChange={(value) => setSupplyPointForm({ ...supplyPointForm, sequence: value })}
               min={1}
             />
           </div>

@@ -3,15 +3,33 @@
  * 封装浏览器原生定位API和高德地图定位插件
  */
 
-import { getCurrentLocation, getAmapLocation, isInRadius, calculateDistance } from './map'
+import { getCurrentLocation, getAmapLocation, isInRadius, calculateDistance, wgs84ToGcj02 } from './map'
 
 /**
  * 定位配置
  */
 const LOCATION_CONFIG = {
-  enableHighAccuracy: true,
-  timeout: 10000,
-  maximumAge: 0
+  enableHighAccuracy: true,    // 启用高精度定位
+  timeout: 15000,              // 15秒超时
+  maximumAge: 60000            // 允许使用1分钟内的缓存
+}
+
+/**
+ * 高精度定位配置（用于轨迹记录）
+ */
+const HIGH_ACCURACY_CONFIG = {
+  enableHighAccuracy: true,    // 启用高精度定位
+  timeout: 20000,              // 更长的超时时间
+  maximumAge: 0                // 不使用缓存，强制获取最新位置
+}
+
+/**
+ * 强制GPS定位配置（诊断用）
+ */
+const FORCE_GPS_CONFIG = {
+  enableHighAccuracy: true,    // 强制启用GPS
+  timeout: 30000,              // 30秒超时，给GPS更多时间
+  maximumAge: 0                // 绝对不使用缓存
 }
 
 /**
@@ -39,28 +57,182 @@ export const getBrowserLocation = () => {
 export { getAmapLocation } from './map'
 
 /**
- * 获取位置（自动选择最佳方案）
- * 优先使用高德地图插件，如果失败则使用浏览器原生API
- * @returns {Promise<{latitude, longitude, accuracy, address}>}
+ * 强制GPS定位（诊断用）
+ * 强制使用GPS而非网络定位，用于诊断定位问题
+ * @returns {Promise<{latitude, longitude, accuracy, method, diagnostics}>}
  */
+export const forceGpsLocation = () => {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('浏览器不支持地理定位'))
+      return
+    }
+
+    console.log('开始强制GPS定位诊断...')
+    const startTime = Date.now()
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const endTime = Date.now()
+        const originalLat = position.coords.latitude
+        const originalLng = position.coords.longitude
+
+        // 进行坐标系转换
+        const converted = wgs84ToGcj02(originalLng, originalLat)
+
+        const diagnostics = {
+          accuracy: position.coords.accuracy,
+          altitude: position.coords.altitude,
+          altitudeAccuracy: position.coords.altitudeAccuracy,
+          heading: position.coords.heading,
+          speed: position.coords.speed,
+          timestamp: position.timestamp,
+          responseTime: endTime - startTime,
+          source: position.coords.accuracy < 100 ? 'GPS' : 'Network'
+        }
+
+        console.log('强制GPS定位完成:', {
+          originalCoords: { lat: originalLat, lng: originalLng },
+          convertedCoords: { lat: converted.lat, lng: converted.lng },
+          diagnostics
+        })
+
+        resolve({
+          latitude: converted.lat,
+          longitude: converted.lng,
+          accuracy: position.coords.accuracy,
+          originalLatitude: originalLat,
+          originalLongitude: originalLng,
+          method: 'force-gps',
+          coordinateSystem: 'GCJ02 (强制GPS)',
+          diagnostics
+        })
+      },
+      (error) => {
+        console.error('强制GPS定位失败:', error)
+        let errorMessage = '强制GPS定位失败'
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'GPS定位权限被拒绝'
+            break
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'GPS位置信息不可用，可能在室内或GPS信号弱'
+            break
+          case error.TIMEOUT:
+            errorMessage = 'GPS定位超时，请确保在户外并等待更长时间'
+            break
+        }
+        reject(new Error(errorMessage))
+      },
+      FORCE_GPS_CONFIG
+    )
+  })
+}
+
+/**
+ * 定位诊断工具
+ * 测试多种定位方式并比较结果
+ * @returns {Promise<Array>} 多种定位方式的结果对比
+ */
+export const locationDiagnostics = async () => {
+  const results = []
+
+  try {
+    console.log('开始定位诊断...')
+
+    // 1. 普通浏览器定位
+    try {
+      const browserResult = await getBrowserLocation()
+      results.push({
+        method: '浏览器定位',
+        ...browserResult,
+        success: true
+      })
+    } catch (error) {
+      results.push({
+        method: '浏览器定位',
+        success: false,
+        error: error.message
+      })
+    }
+
+    // 2. 强制GPS定位
+    try {
+      const gpsResult = await forceGpsLocation()
+      results.push({
+        method: '强制GPS定位',
+        ...gpsResult,
+        success: true
+      })
+    } catch (error) {
+      results.push({
+        method: '强制GPS定位',
+        success: false,
+        error: error.message
+      })
+    }
+
+    // 3. 高德地图定位
+    try {
+      if (window.AMap) {
+        const amapResult = await getAmapLocation()
+        results.push({
+          method: '高德地图定位',
+          ...amapResult,
+          success: true
+        })
+      }
+    } catch (error) {
+      results.push({
+        method: '高德地图定位',
+        success: false,
+        error: error.message
+      })
+    }
+
+    return results
+  } catch (error) {
+    console.error('定位诊断失败:', error)
+    return results
+  }
+}
 export const getLocation = async () => {
   try {
-    // 尝试使用高德地图定位
-    const amapLocation = await getAmapLocation()
+    // 优先使用浏览器原生定位（更稳定、兼容性更好）
+    console.log('尝试使用浏览器原生定位...')
+    const browserLocation = await getBrowserLocation()
+    console.log('浏览器原生定位成功:', browserLocation)
     return {
-      ...amapLocation,
-      method: 'amap'
+      ...browserLocation,
+      method: 'browser'
     }
   } catch (error) {
-    console.warn('高德地图定位失败，使用浏览器原生定位:', error)
+    console.warn('浏览器原生定位失败，尝试高德地图定位:', error.message)
     try {
-      const browserLocation = await getBrowserLocation()
-      return {
-        ...browserLocation,
-        method: 'browser'
+      // 确保高德地图API已加载
+      if (!window.AMap) {
+        const { loadAmapScript } = await import('./map')
+        await loadAmapScript()
       }
-    } catch (browserError) {
-      throw new Error('定位失败: ' + browserError.message)
+
+      const amapLocation = await getAmapLocation()
+      console.log('高德地图定位成功:', amapLocation)
+      return {
+        ...amapLocation,
+        method: 'amap'
+      }
+    } catch (amapError) {
+      console.error('所有定位方式都失败了:', amapError.message)
+      // 提供更详细的错误信息
+      let errorMessage = '定位失败'
+      if (error.message.includes('用户拒绝')) {
+        errorMessage = '请允许浏览器获取您的位置信息，并确保设备GPS功能已开启'
+      } else if (error.message.includes('超时')) {
+        errorMessage = '定位超时，请检查GPS信号或网络连接'
+      } else if (error.message.includes('不可用')) {
+        errorMessage = '位置信息不可用，请检查设备GPS功能'
+      }
+      throw new Error(errorMessage)
     }
   }
 }
@@ -195,12 +367,20 @@ export class TrackRecorder {
 
     this.watchId = navigator.geolocation.watchPosition(
       (position) => {
+        const originalLat = position.coords.latitude
+        const originalLng = position.coords.longitude
+
+        // 转换坐标系
+        const converted = wgs84ToGcj02(originalLng, originalLat)
+
         const track = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+          latitude: converted.lat,
+          longitude: converted.lng,
           accuracy: position.coords.accuracy,
           speed: position.coords.speed,
-          timestamp: position.timestamp
+          timestamp: position.timestamp,
+          originalLatitude: originalLat,
+          originalLongitude: originalLng
         }
 
         // 添加到轨迹数组
@@ -222,7 +402,7 @@ export class TrackRecorder {
           onError(error)
         }
       },
-      LOCATION_CONFIG
+      HIGH_ACCURACY_CONFIG
     )
 
     // 启动自动上传
@@ -316,6 +496,8 @@ export default {
   getLocation,
   getBrowserLocation,
   getAmapLocation,
+  forceGpsLocation,
+  locationDiagnostics,
   watchLocation,
   checkLocationPermission,
   requestLocationPermission,

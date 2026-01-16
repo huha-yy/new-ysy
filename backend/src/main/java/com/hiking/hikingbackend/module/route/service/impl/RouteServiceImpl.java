@@ -52,6 +52,7 @@ public class RouteServiceImpl implements RouteService {
     private static final int CHECKPOINT_RADIUS_DEFAULT = 50; // 默认签到半径（米）
     private static final int CHECKPOINT_TYPE_WAY = 2;      // 途中点（默认）
     private static final int CHECKPOINT_REQUIRED = 1;       // 必签（默认）
+    private static final int ROUTE_POINT_TYPE_TRACK = 5;    // 路线轨迹点
 
     /**
      * 创建路线（组织者）
@@ -69,21 +70,12 @@ public class RouteServiceImpl implements RouteService {
             throw new BusinessException(ResultCode.USER_NOT_FOUND);
         }
 
-        // 2. 从路线点中提取起点和终点信息
-        if (createDTO.getRoutePoints() != null && !createDTO.getRoutePoints().isEmpty()) {
-            List<RouteCreateDTO.RoutePointDTO> points = createDTO.getRoutePoints();
-            RouteCreateDTO.RoutePointDTO startPoint = points.get(0);
-            RouteCreateDTO.RoutePointDTO endPoint = points.get(points.size() - 1);
-
-            // 自动设置起点和终点信息（如果没有手动设置）
-            if (createDTO.getStartLatitude() == null) {
-                createDTO.setStartLatitude(BigDecimal.valueOf(startPoint.getLat()));
-                createDTO.setStartLongitude(BigDecimal.valueOf(startPoint.getLng()));
-            }
-            if (createDTO.getEndLatitude() == null) {
-                createDTO.setEndLatitude(BigDecimal.valueOf(endPoint.getLat()));
-                createDTO.setEndLongitude(BigDecimal.valueOf(endPoint.getLng()));
-            }
+        // 2. 校验起点和终点必须存在
+        if (createDTO.getStartLatitude() == null || createDTO.getStartLongitude() == null) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "起点坐标不能为空");
+        }
+        if (createDTO.getEndLatitude() == null || createDTO.getEndLongitude() == null) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "终点坐标不能为空");
         }
 
         // 3. 构建路线对象
@@ -114,7 +106,7 @@ public class RouteServiceImpl implements RouteService {
         Long routeId = route.getId();
         log.info("创建路线成功，路线ID：{}，创建者ID：{}", routeId, userId);
 
-        // 4. 保存路线点（route_point表）
+        // 4. 保存路线轨迹点（route_point表，point_type=5）
         if (createDTO.getRoutePoints() != null && !createDTO.getRoutePoints().isEmpty()) {
             List<RoutePoint> routePoints = createDTO.getRoutePoints().stream()
                     .map(point -> {
@@ -124,14 +116,14 @@ public class RouteServiceImpl implements RouteService {
                                 .name("路线点" + sequence) // 添加必需的name字段
                                 .latitude(BigDecimal.valueOf(point.getLat()))
                                 .longitude(BigDecimal.valueOf(point.getLng()))
-                                .pointType(1) // 默认为途经点
+                                .pointType(ROUTE_POINT_TYPE_TRACK) // 使用point_type=5表示路线轨迹点
                                 .sequence(sequence)
                                 .build();
                     })
                     .toList();
 
             routePoints.forEach(routePointMapper::insert);
-            log.info("保存路线点成功，路线ID：{}，路线点数量：{}", routeId, routePoints.size());
+            log.info("保存路线轨迹点成功，路线ID：{}，轨迹点数量：{}", routeId, routePoints.size());
         }
 
         // 5. 保存签到点（checkpoint表）
@@ -167,7 +159,63 @@ public class RouteServiceImpl implements RouteService {
                     .toList();
 
             waypoints.forEach(routePointMapper::insert);
-            log.info("保存途经点成功，路线ID：{}，途经点数量：{}", routeId, waypoints.size());
+            log.info("保存途经点成功,路线ID：{}，途经点数量：{}", routeId, waypoints.size());
+        }
+
+        // 7. 保存风险点（route_point表，point_type=2）
+        if (createDTO.getRiskPoints() != null && !createDTO.getRiskPoints().isEmpty()) {
+            List<RoutePoint> riskPoints = createDTO.getRiskPoints().stream()
+                    .map(rp -> RoutePoint.builder()
+                            .routeId(routeId)
+                            .name(rp.getName())
+                            .description(rp.getDescription())
+                            .latitude(BigDecimal.valueOf(rp.getLatitude()))
+                            .longitude(BigDecimal.valueOf(rp.getLongitude()))
+                            .pointType(2) // 风险点
+                            .riskLevel(rp.getRiskLevel())
+                            .riskTip(rp.getRiskTip())
+                            .sequence(rp.getSequence() != null ? rp.getSequence() : createDTO.getRiskPoints().indexOf(rp) + 1)
+                            .build())
+                    .toList();
+
+            riskPoints.forEach(routePointMapper::insert);
+            log.info("保存风险点成功，路线ID：{}，风险点数量：{}", routeId, riskPoints.size());
+        }
+
+        // 8. 保存休息点（route_point表，point_type=3）
+        if (createDTO.getRestPoints() != null && !createDTO.getRestPoints().isEmpty()) {
+            List<RoutePoint> restPoints = createDTO.getRestPoints().stream()
+                    .map(rp -> RoutePoint.builder()
+                            .routeId(routeId)
+                            .name(rp.getName())
+                            .description(rp.getDescription())
+                            .latitude(BigDecimal.valueOf(rp.getLatitude()))
+                            .longitude(BigDecimal.valueOf(rp.getLongitude()))
+                            .pointType(3) // 休息点
+                            .sequence(rp.getSequence() != null ? rp.getSequence() : createDTO.getRestPoints().indexOf(rp) + 1)
+                            .build())
+                    .toList();
+
+            restPoints.forEach(routePointMapper::insert);
+            log.info("保存休息点成功，路线ID：{}，休息点数量：{}", routeId, restPoints.size());
+        }
+
+        // 9. 保存补给点（route_point表，point_type=4）
+        if (createDTO.getSupplyPoints() != null && !createDTO.getSupplyPoints().isEmpty()) {
+            List<RoutePoint> supplyPoints = createDTO.getSupplyPoints().stream()
+                    .map(sp -> RoutePoint.builder()
+                            .routeId(routeId)
+                            .name(sp.getName())
+                            .description(sp.getDescription())
+                            .latitude(BigDecimal.valueOf(sp.getLatitude()))
+                            .longitude(BigDecimal.valueOf(sp.getLongitude()))
+                            .pointType(4) // 补给点
+                            .sequence(sp.getSequence() != null ? sp.getSequence() : createDTO.getSupplyPoints().indexOf(sp) + 1)
+                            .build())
+                    .toList();
+
+            supplyPoints.forEach(routePointMapper::insert);
+            log.info("保存补给点成功，路线ID：{}，补给点数量：{}", routeId, supplyPoints.size());
         }
 
         return routeId;
@@ -279,15 +327,21 @@ public class RouteServiceImpl implements RouteService {
         if (route == null) {
             throw new BusinessException(ResultCode.ROUTE_NOT_FOUND);
         }
-        
+
         // 2. 查询该路线的所有签到点
         LambdaQueryWrapper<Checkpoint> checkpointWrapper = new LambdaQueryWrapper<>();
         checkpointWrapper.eq(Checkpoint::getRouteId, routeId)
                       .orderByAsc(Checkpoint::getSequence);
         List<Checkpoint> checkpoints = checkpointMapper.selectList(checkpointWrapper);
-        
-        // 3. 转换为VO
-        return convertToVOWithCheckpoints(route, checkpoints);
+
+        // 3. 查询该路线的所有路线点（按类型分类）
+        LambdaQueryWrapper<RoutePoint> routePointWrapper = new LambdaQueryWrapper<>();
+        routePointWrapper.eq(RoutePoint::getRouteId, routeId)
+                      .orderByAsc(RoutePoint::getSequence);
+        List<RoutePoint> allRoutePoints = routePointMapper.selectList(routePointWrapper);
+
+        // 4. 转换为VO
+        return convertToVOWithAllPoints(route, checkpoints, allRoutePoints);
     }
 
     /**
@@ -385,15 +439,99 @@ public class RouteServiceImpl implements RouteService {
     private RouteVO convertToVOWithCheckpoints(Route route, List<Checkpoint> checkpoints) {
         // 先转换基本信息
         RouteVO routeVO = convertToVOBasic(route);
-        
+
         // 转换签到点列表
         List<CheckpointVO> checkpointVOList = checkpoints.stream()
                 .map(this::convertToVO)
                 .toList();
-        
+
         routeVO.setCheckpoints(checkpointVOList);
-        
+
         return routeVO;
+    }
+
+    /**
+     * 转换为VO（包含所有点位信息）
+     */
+    private RouteVO convertToVOWithAllPoints(Route route, List<Checkpoint> checkpoints, List<RoutePoint> allRoutePoints) {
+        // 先转换基本信息
+        RouteVO routeVO = convertToVOBasic(route);
+
+        // 转换签到点列表
+        List<CheckpointVO> checkpointVOList = checkpoints.stream()
+                .map(this::convertToVO)
+                .toList();
+        routeVO.setCheckpoints(checkpointVOList);
+
+        // 按点位类型分类
+        List<RouteVO.RoutePointVO> routeTrackPoints = allRoutePoints.stream()
+                .filter(p -> p.getPointType() == 5)  // 路线轨迹点
+                .map(this::convertRoutePointToVO)
+                .toList();
+        routeVO.setRoutePoints(routeTrackPoints);
+
+        List<RouteVO.RoutePointVO> waypointsList = allRoutePoints.stream()
+                .filter(p -> p.getPointType() == 1)  // 途经点
+                .map(this::convertRoutePointToVO)
+                .toList();
+        routeVO.setWaypoints(waypointsList);
+
+        List<RouteVO.RoutePointVO> riskPointsList = allRoutePoints.stream()
+                .filter(p -> p.getPointType() == 2)  // 风险点
+                .map(this::convertRoutePointToVO)
+                .toList();
+        routeVO.setRiskPoints(riskPointsList);
+
+        List<RouteVO.RoutePointVO> restPointsList = allRoutePoints.stream()
+                .filter(p -> p.getPointType() == 3)  // 休息点
+                .map(this::convertRoutePointToVO)
+                .toList();
+        routeVO.setRestPoints(restPointsList);
+
+        List<RouteVO.RoutePointVO> supplyPointsList = allRoutePoints.stream()
+                .filter(p -> p.getPointType() == 4)  // 补给点
+                .map(this::convertRoutePointToVO)
+                .toList();
+        routeVO.setSupplyPoints(supplyPointsList);
+
+        // 构建起点终点对象
+        if (route.getStartLatitude() != null && route.getStartLongitude() != null) {
+            RouteVO.PointVO startPoint = RouteVO.PointVO.builder()
+                    .name(route.getStartPointName())
+                    .latitude(route.getStartLatitude())
+                    .longitude(route.getStartLongitude())
+                    .build();
+            routeVO.setStartPoint(startPoint);
+        }
+
+        if (route.getEndLatitude() != null && route.getEndLongitude() != null) {
+            RouteVO.PointVO endPoint = RouteVO.PointVO.builder()
+                    .name(route.getEndPointName())
+                    .latitude(route.getEndLatitude())
+                    .longitude(route.getEndLongitude())
+                    .build();
+            routeVO.setEndPoint(endPoint);
+        }
+
+        return routeVO;
+    }
+
+    /**
+     * 路线点转换为VO
+     */
+    private RouteVO.RoutePointVO convertRoutePointToVO(RoutePoint routePoint) {
+        return RouteVO.RoutePointVO.builder()
+                .id(routePoint.getId())
+                .name(routePoint.getName())
+                .description(routePoint.getDescription())
+                .latitude(routePoint.getLatitude())
+                .longitude(routePoint.getLongitude())
+                .elevation(routePoint.getElevation())
+                .pointType(routePoint.getPointType())
+                .sequence(routePoint.getSequence())
+                .riskLevel(routePoint.getRiskLevel())
+                .riskTip(routePoint.getRiskTip())
+                .build();
     }
 
     /**
