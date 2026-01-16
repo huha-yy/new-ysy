@@ -176,3 +176,21 @@ export const updateGatheringPlan = (activityId, data) => {
 export const publishGatheringPlan = (id) => {
   return request.put(`/activities/${id}/gathering/publish`)
 }
+
+/**
+ * 启动活动（组织者）
+ * @param {number} id - 活动ID
+ * @returns {Promise}
+ */
+export const startActivity = (id) => {
+  return request.post(`/activities/${id}/start`)
+}
+
+/**
+ * 结束活动（组织者）
+ * @param {number} id - 活动ID
+ * @returns {Promise}
+ */
+export const endActivity = (id) => {
+  return request.post(`/activities/${id}/end`)
+}

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   Card, Form, Input, InputNumber, Select, DatePicker, Upload, Button,
-  message, Space, Divider, Row, Col, Steps, Switch, Tooltip, Modal, Radio
+  message, Space, Divider, Row, Col, Steps, Switch, Tooltip, Modal, Radio, Alert
 } from 'antd'
 import {
   SaveOutlined,
@@ -82,9 +82,13 @@ function ActivityForm() {
         elevationGain: null,
         estimatedDuration: null
       })
+      // 清空签到点（切换到选择模式时，等待用户选择路线后自动继承）
+      setCheckpoints([])
     } else {
-      // 清空路线选择
+      // 清空路线选择和继承的签到点
       form.setFieldsValue({ routeId: null })
+      setCheckpoints([])
+      message.info('已切换到自定义路线模式，请手动设置路线信息和签到点')
     }
   }
 
@@ -104,6 +108,26 @@ function ActivityForm() {
           estimatedDuration: route.estimatedHours,
           difficultyLevel: route.difficultyLevel
         })
+
+        // 自动继承路线的签到点
+        if (route.checkpoints && route.checkpoints.length > 0) {
+          const inheritedCheckpoints = route.checkpoints.map(cp => ({
+            id: Date.now() + Math.random(), // 生成新的临时ID
+            name: cp.name,
+            latitude: cp.latitude,
+            longitude: cp.longitude,
+            radius: cp.radius || 100,
+            order: cp.sequence || cp.order,
+            checkpointType: cp.checkpointType,
+            isRequired: cp.isRequired,
+            expectedArriveMinutes: cp.expectedArriveMinutes
+          }))
+          setCheckpoints(inheritedCheckpoints)
+          message.success(`已继承路线"${route.name}"的 ${route.checkpoints.length} 个签到点`)
+        } else {
+          setCheckpoints([])
+          message.info(`路线"${route.name}"暂无签到点，您可以手动添加`)
+        }
       }
     } catch (error) {
       console.error('获取路线详情失败:', error)
@@ -806,6 +830,29 @@ function ActivityForm() {
           )}
 
           <Divider>签到点设置（可选）</Divider>
+
+          {/* 显示签到点继承状态 */}
+          {routeMode === 'select' && checkpoints.length > 0 && (
+            <Alert
+              message="已继承所选路线的签到点"
+              description={`当前共有 ${checkpoints.length} 个签到点，您可以直接使用或进行修改`}
+              type="success"
+              showIcon
+              style={{ marginBottom: 16 }}
+              action={
+                <Button
+                  size="small"
+                  type="text"
+                  onClick={() => {
+                    setCheckpoints([])
+                    message.info('已清空签到点，您可以重新添加')
+                  }}
+                >
+                  清空重新设置
+                </Button>
+              }
+            />
+          )}
 
           <div className="checkpoints-section">
             {checkpoints.map((checkpoint, index) => (

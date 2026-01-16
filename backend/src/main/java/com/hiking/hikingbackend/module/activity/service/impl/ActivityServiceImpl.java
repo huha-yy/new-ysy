@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -859,6 +860,93 @@ public class ActivityServiceImpl implements ActivityService {
 
             return vo;
         });
+    }
+
+    /**
+     * 启动活动
+     * 将活动状态从已发布变更为进行中
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void startActivity(Long activityId, Long operatorId) {
+        // 1. 校验活动是否存在
+        Activity activity = activityMapper.selectById(activityId);
+        if (activity == null) {
+            throw new BusinessException(ResultCode.ACTIVITY_NOT_FOUND);
+        }
+
+        // 2. 校验操作权限（组织者或管理员）
+        validateActivityOperatePermission(activity, operatorId);
+
+        // 3. 校验活动状态（只有已发布的活动才能启动）
+        if (activity.getStatus() != STATUS_PUBLISHED) {
+            throw new BusinessException(ResultCode.OPERATION_FAILED.getCode(),
+                "只有已发布的活动才能启动，当前状态：" + getStatusText(activity.getStatus()));
+        }
+
+        // 4. 可选：校验活动时间（确保在合理的时间范围内启动）
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime activityStart = LocalDateTime.of(activity.getActivityDate(), activity.getStartTime());
+        LocalDateTime activityEnd = LocalDateTime.of(activity.getActivityDate(), activity.getEndTime());
+
+        if (now.isAfter(activityEnd)) {
+            throw new BusinessException(ResultCode.OPERATION_FAILED.getCode(), "活动已过期，无法启动");
+        }
+
+        // 5. 更新活动状态为进行中
+        activity.setStatus(STATUS_IN_PROGRESS);
+        activityMapper.updateById(activity);
+
+        log.info("活动启动成功，活动ID：{}，操作人ID：{}", activityId, operatorId);
+    }
+
+    /**
+     * 结束活动
+     * 将活动状态从进行中变更为已结束
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void endActivity(Long activityId, Long operatorId) {
+        // 1. 校验活动是否存在
+        Activity activity = activityMapper.selectById(activityId);
+        if (activity == null) {
+            throw new BusinessException(ResultCode.ACTIVITY_NOT_FOUND);
+        }
+
+        // 2. 校验操作权限（组织者或管理员）
+        validateActivityOperatePermission(activity, operatorId);
+
+        // 3. 校验活动状态（只有进行中的活动才能结束）
+        if (activity.getStatus() != STATUS_IN_PROGRESS) {
+            throw new BusinessException(ResultCode.OPERATION_FAILED.getCode(),
+                "只有进行中的活动才能结束，当前状态：" + getStatusText(activity.getStatus()));
+        }
+
+        // 4. 更新活动状态为已结束
+        activity.setStatus(STATUS_ENDED);
+        activityMapper.updateById(activity);
+
+        log.info("活动结束成功，活动ID：{}，操作人ID：{}", activityId, operatorId);
+    }
+
+    /**
+     * 验证活动操作权限（组织者或管理员）
+     */
+    private void validateActivityOperatePermission(Activity activity, Long operatorId) {
+        User operator = userMapper.selectById(operatorId);
+        if (operator == null) {
+            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+        }
+
+        // 检查是否为活动组织者
+        boolean isOrganizer = activity.getOrganizerId().equals(operatorId);
+
+        // 检查是否为管理员
+        boolean isAdmin = operator.getRole() != null && operator.getRole() == 2;
+
+        if (!isOrganizer && !isAdmin) {
+            throw new BusinessException(ResultCode.FORBIDDEN, "只有活动组织者或管理员可以操作活动状态");
+        }
     }
 }
 

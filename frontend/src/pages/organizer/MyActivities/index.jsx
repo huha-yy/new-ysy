@@ -14,9 +14,11 @@ import {
   ExclamationCircleOutlined,
   SearchOutlined,
   ReloadOutlined,
-  EnvironmentOutlined
+  EnvironmentOutlined,
+  PlayCircleOutlined,
+  PoweroffOutlined
 } from '@ant-design/icons'
-import { getMyActivities, deleteActivity, cancelActivity, submitActivity } from '../../../api/activity'
+import { getMyActivities, deleteActivity, cancelActivity, submitActivity, startActivity, endActivity } from '../../../api/activity'
 import { ACTIVITY_STATUS, DIFFICULTY_MAP } from '../../../utils/constants'
 import { getActivityCoverUrl } from '../../../utils/imageUrl'
 import dayjs from 'dayjs'
@@ -221,6 +223,28 @@ function MyActivities() {
     }
   }
 
+  // 启动活动
+  const handleStart = async (id) => {
+    try {
+      await startActivity(id)
+      message.success('活动已启动')
+      fetchActivities()
+    } catch (error) {
+      message.error(error.message || '启动失败')
+    }
+  }
+
+  // 结束活动
+  const handleEnd = async (id) => {
+    try {
+      await endActivity(id)
+      message.success('活动已结束')
+      fetchActivities()
+    } catch (error) {
+      message.error(error.message || '结束失败')
+    }
+  }
+
   // 表格列定义
   const columns = [
     {
@@ -407,8 +431,26 @@ function MyActivities() {
           )
         }
 
-        // 已发布状态：可查看报名、设置集合方案、取消活动
+        // 已发布状态：可查看报名、设置集合方案、启动活动、取消活动
         if (record.status === ACTIVITY_STATUS.PUBLISHED) {
+          actions.push(
+            <Tooltip title="启动活动" key="start">
+              <Button
+                type="text"
+                icon={<PlayCircleOutlined />}
+                onClick={() => {
+                  Modal.confirm({
+                    title: '确认启动活动？',
+                    content: '活动启动后将进入进行中状态，参与者可以进行签到。',
+                    okText: '确认启动',
+                    cancelText: '取消',
+                    onOk: () => handleStart(record.id)
+                  })
+                }}
+                style={{ color: '#52c41a' }}
+              />
+            </Tooltip>
+          )
           actions.push(
             <Tooltip title="报名管理" key="registrations">
               <Button
@@ -464,7 +506,7 @@ function MyActivities() {
           )
         }
 
-        // 进行中状态：可查看签到、设置集合方案
+        // 进行中状态：可查看签到、设置集合方案、结束活动
         if (record.status === ACTIVITY_STATUS.IN_PROGRESS) {
           actions.push(
             <Tooltip title="签到监控" key="checkin">
@@ -483,6 +525,24 @@ function MyActivities() {
                 icon={<EnvironmentOutlined />}
                 onClick={() => navigate(`/organizer/activities/${record.id}/gathering`)}
                 style={{ color: 'var(--primary-color)' }}
+              />
+            </Tooltip>
+          )
+          actions.push(
+            <Tooltip title="结束活动" key="end">
+              <Button
+                type="text"
+                icon={<PoweroffOutlined />}
+                onClick={() => {
+                  Modal.confirm({
+                    title: '确认结束活动？',
+                    content: '活动结束后将变为已结束状态，无法再进行签到。',
+                    okText: '确认结束',
+                    cancelText: '取消',
+                    onOk: () => handleEnd(record.id)
+                  })
+                }}
+                style={{ color: '#ff4d4f' }}
               />
             </Tooltip>
           )

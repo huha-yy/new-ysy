@@ -275,4 +275,52 @@ public class ActivityController {
         return Result.success("报名成功", registrationId);
     }
 
+    /**
+     * 启动活动
+     * 将活动状态从已发布变更为进行中
+     * 需要校验：当前用户必须是活动组织者或管理员
+     *
+     * @param activityId 活动ID
+     * @return 操作结果
+     */
+    @Operation(summary = "启动活动", description = "将活动状态从已发布变更为进行中，只有活动组织者或管理员可以操作")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PostMapping("/activities/{activityId}/start")
+    public Result<Void> startActivity(
+            @Parameter(description = "活动ID", required = true, example = "1")
+            @PathVariable("activityId") Long activityId) {
+        // 获取当前用户ID
+        Long userId = SecurityUtils.getCurrentUserId();
+        if (userId == null) {
+            throw new RuntimeException("无法获取当前用户ID");
+        }
+
+        activityService.startActivity(activityId, userId);
+        return Result.success("活动已启动");
+    }
+
+    /**
+     * 结束活动
+     * 将活动状态从进行中变更为已结束
+     * 需要校验：当前用户必须是活动组织者或管理员
+     *
+     * @param activityId 活动ID
+     * @return 操作结果
+     */
+    @Operation(summary = "结束活动", description = "将活动状态从进行中变更为已结束，只有活动组织者或管理员可以操作")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @PostMapping("/activities/{activityId}/end")
+    public Result<Void> endActivity(
+            @Parameter(description = "活动ID", required = true, example = "1")
+            @PathVariable("activityId") Long activityId) {
+        // 获取当前用户ID
+        Long userId = SecurityUtils.getCurrentUserId();
+        if (userId == null) {
+            throw new RuntimeException("无法获取当前用户ID");
+        }
+
+        activityService.endActivity(activityId, userId);
+        return Result.success("活动已结束");
+    }
+
 }

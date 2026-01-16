@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Card, Button, message, Space, Tag, Progress, Modal, Alert } from 'antd'
+import { Card, Button, message, Space, Tag, Progress, Modal, Alert, Form, Input, InputNumber } from 'antd'
 import {
   EnvironmentOutlined,
   CheckCircleOutlined,
@@ -10,7 +10,7 @@ import {
 } from '@ant-design/icons'
 import MapView from '../../../components/MapView/MapView'
 import { getCheckpoints, getCheckinStatus, checkin as checkinApi, reportTrack } from '../../../api/checkin'
-import { getLocation, checkIn, TrackRecorder } from '../../../utils/location'
+import { getLocation, checkIn, TrackRecorder, checkLocationPermission, forceGpsLocation, locationDiagnostics } from '../../../utils/location'
 import { formatDistance, calculateDistance } from '../../../utils/map'
 import dayjs from 'dayjs'
 import './CheckIn.css'
@@ -24,14 +24,19 @@ function CheckIn() {
   const [checkpoints, setCheckpoints] = useState([])
   const [currentLocation, setCurrentLocation] = useState(null)
   const [locating, setLocating] = useState(false)
+  const [locationError, setLocationError] = useState(null)
   const [checkinProgress, setCheckinProgress] = useState(0)
   const [nextCheckpoint, setNextCheckpoint] = useState(null)
 
   const [trackRecorder] = useState(new TrackRecorder())
   const [isRecording, setIsRecording] = useState(false)
+  const [permissionStatus, setPermissionStatus] = useState('checking')
+  const [diagnosing, setDiagnosing] = useState(false)
+  const [manualLocationVisible, setManualLocationVisible] = useState(false)
 
   useEffect(() => {
     fetchCheckinData()
+    checkPermissionAndLocation()
     return () => {
       // 停止轨迹记录
       if (isRecording) {
@@ -39,6 +44,28 @@ function CheckIn() {
       }
     }
   }, [id])
+
+  const checkPermissionAndLocation = async () => {
+    try {
+      const permission = await checkLocationPermission()
+      setPermissionStatus(permission)
+
+      if (permission === 'granted') {
+        // 权限已授权，直接获取位置
+        fetchLocation()
+      } else if (permission === 'prompt') {
+        // 需要用户授权，主动请求
+        console.log('需要请求定位权限')
+        fetchLocation() // 这会触发权限请求
+      } else {
+        // 权限被拒绝
+        setLocationError('定位权限被拒绝，请在浏览器设置中允许此网站访问位置信息')
+      }
+    } catch (error) {
+      console.error('权限检查失败:', error)
+      setPermissionStatus('denied')
+    }
+  }
 
   useEffect(() => {
     // 计算签到进度
@@ -55,15 +82,16 @@ function CheckIn() {
   }, [checkinStatus, checkpoints])
 
   useEffect(() => {
-    // 自动获取位置（每30秒）
+    // 自动获取位置（每2分钟，避免过度请求）
     const interval = setInterval(() => {
-      if (!locating) {
+      if (!locating && !currentLocation) {
+        console.log('自动获取位置...')
         fetchLocation()
       }
-    }, 30000)
+    }, 120000) // 2分钟
 
     return () => clearInterval(interval)
-  }, [locating])
+  }, [locating, currentLocation])
 
   const fetchCheckinData = async () => {
     try {
@@ -96,14 +124,144 @@ function CheckIn() {
   const fetchLocation = async () => {
     try {
       setLocating(true)
+      setLocationError(null)
+      console.log('开始获取位置...')
       const location = await getLocation()
+      console.log('位置获取成功:', location)
       setCurrentLocation(location)
+      message.success(`位置获取成功 (${location.method === 'browser' ? '浏览器定位' : '高德定位'})`)
     } catch (error) {
       console.error('获取位置失败:', error)
-      // 不显示错误提示，避免频繁打扰用户
+      setLocationError(error.message)
+      setCurrentLocation(null)
+      // 显示详细的错误信息
+      Modal.error({
+        title: '定位失败',
+        content: (
+          <div>
+            <p>无法获取您的当前位置：</p>
+            <p style={{ color: '#ff4d4f', margin: '8px 0' }}>{error.message}</p>
+            <p>请尝试以下解决方案：</p>
+            <ul style={{ marginLeft: 16, marginTop: 8 }}>
+              <li>确保浏览器定位权限已开启</li>
+              <li>检查设备GPS功能是否正常</li>
+              <li>确保网络连接正常</li>
+              <li>尝试在户外或信号更好的地方使用</li>
+              <li>如果是HTTPS网站，确保证书有效</li>
+            </ul>
+          </div>
+        ),
+        width: 480,
+        okText: '我知道了'
+      })
     } finally {
       setLocating(false)
     }
+  }
+
+  // 强制GPS定位
+  const handleForceGpsLocation = async () => {
+    try {
+      setLocating(true)
+      setLocationError(null)
+      console.log('开始强制GPS定位...')
+      const location = await forceGpsLocation()
+      console.log('强制GPS定位成功:', location)
+      setCurrentLocation(location)
+      message.success(`强制GPS定位成功！响应时间: ${location.diagnostics?.responseTime || 0}ms`)
+    } catch (error) {
+      console.error('强制GPS定位失败:', error)
+      setLocationError(error.message)
+      message.error('强制GPS定位失败: ' + error.message)
+    } finally {
+      setLocating(false)
+    }
+  }
+
+  // 定位诊断
+  const handleLocationDiagnostics = async () => {
+    try {
+      setDiagnosing(true)
+      console.log('开始定位诊断...')
+      const results = await locationDiagnostics()
+
+      // 显示诊断结果
+      Modal.info({
+        title: '定位诊断结果',
+        width: 600,
+        content: (
+          <div>
+            {results.map((result, index) => (
+              <div key={index} style={{ marginBottom: 16, padding: 12, border: '1px solid #f0f0f0', borderRadius: 6 }}>
+                <div style={{ fontWeight: 'bold', marginBottom: 8 }}>
+                  {result.method} {result.success ? '✅' : '❌'}
+                </div>
+                {result.success ? (
+                  <div style={{ fontSize: '12px' }}>
+                    <div>坐标: {result.latitude?.toFixed(6)}, {result.longitude?.toFixed(6)}</div>
+                    <div>精度: ±{Math.round(result.accuracy || 0)}米</div>
+                    {result.diagnostics && (
+                      <div>
+                        <div>定位源: {result.diagnostics.source}</div>
+                        <div>响应时间: {result.diagnostics.responseTime}ms</div>
+                      </div>
+                    )}
+                    {result.address && <div>地址: {result.address}</div>}
+                  </div>
+                ) : (
+                  <div style={{ color: '#ff4d4f', fontSize: '12px' }}>
+                    错误: {result.error}
+                  </div>
+                )}
+              </div>
+            ))}
+            <div style={{ marginTop: 16, padding: 8, backgroundColor: '#f6f8fa', borderRadius: 4, fontSize: '12px' }}>
+              💡 诊断说明：
+              <ul style={{ marginLeft: 16, marginTop: 4 }}>
+                <li>精度 &lt; 100米：通常来自GPS卫星</li>
+                <li>精度 &gt; 100米：可能来自网络定位(WiFi/基站)</li>
+                <li>如果多个方法结果相似但都偏差很大，可能是设备GPS异常</li>
+                <li>如果高德地图定位更准确，建议使用高德定位</li>
+              </ul>
+            </div>
+          </div>
+        ),
+        okText: '我知道了'
+      })
+    } catch (error) {
+      console.error('定位诊断失败:', error)
+      message.error('定位诊断失败')
+    } finally {
+      setDiagnosing(false)
+    }
+  }
+
+  // 手动设置位置
+  const handleManualLocation = () => {
+    setManualLocationVisible(true)
+  }
+
+  const handleManualLocationSubmit = (values) => {
+    const { latitude, longitude } = values
+    if (!latitude || !longitude) {
+      message.error('请输入有效的坐标')
+      return
+    }
+
+    // 创建手动位置对象
+    const manualLocation = {
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
+      accuracy: 0, // 手动输入，精度设为0
+      method: 'manual',
+      coordinateSystem: 'GCJ02 (手动输入)',
+      isManual: true
+    }
+
+    setCurrentLocation(manualLocation)
+    setLocationError(null)
+    setManualLocationVisible(false)
+    message.success('手动位置设置成功！')
   }
 
   const startTrackRecording = () => {
@@ -250,6 +408,61 @@ function CheckIn() {
                 >
                   刷新位置
                 </Button>
+                <Button
+                  size="small"
+                  type="default"
+                  onClick={handleForceGpsLocation}
+                  loading={locating}
+                  style={{ color: '#1890ff' }}
+                >
+                  强制GPS
+                </Button>
+                <Button
+                  size="small"
+                  type="default"
+                  onClick={handleLocationDiagnostics}
+                  loading={diagnosing}
+                  style={{ color: '#722ed1' }}
+                >
+                  定位诊断
+                </Button>
+                <Button
+                  size="small"
+                  type="default"
+                  onClick={handleManualLocation}
+                  style={{ color: '#f5222d' }}
+                >
+                  手动定位
+                </Button>
+                {currentLocation && currentLocation.originalLatitude && (
+                  <Button
+                    size="small"
+                    type="link"
+                    onClick={() => {
+                      Modal.info({
+                        title: '坐标转换详情',
+                        content: (
+                          <div>
+                            <p><strong>GPS原始坐标 (WGS84):</strong></p>
+                            <p>纬度: {currentLocation.originalLatitude.toFixed(7)}</p>
+                            <p>经度: {currentLocation.originalLongitude.toFixed(7)}</p>
+                            <br />
+                            <p><strong>转换后坐标 (GCJ02):</strong></p>
+                            <p>纬度: {currentLocation.latitude.toFixed(7)}</p>
+                            <p>经度: {currentLocation.longitude.toFixed(7)}</p>
+                            <br />
+                            <p style={{ fontSize: '12px', color: '#666' }}>
+                              * 中国境内GPS定位需要进行坐标系转换才能在地图上正确显示
+                            </p>
+                          </div>
+                        ),
+                        width: 420
+                      })
+                    }}
+                  >
+                    查看转换详情
+                  </Button>
+                )}
               </Space>
             </div>
             <Progress
@@ -262,21 +475,91 @@ function CheckIn() {
             />
           </div>
 
+          {/* 位置权限状态 */}
+          {permissionStatus === 'denied' && (
+            <Alert
+              message="定位权限被拒绝"
+              description={
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  <span>请在浏览器设置中允许此网站访问您的位置信息，然后刷新页面</span>
+                  <div>
+                    <Button
+                      type="link"
+                      size="small"
+                      onClick={() => window.location.reload()}
+                    >
+                      刷新页面
+                    </Button>
+                    <span style={{ margin: '0 8px' }}>或</span>
+                    <Button
+                      type="primary"
+                      size="small"
+                      onClick={checkPermissionAndLocation}
+                    >
+                      重新检查权限
+                    </Button>
+                  </div>
+                </Space>
+              }
+              type="warning"
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
+          )}
+
+          {/* 定位错误提示 */}
+          {locationError && !currentLocation && permissionStatus !== 'denied' && (
+            <Alert
+              message="定位失败"
+              description={
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  <span>{locationError}</span>
+                  <Button
+                    type="primary"
+                    size="small"
+                    onClick={fetchLocation}
+                    loading={locating}
+                    icon={<ReloadOutlined />}
+                  >
+                    重新获取位置
+                  </Button>
+                </Space>
+              }
+              type="error"
+              showIcon
+              className="location-error-alert"
+              style={{ marginBottom: 16 }}
+            />
+          )}
+
           {/* 当前位置信息 */}
           {currentLocation && (
             <Alert
               message="当前位置"
               description={
-                <Space>
-                  <EnvironmentOutlined />
-                  <span>
-                    纬度: {currentLocation.latitude.toFixed(6)}，
-                    经度: {currentLocation.longitude.toFixed(6)}
-                  </span>
-                  {currentLocation.address && (
-                    <span style={{ color: '#999' }}>
-                      ({currentLocation.address})
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  <div>
+                    <EnvironmentOutlined />
+                    <span style={{ marginLeft: 8 }}>
+                      纬度: {currentLocation.latitude.toFixed(6)}，
+                      经度: {currentLocation.longitude.toFixed(6)}
                     </span>
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#999' }}>
+                    坐标系: {currentLocation.coordinateSystem || 'GCJ02'}
+                    {currentLocation.accuracy && (
+                      <span> · 精度: ±{Math.round(currentLocation.accuracy)}米</span>
+                    )}
+                  </div>
+                  {currentLocation.originalLatitude && (
+                    <div style={{ fontSize: '11px', color: '#666' }}>
+                      原始坐标(WGS84): {currentLocation.originalLatitude.toFixed(6)}, {currentLocation.originalLongitude.toFixed(6)}
+                    </div>
+                  )}
+                  {currentLocation.address && (
+                    <div style={{ fontSize: '12px', color: '#666' }}>
+                      地址: {currentLocation.address}
+                    </div>
                   )}
                 </Space>
               }
@@ -390,6 +673,81 @@ function CheckIn() {
             />
           )}
         </Card>
+
+        {/* 手动定位对话框 */}
+        <Modal
+          title="手动设置位置"
+          open={manualLocationVisible}
+          onCancel={() => setManualLocationVisible(false)}
+          footer={null}
+          width={480}
+        >
+          <div style={{ marginBottom: 16 }}>
+            <Alert
+              message="GPS定位不准确？"
+              description={
+                <div>
+                  <p>当GPS定位存在较大偏差时，您可以手动输入准确的坐标信息。</p>
+                  <p style={{ color: '#666', fontSize: '12px' }}>
+                    💡 提示：您可以使用手机的指南针应用或其他地图应用获取准确坐标。
+                  </p>
+                </div>
+              }
+              type="info"
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
+            <Form
+              layout="vertical"
+              onFinish={handleManualLocationSubmit}
+              initialValues={{
+                latitude: 40.068333, // 根据您的实际位置设置默认值
+                longitude: 116.173333
+              }}
+            >
+              <Form.Item
+                label="纬度 (北纬)"
+                name="latitude"
+                rules={[
+                  { required: true, message: '请输入纬度' },
+                  { type: 'number', min: 0, max: 90, message: '纬度范围0-90' }
+                ]}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  placeholder="例如: 40.068333"
+                  precision={6}
+                  step={0.000001}
+                />
+              </Form.Item>
+              <Form.Item
+                label="经度 (东经)"
+                name="longitude"
+                rules={[
+                  { required: true, message: '请输入经度' },
+                  { type: 'number', min: 0, max: 180, message: '经度范围0-180' }
+                ]}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  placeholder="例如: 116.173333"
+                  precision={6}
+                  step={0.000001}
+                />
+              </Form.Item>
+              <Form.Item>
+                <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+                  <Button onClick={() => setManualLocationVisible(false)}>
+                    取消
+                  </Button>
+                  <Button type="primary" htmlType="submit">
+                    设置位置
+                  </Button>
+                </Space>
+              </Form.Item>
+            </Form>
+          </div>
+        </Modal>
       </div>
     </div>
   )
