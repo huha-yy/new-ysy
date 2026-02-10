@@ -16,7 +16,9 @@ mvn spring-boot:run        # 运行后端服务 (http://localhost:8080)
 mvn test                   # 运行测试
 ```
 
-API 文档地址：http://localhost:8080/doc.html (Knife4j UI)
+- API 文档：http://localhost:8080/api/doc.html (Knife4j)
+- Swagger：http://localhost:8080/api/swagger-ui.html
+- 注意：`server.servlet.context-path` 为 `/api`，所有后端接口实际路径为 `/api/...`
 
 ### 前端 (React + Vite)
 ```bash
@@ -41,21 +43,23 @@ CREATE DATABASE hiking_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 ### 后端架构 (Spring Boot 3.2.0 + JDK 17)
 
-**模块结构**：领域驱动设计，模块位于 `com.hiking.hikingbackend.module/` 下：
-- `activity/` - 活动生命周期（创建、审核、发布、取消）
-- `registration/` - 报名工作流（申请、审核、候补）
-- `checkin/` - GPS 签到、轨迹记录、偏离预警
-- `route/` - 路线规划及路点（起点/终点/路点/休息点/景点/危险点）
-- `user/` - 用户认证（JWT）、个人资料、徒步档案
-- `admin/` - 管理员操作（审核、用户管理）
-- `message/` - 站内消息通知
-- `review/` - 活动评价与评分
-- `system/` - 字典数据管理
+入口类：`com.hiking.hikingbackend.HikingApplication`（启用了 `@EnableScheduling`）
 
-**公共层** (`common/`)：
-- `result/Result.java` - 统一 API 响应格式：`{code, message, data, timestamp}`
-- `exception/` - 全局异常处理
-- `constant/` - 系统常量
+**包结构** (`src/main/java/com/hiking/hikingbackend/`)：
+- `module/` — 按领域划分的业务模块，每个模块含 controller/service/mapper/entity/dto：
+  - `activity/` - 活动生命周期（创建、审核、发布、取消）
+  - `registration/` - 报名工作流（申请、审核、候补）
+  - `checkin/` - GPS 签到、轨迹记录、偏离预警
+  - `route/` - 路线规划及路点（起点/终点/路点/休息点/景点/危险点）
+  - `user/` - 用户认证（JWT）、个人资料、徒步档案
+  - `admin/` - 管理员操作（审核、用户管理）
+  - `message/` - 站内消息通知
+  - `review/` - 活动评价与评分
+  - `file/` - 文件上传
+  - `system/` - 字典数据管理
+- `security/` — JWT 认证过滤器（`JwtAuthenticationFilter`）、`CustomUserDetailsService`
+- `config/` — `SecurityConfig`、`CorsConfig`、`MyBatisPlusConfig`、`WebMvcConfig`、`OpenApiConfig`、`JwtProperties`
+- `common/` — `result/Result.java`（统一响应）、`exception/`（全局异常处理）、`constant/`
 
 **安全机制**：基于 JWT 的 Spring Security 认证
 - Token 格式：`Authorization: Bearer <token>` 请求头
@@ -66,17 +70,22 @@ CREATE DATABASE hiking_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 **数据层**：MyBatis-Plus 自动配置
 - 实体类使用 `@TableName`、`@TableId(type = IdType.AUTO)`
 - 逻辑删除：`deleted` 字段（0=有效，1=已删除）
+- 时间戳自动填充：`create_time`、`update_time`（通过 `MyMetaObjectHandler`）
 - Mapper XML 文件位于 `src/main/resources/mapper/`
 
-**文件上传**：存储在 `uploads/` 目录（在 application.yml 中配置）
+**文件上传**：存储路径在 `application.yml` 的 `file.upload-path` 中配置，项目支持 Windows 和 macOS 双平台开发：
+- **Windows 路径**：`E:/1huah毕业设计/new-户外徒步/ysy/uploads`
+- **macOS 路径**：`/Users/yangshuyun/Desktop/毕业设计/new-ysy/uploads`
+- **重要**：修改配置前必须先识别当前开发环境（通过 `uname` 命令判断），然后启用对应平台的路径，注释掉另一个平台的路径。两个路径都保留在 `application.yml` 中，用注释区分。
 
 ### 前端架构 (React 18 + Vite)
 
-**路由**：React Router v6 懒加载（`router/index.jsx`）
+**路由**：React Router v6 懒加载（`src/router/index.jsx`）
 - 公开路由：`/`、`/activities`、`/activities/:id`、`/login`、`/register`
-- 用户路由：`/user/*`（个人资料、报名记录、消息）
-- 组织者路由：`/organizer/*`（活动管理、签到监控）
-- 管理员路由：`/admin/*`（审核、用户管理、统计）
+- 用户路由（需登录）：`/user/*`（profile、hiking-profile、registrations、messages）
+- 组织者路由：`/organizer/*`（activities、routes、checkin monitor、alerts、gathering）
+- 管理员路由：`/admin/*`（dashboard、activities audit、users、statistics、registrations）
+- 受保护路由通过 `AuthRoute` 组件包装
 
 **API 层** (`api/`)：基于 Axios 的拦截器
 - Base URL：`/api`（代理到后端）
@@ -93,11 +102,16 @@ CREATE DATABASE hiking_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 - 认证：`components/AuthRoute.jsx`（受保护路由包装器）
 - 地图：`components/MapView/`（路线编辑器、GPS 追踪）
 
-**核心工具**：
-- `utils/storage.js` - Token/用户信息持久化
-- `utils/constants.js` - 前端常量
-- `utils/location.js` - GPS 工具函数
-- `utils/map.js` - 地图辅助函数
+**路径别名**：`@` → `./src`（在 `vite.config.js` 中配置）
+
+**核心工具** (`src/utils/`)：
+- `storage.js` - Token/用户信息持久化
+- `constants.js` - 前端常量
+- `location.js` - GPS 工具函数
+- `map.js` - 地图辅助函数
+- `imageUrl.js` - 图片 URL 处理
+
+**自定义 Hooks**：`src/hooks/`
 
 ## 核心业务流程
 
@@ -155,7 +169,7 @@ const activities = await request.get('/activities')  // 直接返回 data
 
 - 所有表使用 `id` 作为主键（AUTO_INCREMENT）
 - 通过 `deleted` 字段实现软删除（由 MyBatis-Plus 管理）
-- 时间戳：`create_time`、`update_time`（自动管理）
+- 时间戳：`create_time`、`update_time`（通过 `MyMetaObjectHandler` 自动填充）
 - 外键：`user_id`、`activity_id`、`route_id` 等
 
 ## 配置文件
@@ -163,10 +177,10 @@ const activities = await request.get('/activities')  // 直接返回 data
 - 后端配置：`backend/src/main/resources/application.yml`
   - 数据库凭据
   - JWT 密钥和过期时间
-  - 文件上传路径
+  - 文件上传路径（`file.upload-path`，Windows 和 macOS 双路径通过注释切换，详见上方"文件上传"说明）
   - CORS 设置
 
-- 前端代理：`frontend/vite.config.js`（将 `/api` 代理到 `http://localhost:8080/api`）
+- 前端代理：`frontend/vite.config.js`（将 `/api` 代理到 `http://localhost:8080`）
 
 ## 当前分支
 
