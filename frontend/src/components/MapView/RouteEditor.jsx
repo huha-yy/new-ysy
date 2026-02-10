@@ -66,7 +66,6 @@ const RouteEditor = ({
   const supplyPointsRef = useRef(supplyPoints)
 
   useEffect(() => {
-    console.log('✓ RouteEditor 渲染，当前 editingMode：', editingMode)
     // 同步 ref 的值
     editingModeRef.current = editingMode
     waypointsRef.current = waypoints
@@ -142,20 +141,7 @@ const RouteEditor = ({
 
   // 初始化数据，只在真正有数据时更新
   useEffect(() => {
-    console.log('🔄 RouteEditor useEffect 被触发')
-    console.log('🔄 接收到的初始数据：', {
-      initialRoute,
-      initialCheckpoints,
-      initialWaypoints,
-      initialRiskPoints,
-      initialRestPoints,
-      initialSupplyPoints,
-      initialStartPoint,
-      initialEndPoint
-    })
-
     if (!isInitializedRef.current) {
-      console.log('🔄 首次初始化')
       setRoutePoints(initialRoute || [])
       setCheckpoints(initialCheckpoints || [])
       setWaypoints(initialWaypoints || [])
@@ -166,7 +152,6 @@ const RouteEditor = ({
       setEndPoint(initialEndPoint)
       isInitializedRef.current = true
     } else {
-      console.log('🔄 更新现有数据')
       // 已初始化后，只在外部数据真正变化时更新
       if (JSON.stringify(initialRoute) !== JSON.stringify(initialRouteRef.current)) {
         setRoutePoints(initialRoute || [])
@@ -204,56 +189,48 @@ const RouteEditor = ({
   }, [initialRoute, initialCheckpoints, initialWaypoints, initialRiskPoints, initialRestPoints, initialSupplyPoints, initialStartPoint, initialEndPoint])
 
   useEffect(() => {
-    console.log('✓ routePoints 更新，当前数量：', routePoints.length)
     if (onRouteChangeRef.current) {
       onRouteChangeRef.current(routePoints)
     }
   }, [routePoints])
 
   useEffect(() => {
-    console.log('✓ checkpoints 更新，当前数量：', checkpoints.length)
     if (onCheckpointsChangeRef.current) {
       onCheckpointsChangeRef.current(checkpoints)
     }
   }, [checkpoints])
 
   useEffect(() => {
-    console.log('✓ waypoints 更新，当前数量：', waypoints.length)
     if (onWaypointsChangeRef.current) {
       onWaypointsChangeRef.current(waypoints)
     }
   }, [waypoints])
 
   useEffect(() => {
-    console.log('✓ riskPoints 更新，当前数量：', riskPoints.length)
     if (onRiskPointsChangeRef.current) {
       onRiskPointsChangeRef.current(riskPoints)
     }
   }, [riskPoints])
 
   useEffect(() => {
-    console.log('✓ restPoints 更新，当前数量：', restPoints.length)
     if (onRestPointsChangeRef.current) {
       onRestPointsChangeRef.current(restPoints)
     }
   }, [restPoints])
 
   useEffect(() => {
-    console.log('✓ supplyPoints 更新，当前数量：', supplyPoints.length)
     if (onSupplyPointsChangeRef.current) {
       onSupplyPointsChangeRef.current(supplyPoints)
     }
   }, [supplyPoints])
 
   useEffect(() => {
-    console.log('✓ 起点更新:', startPoint)
     if (onStartPointChangeRef.current && startPoint) {
       onStartPointChangeRef.current(startPoint)
     }
   }, [startPoint])
 
   useEffect(() => {
-    console.log('✓ 终点更新:', endPoint)
     if (onEndPointChangeRef.current && endPoint) {
       onEndPointChangeRef.current(endPoint)
     }
@@ -261,12 +238,10 @@ const RouteEditor = ({
 
   const handleMapLoad = useCallback((mapInstance) => {
     setMap(mapInstance)
-    console.log('✓ 地图加载完成 - editingMode:', editingMode)
 
     // 移除旧的点击事件监听器
     if (mapInstance.current && mapInstance.current !== mapInstance) {
       mapInstance.current.off('click')
-      console.log('✓ 已移除旧的点击事件监听器')
     }
 
     // 绑定新的点击事件
@@ -274,34 +249,23 @@ const RouteEditor = ({
       mapInstance.on('click', (e) => {
         // 使用 ref 获取最新的 editingMode，避免闭包问题
         const currentMode = editingModeRef.current
-        console.log('✓ 地图被点击 - editingModeRef:', currentMode, ' lnglat:', e.lnglat)
 
         if (currentMode === 'route') {
-          console.log('✓ 执行：添加路线点')
           addRoutePoint(e.lnglat)
         } else if (currentMode === 'checkpoint') {
-          console.log('✓ 执行：打开签到点对话框')
           showCheckpointModal(e.lnglat)
         } else if (currentMode === 'waypoint') {
-          console.log('🎯 执行：添加途经点')
           addWaypoint(e.lnglat)
         } else if (currentMode === 'riskPoint') {
-          console.log('⚠️ 执行：打开风险点对话框')
           showRiskPointModal(e.lnglat)
         } else if (currentMode === 'restPoint') {
-          console.log('☕ 执行：打开休息点对话框')
           showRestPointModal(e.lnglat)
         } else if (currentMode === 'supplyPoint') {
-          console.log('🏪 执行：打开补给点对话框')
           showSupplyPointModal(e.lnglat)
         } else if (currentMode === 'setStart') {
-          console.log('✓ 执行：设置起点')
           setStartPointHandler(e.lnglat)
         } else if (currentMode === 'setEnd') {
-          console.log('✓ 执行：设置终点')
           setEndPointHandler(e.lnglat)
-        } else {
-          console.log('✓ 警告：未选择编辑模式，当前 editingMode =', currentMode)
         }
       })
     }
@@ -339,9 +303,6 @@ const RouteEditor = ({
   }
 
   const addWaypoint = useCallback((lnglat) => {
-    console.log('🎯 addWaypoint 被调用，当前 waypoints 数量：', waypointsRef.current.length)
-    console.log('🎯 新的坐标：', lnglat.getLng(), lnglat.getLat())
-
     const newWaypoint = {
       lng: lnglat.getLng(),
       lat: lnglat.getLat(),
@@ -350,10 +311,7 @@ const RouteEditor = ({
       sequence: waypointsRef.current.length + 1
     }
 
-    console.log('🎯 准备添加的途经点：', newWaypoint)
-
     const updatedWaypoints = [...waypointsRef.current, newWaypoint]
-    console.log('🎯 更新后的 waypoints 数组：', updatedWaypoints)
 
     setWaypoints(updatedWaypoints)
     message.success(`已添加途经点${waypointsRef.current.length + 1}`)
@@ -724,14 +682,11 @@ const RouteEditor = ({
 
   // 构建所有标记点（起点 + 终点 + 路线点 + 签到点 + 途经点）
   const allMarkers = useMemo(() => {
-    console.log('🏗️ 重新构建 allMarkers')
-    console.log('🏗️ 当前状态 - routePoints:', routePoints.length, 'checkpoints:', checkpoints.length, 'waypoints:', waypoints.length)
 
     const markers = []
 
     // 起点
     if (startPoint && window.AMap) {
-      console.log('✓ 添加起点标记:', startPoint)
       markers.push({
         ...startPoint,
         title: '起点',
@@ -743,7 +698,6 @@ const RouteEditor = ({
 
     // 终点
     if (endPoint && window.AMap) {
-      console.log('✓ 添加终点标记:', endPoint)
       markers.push({
         ...endPoint,
         title: '终点',
@@ -780,10 +734,8 @@ const RouteEditor = ({
     })
 
     // 途经点
-    console.log('🏗️ 开始构建途经点标记，waypoints:', waypoints)
     waypoints.forEach((wp, index) => {
       if (window.AMap) {
-        console.log(`🏗️ 添加途经点 ${index + 1}:`, wp)
         markers.push({
           ...wp,
           title: wp.name,
@@ -795,10 +747,8 @@ const RouteEditor = ({
     })
 
     // 风险点
-    console.log('🏗️ 开始构建风险点标记，riskPoints:', riskPoints)
     riskPoints.forEach((rp, index) => {
       if (window.AMap) {
-        console.log(`🏗️ 添加风险点 ${index + 1}:`, rp)
         markers.push({
           ...rp,
           title: rp.name,
@@ -810,10 +760,8 @@ const RouteEditor = ({
     })
 
     // 休息点
-    console.log('🏗️ 开始构建休息点标记，restPoints:', restPoints)
     restPoints.forEach((rp, index) => {
       if (window.AMap) {
-        console.log(`🏗️ 添加休息点 ${index + 1}:`, rp)
         markers.push({
           ...rp,
           title: rp.name,
@@ -825,10 +773,8 @@ const RouteEditor = ({
     })
 
     // 补给点
-    console.log('🏗️ 开始构建补给点标记，supplyPoints:', supplyPoints)
     supplyPoints.forEach((sp, index) => {
       if (window.AMap) {
-        console.log(`🏗️ 添加补给点 ${index + 1}:`, sp)
         markers.push({
           ...sp,
           title: sp.name,
@@ -839,10 +785,8 @@ const RouteEditor = ({
       }
     })
 
-    console.log('🏗️ allMarkers 构建完成，数量：', markers.length)
-    console.log('🏗️ 最终 markers 数组：', markers)
     return markers
-  }, [startPoint, endPoint, routePoints, checkpoints, waypoints, riskPoints, restPoints, supplyPoints])
+  }, [startPoint, endPoint, routePoints, checkpoints, waypoints, riskPoints, restPoints, supplyPoints, map])
 
   return (
     <div className="route-editor">
@@ -853,7 +797,6 @@ const RouteEditor = ({
               type={editingMode === 'route' ? 'primary' : 'default'}
               icon={<EnvironmentOutlined />}
               onClick={() => {
-                console.log('✓ 点击绘制路线按钮，当前editingMode：', editingMode)
                 if (editingMode !== 'route') {
                   setEditingMode('route')
                 }
@@ -866,7 +809,6 @@ const RouteEditor = ({
               type={editingMode === 'setStart' ? 'primary' : 'default'}
               icon={<EnvironmentOutlined />}
               onClick={() => {
-                console.log('✓ 点击设置起点按钮，当前editingMode：', editingMode)
                 setEditingMode(editingMode === 'setStart' ? null : 'setStart')
               }}
               disabled={readOnly}
@@ -877,7 +819,6 @@ const RouteEditor = ({
               type={editingMode === 'setEnd' ? 'primary' : 'default'}
               icon={<EnvironmentOutlined />}
               onClick={() => {
-                console.log('✓ 点击设置终点按钮，当前editingMode：', editingMode)
                 setEditingMode(editingMode === 'setEnd' ? null : 'setEnd')
               }}
               disabled={readOnly}
@@ -888,7 +829,6 @@ const RouteEditor = ({
               type={editingMode === 'checkpoint' ? 'primary' : 'default'}
               icon={<FlagOutlined />}
               onClick={() => {
-                console.log('✓ 点击添加签到点按钮，当前editingMode：', editingMode)
                 if (editingMode !== 'checkpoint') {
                   setEditingMode('checkpoint')
                 }
@@ -901,16 +841,10 @@ const RouteEditor = ({
               type={editingMode === 'waypoint' ? 'primary' : 'default'}
               icon={<PlusOutlined />}
               onClick={() => {
-                console.log('🔵 点击添加途经点按钮，当前editingMode：', editingMode)
-                console.log('🔵 当前 waypoints 数量：', waypoints.length)
                 // 如果不是waypoint模式，就进入waypoint模式；如果已经是waypoint模式，保持不变
                 if (editingMode !== 'waypoint') {
-                  console.log('🔵 进入 waypoint 编辑模式')
                   setEditingMode('waypoint')
-                } else {
-                  console.log('🔵 已经在 waypoint 编辑模式中，保持模式')
                 }
-                // 如果已经是waypoint模式，不做任何改变，让用户可以连续添加
               }}
               disabled={readOnly}
             >
@@ -921,7 +855,6 @@ const RouteEditor = ({
               type={editingMode === 'riskPoint' ? 'primary' : 'default'}
               icon={<EnvironmentOutlined />}
               onClick={() => {
-                console.log('⚠️ 点击添加风险点按钮')
                 if (editingMode !== 'riskPoint') {
                   setEditingMode('riskPoint')
                 }
@@ -935,7 +868,6 @@ const RouteEditor = ({
               type={editingMode === 'restPoint' ? 'primary' : 'default'}
               icon={<PlusOutlined />}
               onClick={() => {
-                console.log('☕ 点击添加休息点按钮')
                 if (editingMode !== 'restPoint') {
                   setEditingMode('restPoint')
                 }
@@ -949,7 +881,6 @@ const RouteEditor = ({
               type={editingMode === 'supplyPoint' ? 'primary' : 'default'}
               icon={<PlusOutlined />}
               onClick={() => {
-                console.log('🏪 点击添加补给点按钮')
                 if (editingMode !== 'supplyPoint') {
                   setEditingMode('supplyPoint')
                 }
@@ -965,7 +896,6 @@ const RouteEditor = ({
                 type="default"
                 danger
                 onClick={() => {
-                  console.log('✓ 退出编辑模式')
                   setEditingMode(null)
                 }}
                 disabled={readOnly}
@@ -1002,12 +932,6 @@ const RouteEditor = ({
                 {editingMode === 'restPoint' && '点击地图连续添加休息点，完成后点击"完成编辑"'}
                 {editingMode === 'supplyPoint' && '点击地图连续添加补给点，完成后点击"完成编辑"'}
               </Tag>
-            </div>
-          )}
-
-          {editingMode && (
-            <div className="edit-mode-debug">
-              <Tag color="green">当前编辑模式：{editingMode}</Tag>
             </div>
           )}
 

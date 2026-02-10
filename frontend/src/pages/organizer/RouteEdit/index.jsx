@@ -561,18 +561,6 @@ function RouteEdit() {
                   onStartPointChange={handleStartPointChange}
                   onEndPointChange={handleEndPointChange}
                 />
-                {/* 调试信息 */}
-                <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f0f0f0', fontSize: '12px' }}>
-                  <strong>调试信息：</strong>
-                  <div>routePoints: {JSON.stringify(routePoints)}</div>
-                  <div>checkpoints: {JSON.stringify(checkpoints)}</div>
-                  <div>waypoints: {JSON.stringify(waypoints)}</div>
-                  <div>riskPoints: {JSON.stringify(riskPoints)}</div>
-                  <div>restPoints: {JSON.stringify(restPoints)}</div>
-                  <div>supplyPoints: {JSON.stringify(supplyPoints)}</div>
-                  <div>startPoint: {JSON.stringify(startPoint)}</div>
-                  <div>endPoint: {JSON.stringify(endPoint)}</div>
-                </div>
               </>
             )}
           </div>

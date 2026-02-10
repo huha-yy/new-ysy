@@ -139,6 +139,27 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <!-- Maven Enforcer Plugin: 强制使用 JDK 17 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-java-version</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[17,18)</version>
+                                    <message>本项目必须使用 JDK 17 构建！当前 JDK 版本不符合要求。请设置 JAVA_HOME 指向 JDK 17。</message>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

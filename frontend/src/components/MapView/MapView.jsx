@@ -37,6 +37,21 @@ const MapView = ({
   const [loading, setLoading] = useState(true)
   const [currentLocation, setCurrentLocation] = useState(null)
   const routeLineRef = useRef(null)
+  // 用 ref 保存最新的 markers 和 routePoints，解决 initMap 异步闭包拿不到最新值的问题
+  const markersRef = useRef(markers)
+  const routePointsRef = useRef(routePoints)
+  const onMarkerClickRef = useRef(onMarkerClick)
+
+  // 同步 ref 到最新值
+  useEffect(() => {
+    markersRef.current = markers
+  }, [markers])
+  useEffect(() => {
+    routePointsRef.current = routePoints
+  }, [routePoints])
+  useEffect(() => {
+    onMarkerClickRef.current = onMarkerClick
+  }, [onMarkerClick])
 
   useEffect(() => {
     initMap()
@@ -114,6 +129,11 @@ const MapView = ({
 
       setLoading(false)
 
+      // 地图加载完成后，渲染已有的标记点和路线（解决编辑模式下初始数据不渲染的问题）
+      // 使用 ref 获取最新数据，避免闭包捕获旧值
+      renderMarkersFromData(markersRef.current)
+      renderRouteLineFromData(routePointsRef.current)
+
       // 触发地图加载完成回调
       if (onMapLoad) {
         onMapLoad(mapInstance.current)
@@ -151,13 +171,15 @@ const MapView = ({
   }
 
   const renderMarkers = () => {
+    renderMarkersFromData(markers)
+  }
+
+  const renderMarkersFromData = (markerList) => {
     if (!mapInstance.current) {
-      console.log('⚠️ 地图实例不存在，无法渲染标记')
       return
     }
 
     const AMap = window.AMap
-    console.log(`✓ 开始渲染 ${markers.length} 个标记点`)
 
     // 清除旧的标记点 - 使用正确的方法
     try {
@@ -168,14 +190,13 @@ const MapView = ({
             overlay.setMap(null)
           }
         })
-        console.log('✓ 已清除旧的标记点')
       }
     } catch (error) {
       console.error('⚠️ 清除标记点时出错:', error)
     }
 
     // 渲染新的标记点
-    markers.forEach((markerData, index) => {
+    markerList.forEach((markerData, index) => {
       // 验证坐标有效性
       const lng = parseFloat(markerData.lng)
       const lat = parseFloat(markerData.lat)
@@ -184,11 +205,6 @@ const MapView = ({
         console.warn(`⚠️ 标记点 ${index + 1} 坐标无效:`, markerData)
         return
       }
-
-      console.log(`✓ 渲染标记点 ${index + 1}:`, {
-        position: [lng, lat],
-        title: markerData.title
-      })
 
       try {
         // 构建标记配置对象
@@ -207,9 +223,10 @@ const MapView = ({
 
         const marker = new AMap.Marker(markerConfig)
 
-        if (onMarkerClick) {
+        const clickHandler = onMarkerClickRef.current
+        if (clickHandler) {
           marker.on('click', () => {
-            onMarkerClick(markerData, index)
+            clickHandler(markerData, index)
           })
         }
 
@@ -219,38 +236,37 @@ const MapView = ({
       }
     })
 
-    console.log('✓ 所有标记点渲染完成')
   }
 
   const renderRouteLine = () => {
+    renderRouteLineFromData(routePoints)
+  }
+
+  const renderRouteLineFromData = (points) => {
     if (!mapInstance.current) {
-      console.log('⚠️ 地图实例不存在，无法绘制路线')
       return
     }
 
     const AMap = window.AMap
-    console.log(`✓ 开始绘制路线，路线点数量: ${routePoints ? routePoints.length : 0}`)
 
     // 清除旧的路线线
     if (routeLineRef.current) {
       routeLineRef.current.setMap(null)
       routeLineRef.current = null
-      console.log('✓ 已清除旧路线')
     }
 
     // 如果有路线点，绘制新的路线线
-    if (routePoints && routePoints.length >= 2) {
+    if (points && points.length >= 2) {
       try {
-        const path = routePoints.map(point => {
+        const path = points.map(point => {
           const lng = parseFloat(point.lng)
           const lat = parseFloat(point.lat)
           if (isNaN(lng) || isNaN(lat) || lng === 0 || lat === 0) {
             console.warn(`⚠️ 路线点坐标无效:`, point)
             return null
           }
-          console.log(`  路线点: [${lng}, ${lat}]`)
           return [lng, lat]
-        }).filter(point => point !== null) // 过滤掉无效点
+        }).filter(point => point !== null)
 
         if (path.length < 2) {
           console.warn('⚠️ 有效路线点少于2个，无法绘制路线')
@@ -275,12 +291,9 @@ const MapView = ({
           mapInstance.current.setBounds(bounds)
         }
 
-        console.log('✓ 路线绘制成功')
       } catch (error) {
         console.error('⚠️ 绘制路线时出错:', error)
       }
-    } else if (routePoints && routePoints.length === 1) {
-      console.log('⚠️ 路线点只有1个，无法绘制路线线')
     }
   }
 

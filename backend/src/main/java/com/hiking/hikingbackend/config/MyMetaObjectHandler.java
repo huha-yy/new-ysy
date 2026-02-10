@@ -1,6 +1,7 @@
 package com.hiking.hikingbackend.config;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.hiking.hikingbackend.common.utils.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
@@ -65,20 +66,12 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
 
     /**
      * 获取当前用户ID
-     * <p>
-     * 暂时返回0，后续集成Spring Security后可以从SecurityContext获取
      *
-     * @return 用户ID
+     * @return 用户ID，未登录时返回0
      */
     private Long getCurrentUserId() {
-        // TODO: 集成Spring Security后，从SecurityContext获取当前登录用户ID
-        // 示例代码：
-        // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // if (authentication != null && authentication.isAuthenticated()) {
-        //     CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        //     return userDetails.getUserId();
-        // }
-        return 0L;
+        Long userId = SecurityUtils.getCurrentUserId();
+        return userId != null ? userId : 0L;
     }
 }
 
