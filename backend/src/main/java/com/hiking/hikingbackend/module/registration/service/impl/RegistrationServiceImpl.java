@@ -14,6 +14,7 @@ import com.hiking.hikingbackend.module.registration.entity.Registration;
 import com.hiking.hikingbackend.module.registration.mapper.RegistrationMapper;
 import com.hiking.hikingbackend.module.registration.service.RegistrationService;
 import com.hiking.hikingbackend.module.registration.vo.RegistrationVO;
+import com.hiking.hikingbackend.module.message.service.MessageService;
 import com.hiking.hikingbackend.module.user.entity.User;
 import com.hiking.hikingbackend.module.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final ActivityMapper activityMapper;
 
     private final UserMapper userMapper;
+
+    private final MessageService messageService;
+
+    private static final int MESSAGE_TYPE_REGISTRATION = 2; // 报名通知
 
     private static final int STATUS_PENDING = 0;   // 待审核
     private static final int STATUS_APPROVED = 1;  // 已通过
@@ -200,6 +205,32 @@ public class RegistrationServiceImpl implements RegistrationService {
         registration.setAuditTime(LocalDateTime.now());
 
         registrationMapper.updateById(registration);
+
+        // 7. 发送报名审核通知给用户
+        try {
+            if (auditDTO.getApproved()) {
+                messageService.sendMessage(
+                    registration.getUserId(),
+                    "报名审核通过",
+                    "您报名的活动《" + activity.getTitle() + "》已通过审核，请按时参加活动。",
+                    MESSAGE_TYPE_REGISTRATION,
+                    activity.getId(),
+                    "activity"
+                );
+            } else {
+                String reason = auditDTO.getRejectReason() != null ? auditDTO.getRejectReason() : "未说明原因";
+                messageService.sendMessage(
+                    registration.getUserId(),
+                    "报名审核未通过",
+                    "您报名的活动《" + activity.getTitle() + "》未通过审核，原因：" + reason,
+                    MESSAGE_TYPE_REGISTRATION,
+                    activity.getId(),
+                    "activity"
+                );
+            }
+        } catch (Exception e) {
+            log.warn("发送报名审核通知失败，报名ID：{}，错误：{}", auditDTO.getRegistrationId(), e.getMessage());
+        }
     }
 
     /**
@@ -249,6 +280,22 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         registrationMapper.updateById(registration);
         log.info("取消报名成功，报名ID：{}，用户ID：{}", registrationId, userId);
+
+        // 7. 通知活动组织者
+        try {
+            User user = userMapper.selectById(userId);
+            String nickname = user != null ? user.getNickname() : "未知用户";
+            messageService.sendMessage(
+                activity.getOrganizerId(),
+                "参与者取消报名",
+                "用户【" + nickname + "】取消了活动《" + activity.getTitle() + "》的报名。",
+                MESSAGE_TYPE_REGISTRATION,
+                activity.getId(),
+                "activity"
+            );
+        } catch (Exception e) {
+            log.warn("发送取消报名通知失败，报名ID：{}，错误：{}", registrationId, e.getMessage());
+        }
     }
 
     /**

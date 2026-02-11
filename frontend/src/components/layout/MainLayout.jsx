@@ -21,6 +21,7 @@ import {
   CloseOutlined,
   AimOutlined
 } from '@ant-design/icons'
+import { getUnreadCount } from '../../api/message'
 import { ROLE } from '../../utils/constants'
 import { getImageUrl } from '../../utils/imageUrl'
 import './MainLayout.css'
@@ -31,6 +32,7 @@ function MainLayout() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [currentUser, setCurrentUser] = useState(null)
   const [drawerVisible, setDrawerVisible] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -43,6 +45,22 @@ function MainLayout() {
       setCurrentUser(JSON.parse(user))
     }
   }, [location]) // 路由变化时重新检查登录状态
+
+  // 获取未读消息数量，登录后每60秒轮询一次
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setUnreadCount(0)
+      return
+    }
+    const fetchUnread = () => {
+      getUnreadCount().then(count => {
+        setUnreadCount(count || 0)
+      }).catch(() => {})
+    }
+    fetchUnread()
+    const timer = setInterval(fetchUnread, 60000)
+    return () => clearInterval(timer)
+  }, [isLoggedIn, location])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -108,7 +126,7 @@ function MainLayout() {
     {
       key: 'messages',
       icon: <MessageOutlined />,
-      label: <Link to="/user/messages">消息通知</Link>
+      label: <Link to="/user/messages"><Badge count={unreadCount} size="small" offset={[6, 0]}>消息通知</Badge></Link>
     },
     {
       key: 'my-location',
@@ -249,7 +267,7 @@ function MainLayout() {
       {
         key: '/user/messages',
         icon: <MessageOutlined />,
-        label: '消息通知',
+        label: <Badge count={unreadCount} size="small" offset={[6, 0]}>消息通知</Badge>,
         onClick: () => drawerNavigate('/user/messages')
       }
     )
@@ -364,7 +382,9 @@ function MainLayout() {
             {isLoggedIn ? (
               <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
                 <div className="user-info">
-                  <Avatar icon={<UserOutlined />} src={currentUser?.avatar ? getImageUrl(currentUser.avatar) : null} />
+                  <Badge count={unreadCount} size="small" offset={[-5, 5]}>
+                    <Avatar icon={<UserOutlined />} src={currentUser?.avatar ? getImageUrl(currentUser.avatar) : null} />
+                  </Badge>
                   <div className="user-text">
                     <span className="username">{currentUser?.nickname || currentUser?.username}</span>
                     {getRoleBadge()}
