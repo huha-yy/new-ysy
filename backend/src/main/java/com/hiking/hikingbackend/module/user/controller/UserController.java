@@ -5,6 +5,7 @@ import com.hiking.hikingbackend.common.utils.SecurityUtils;
 import com.hiking.hikingbackend.module.user.dto.UserProfileDTO;
 import com.hiking.hikingbackend.module.user.service.UserService;
 import com.hiking.hikingbackend.module.user.vo.UserProfileVO;
+import com.hiking.hikingbackend.module.user.vo.UserStatsVO;
 import com.hiking.hikingbackend.module.user.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -85,5 +86,20 @@ public class UserController {
 
         UserProfileVO userProfileVO = userService.getUserProfile(userId);
         return Result.success(userProfileVO);
+    }
+
+    /**
+     * 获取用户统计数据
+     */
+    @Operation(summary = "获取用户统计数据", description = "需要登录，返回参加活动数、里程、爬升等统计")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @GetMapping("/stats")
+    public Result<UserStatsVO> getUserStats() {
+        Long userId = SecurityUtils.getCurrentUserId();
+        if (userId == null) {
+            throw new RuntimeException("无法获取当前用户ID");
+        }
+        UserStatsVO stats = userService.getUserStats(userId);
+        return Result.success(stats);
     }
 }

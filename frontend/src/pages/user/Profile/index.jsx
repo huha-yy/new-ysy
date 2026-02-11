@@ -18,7 +18,7 @@ import {
 } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../hooks/useAuth'
-import { getUserInfo } from '../../../api/user'
+import { getUserInfo, getUserStats } from '../../../api/user'
 import { getImageUrl } from '../../../utils/imageUrl'
 import './Profile.css'
 
@@ -54,15 +54,19 @@ function Profile() {
     }
   }
 
-  const fetchStats = () => {
-    // TODO: 从后端获取统计数据
-    // 这里先使用模拟数据
-    setStats({
-      joinedActivities: 12,
-      publishedActivities: authUser?.role >= 1 ? 5 : 0,
-      totalDistance: 156,
-      reviews: 8
-    })
+  const fetchStats = async () => {
+    try {
+      const result = await getUserStats()
+      setStats({
+        joinedActivities: result.joinedActivities || 0,
+        publishedActivities: result.publishedActivities || 0,
+        totalDistance: result.totalDistance || 0,
+        reviews: result.reviews || 0
+      })
+    } catch (error) {
+      // 接口失败时显示0
+      setStats({ joinedActivities: 0, publishedActivities: 0, totalDistance: 0, reviews: 0 })
+    }
   }
 
   const getRoleText = (role) => {

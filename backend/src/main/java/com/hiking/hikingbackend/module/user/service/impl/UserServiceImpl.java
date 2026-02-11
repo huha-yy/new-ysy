@@ -14,7 +14,16 @@ import com.hiking.hikingbackend.module.user.mapper.UserProfileMapper;
 import com.hiking.hikingbackend.module.user.service.UserService;
 import com.hiking.hikingbackend.module.user.vo.LoginVO;
 import com.hiking.hikingbackend.module.user.vo.UserProfileVO;
+import com.hiking.hikingbackend.module.user.vo.UserStatsVO;
 import com.hiking.hikingbackend.module.user.vo.UserVO;
+import com.hiking.hikingbackend.module.registration.entity.Registration;
+import com.hiking.hikingbackend.module.registration.mapper.RegistrationMapper;
+import com.hiking.hikingbackend.module.activity.entity.Activity;
+import com.hiking.hikingbackend.module.activity.mapper.ActivityMapper;
+import com.hiking.hikingbackend.module.route.entity.Route;
+import com.hiking.hikingbackend.module.route.mapper.RouteMapper;
+import com.hiking.hikingbackend.module.review.entity.Review;
+import com.hiking.hikingbackend.module.review.mapper.ReviewMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +44,14 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     private final UserProfileMapper userProfileMapper;
+
+    private final RegistrationMapper registrationMapper;
+
+    private final ActivityMapper activityMapper;
+
+    private final RouteMapper routeMapper;
+
+    private final ReviewMapper reviewMapper;
 
     private final JwtUtils jwtUtils;
 
@@ -348,6 +365,74 @@ public class UserServiceImpl implements UserService {
             userProfileMapper.updateById(userProfile);
             log.info("更新用户档案成功，用户ID：{}", userId);
         }
+    }
+
+    /**
+     * 获取用户统计数据
+     */
+    @Override
+    public UserStatsVO getUserStats(Long userId) {
+        // 1. 查询用户已通过的报名记录
+        LambdaQueryWrapper<Registration> regQuery = new LambdaQueryWrapper<>();
+        regQuery.eq(Registration::getUserId, userId)
+                .eq(Registration::getStatus, 1); // status=1 已通过
+        java.util.List<Registration> approvedRegs = registrationMapper.selectList(regQuery);
+        int joinedActivities = approvedRegs.size();
+
+        // 2. 统计已完成活动数、累计里程、爬升、时长
+        int completedActivities = 0;
+        java.math.BigDecimal totalDistance = java.math.BigDecimal.ZERO;
+        int totalElevation = 0;
+        java.math.BigDecimal totalDuration = java.math.BigDecimal.ZERO;
+
+        for (Registration reg : approvedRegs) {
+            Activity activity = activityMapper.selectById(reg.getActivityId());
+            if (activity == null) continue;
+
+            // 活动状态=4 已结束
+            if (activity.getStatus() != null && activity.getStatus() == 4) {
+                completedActivities++;
+            }
+
+            // 累计时长
+            if (activity.getDurationHours() != null) {
+                totalDuration = totalDuration.add(activity.getDurationHours());
+            }
+
+            // 从路线获取里程和爬升
+            if (activity.getRouteId() != null) {
+                Route route = routeMapper.selectById(activity.getRouteId());
+                if (route != null) {
+                    if (route.getTotalDistance() != null) {
+                        totalDistance = totalDistance.add(route.getTotalDistance());
+                    }
+                    if (route.getElevationGain() != null) {
+                        totalElevation += route.getElevationGain();
+                    }
+                }
+            }
+        }
+
+        // 3. 发布活动数（作为组织者）
+        LambdaQueryWrapper<Activity> actQuery = new LambdaQueryWrapper<>();
+        actQuery.eq(Activity::getOrganizerId, userId);
+        int publishedActivities = activityMapper.selectCount(actQuery).intValue();
+
+        // 4. 获得评价数（别人对该用户参与的活动的评价 → 简化为用户自己发出的评价数）
+        LambdaQueryWrapper<Review> reviewQuery = new LambdaQueryWrapper<>();
+        reviewQuery.eq(Review::getUserId, userId)
+                   .eq(Review::getStatus, 1); // status=1 可见
+        int reviews = reviewMapper.selectCount(reviewQuery).intValue();
+
+        return UserStatsVO.builder()
+                .joinedActivities(joinedActivities)
+                .completedActivities(completedActivities)
+                .publishedActivities(publishedActivities)
+                .totalDistance(totalDistance)
+                .totalElevation(totalElevation)
+                .totalDuration(totalDuration)
+                .reviews(reviews)
+                .build();
     }
 }
 

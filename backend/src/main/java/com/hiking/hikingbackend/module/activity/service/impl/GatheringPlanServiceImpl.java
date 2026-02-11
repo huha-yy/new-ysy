@@ -10,6 +10,9 @@ import com.hiking.hikingbackend.module.activity.mapper.ActivityMapper;
 import com.hiking.hikingbackend.module.activity.mapper.GatheringPlanMapper;
 import com.hiking.hikingbackend.module.activity.service.GatheringPlanService;
 import com.hiking.hikingbackend.module.activity.vo.GatheringPlanVO;
+import com.hiking.hikingbackend.module.message.service.MessageService;
+import com.hiking.hikingbackend.module.registration.entity.Registration;
+import com.hiking.hikingbackend.module.registration.mapper.RegistrationMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,8 +35,14 @@ public class GatheringPlanServiceImpl implements GatheringPlanService {
 
     private final ActivityMapper activityMapper;
 
+    private final MessageService messageService;
+
+    private final RegistrationMapper registrationMapper;
+
     private static final int PUBLISHED = 1; // 已发布
     private static final int NOT_PUBLISHED = 0; // 未发布
+    private static final int STATUS_APPROVED = 1; // 报名已通过
+    private static final int MESSAGE_TYPE_ACTIVITY = 3; // 活动通知
 
     /**
      * 创建集合方案（组织者）
@@ -176,9 +185,34 @@ public class GatheringPlanServiceImpl implements GatheringPlanService {
 
         log.info("集合方案发布成功，方案ID：{}，发布时间：{}", gatheringPlan.getId(), gatheringPlan.getPublishTime());
 
-        // 5. TODO: 向参与者发送通知（此处需要实现消息通知功能）
-        // 可以调用消息服务，向所有已报名的参与者发送集合方案发布通知
-        log.info("TODO: 向参与者发送集合方案发布通知");
+        // 5. 向所有已通过审核的参与者发送集合方案通知
+        try {
+            LambdaQueryWrapper<Registration> regWrapper = new LambdaQueryWrapper<>();
+            regWrapper.eq(Registration::getActivityId, activityId)
+                      .eq(Registration::getStatus, STATUS_APPROVED);
+            java.util.List<Registration> approvedList = registrationMapper.selectList(regWrapper);
+
+            String title = "集合方案已发布";
+            String content = "您报名的活动《" + activity.getTitle() + "》已发布集合方案，请查看集合时间、地点及注意事项。";
+
+            for (Registration reg : approvedList) {
+                try {
+                    messageService.sendMessage(
+                        reg.getUserId(),
+                        title,
+                        content,
+                        MESSAGE_TYPE_ACTIVITY,
+                        activityId,
+                        "activity"
+                    );
+                } catch (Exception e) {
+                    log.warn("发送集合方案通知失败，用户ID：{}，错误：{}", reg.getUserId(), e.getMessage());
+                }
+            }
+            log.info("集合方案通知发送完成，共通知 {} 位参与者", approvedList.size());
+        } catch (Exception e) {
+            log.warn("查询参与者列表失败，无法发送集合方案通知：{}", e.getMessage());
+        }
     }
 
     /**

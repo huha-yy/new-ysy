@@ -5,6 +5,7 @@ import com.hiking.hikingbackend.module.user.dto.UserProfileDTO;
 import com.hiking.hikingbackend.module.user.dto.UserRegisterDTO;
 import com.hiking.hikingbackend.module.user.vo.LoginVO;
 import com.hiking.hikingbackend.module.user.vo.UserProfileVO;
+import com.hiking.hikingbackend.module.user.vo.UserStatsVO;
 import com.hiking.hikingbackend.module.user.vo.UserVO;
 
 /**
@@ -54,5 +55,13 @@ public interface UserService {
      * @param profileDTO 档案信息
      */
     void updateUserProfile(Long userId, UserProfileDTO profileDTO);
+
+    /**
+     * 获取用户统计数据
+     *
+     * @param userId 用户ID
+     * @return 用户统计VO
+     */
+    UserStatsVO getUserStats(Long userId);
 }
 

@@ -56,3 +56,11 @@ export const updateUserInfo = (data) => {
   return request.put('/user/info', data)
 }
 
+/**
+ * 获取用户统计数据
+ * @returns {Promise} { joinedActivities, completedActivities, publishedActivities, totalDistance, totalElevation, totalDuration, reviews }
+ */
+export const getUserStats = () => {
+  return request.get('/user/stats')
+}
+

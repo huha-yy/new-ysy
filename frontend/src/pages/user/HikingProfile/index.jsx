@@ -1,40 +1,40 @@
 import { useState, useEffect } from 'react'
-import { Card, Form, Input, DatePicker, Select, Button, Progress, Row, Col, Statistic, message } from 'antd'
+import { Card, Form, Input, DatePicker, Select, Button, Progress, Row, Col, Statistic, message, Spin } from 'antd'
 import { TrophyOutlined, CalendarOutlined, EnvironmentOutlined, FireOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
+import { getUserStats } from '../../../api/user'
 import dayjs from 'dayjs'
 import './HikingProfile.css'
 
 function HikingProfile() {
   const [loading, setLoading] = useState(false)
+  const [statsLoading, setStatsLoading] = useState(true)
   const [form] = Form.useForm()
   const [stats, setStats] = useState({})
   const navigate = useNavigate()
 
   useEffect(() => {
-    // 模拟从后端获取徒步档案数据
-    const profileData = {
-      totalActivities: 5,
-      totalDistance: 45.5,
-      totalElevation: 1200,
-      totalDuration: 25,
-      completedActivities: 3,
-      preferenceDifficulty: 2,
-      preferredDuration: '4-6',
-      favoriteRoutes: '香山环线,灵山古道'
+    fetchStats()
+  }, [])
+
+  const fetchStats = async () => {
+    try {
+      setStatsLoading(true)
+      const result = await getUserStats()
+      const profileData = {
+        totalActivities: result.joinedActivities || 0,
+        totalDistance: result.totalDistance || 0,
+        totalElevation: result.totalElevation || 0,
+        totalDuration: result.totalDuration || 0,
+        completedActivities: result.completedActivities || 0
+      }
+      setStats(profileData)
+    } catch (error) {
+      setStats({ totalActivities: 0, totalDistance: 0, totalElevation: 0, totalDuration: 0, completedActivities: 0 })
+    } finally {
+      setStatsLoading(false)
     }
-
-    // 设置统计数据
-    setStats(profileData)
-
-    // 设置表单初始值
-    form.setFieldsValue({
-      preferenceDifficulty: profileData.preferenceDifficulty,
-      preferredDuration: profileData.preferredDuration,
-      routeTypes: ['loop', 'point'],
-      notes: ''
-    })
-  }, [form])
+  }
 
   const onFinish = async (values) => {
     setLoading(true)
@@ -115,24 +115,26 @@ function HikingProfile() {
             <div className="level-display">
               <div className="current-level">
                 <span className="level-label">当前等级：</span>
-                <span className="level-badge">中级</span>
+                <span className="level-badge">
+                  {(stats.completedActivities || 0) >= 20 ? '专家' : (stats.completedActivities || 0) >= 10 ? '高级' : (stats.completedActivities || 0) >= 5 ? '中级' : '初级'}
+                </span>
               </div>
               <div className="level-progress">
                 <span className="level-desc">初级</span>
-                <Progress 
-                  percent={50} 
+                <Progress
+                  percent={Math.min(100, ((stats.completedActivities || 0) / 5) * 100)}
                   strokeColor="#4ADE80"
                   showInfo={false}
                 />
                 <span className="level-desc">中级</span>
-                <Progress 
-                  percent={75} 
+                <Progress
+                  percent={Math.min(100, Math.max(0, ((stats.completedActivities || 0) - 5) / 5) * 100)}
                   strokeColor="#FFA726"
                   showInfo={false}
                 />
                 <span className="level-desc">高级</span>
-                <Progress 
-                  percent={90} 
+                <Progress
+                  percent={Math.min(100, Math.max(0, ((stats.completedActivities || 0) - 10) / 10) * 100)}
                   strokeColor="#FFC93D"
                   showInfo={false}
                 />
@@ -140,8 +142,8 @@ function HikingProfile() {
               </div>
             </div>
             <div className="level-info">
-              <p>已参与 3 个活动，总里程 45.5 公里，累计爬升 1200 米</p>
-              <p>再参与 2 个活动即可升级到高级！</p>
+              <p>已参与 {stats.completedActivities || 0} 个活动，总里程 {stats.totalDistance || 0} 公里，累计爬升 {stats.totalElevation || 0} 米</p>
+              <p>{stats.completedActivities >= 10 ? '恭喜你已达到高级水平！' : `再参与 ${10 - (stats.completedActivities || 0)} 个活动即可升级到高级！`}</p>
             </div>
           </div>
 
