@@ -49,7 +49,6 @@ function AdminDashboard() {
         setRecentActivities(res.recentActivities || [])
       }
     } catch (error) {
-      console.error('获取Dashboard数据失败:', error)
       // 使用模拟数据
       setDashboardData({
         userCount: 1256,

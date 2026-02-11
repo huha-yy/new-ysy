@@ -84,13 +84,11 @@ function MyActivities() {
           else if (status === 4) counts.ended = count
           else if (status === 6) counts.rejected = count
         } catch (e) {
-          console.error(`获取状态${status}统计失败:`, e)
         }
       }
 
       setStatusCounts(counts)
     } catch (error) {
-      console.error('获取统计数据失败:', error)
     }
   }
 
@@ -113,7 +111,6 @@ function MyActivities() {
         }))
       }
     } catch (error) {
-      console.error('获取活动列表失败:', error)
       // 使用模拟数据
       setActivities([
         {
@@ -269,7 +266,7 @@ function MyActivities() {
               </Tag>
             </div>
             <div className="activity-time">
-              {dayjs(record.startTime).format('MM-DD HH:mm')} ~ {dayjs(record.endTime).format('MM-DD HH:mm')}
+              {record.activityDate} {record.startTime ? record.startTime.substring(0, 5) : ''} ~ {record.endTime ? record.endTime.substring(0, 5) : ''}
             </div>
           </div>
         </div>
@@ -283,7 +280,6 @@ function MyActivities() {
       render: (_, record) => {
         const hasRegistrations = record.currentParticipants > 0
         const handleClick = () => {
-          console.log('点击报名管理，活动ID:', record.id)
           if (hasRegistrations) {
             navigate(`/organizer/activities/${record.id}/registrations`)
           }
@@ -457,7 +453,6 @@ function MyActivities() {
                 type="text"
                 icon={<TeamOutlined />}
                 onClick={() => {
-                  console.log('点击报名管理按钮，活动ID:', record.id)
                   navigate(`/organizer/activities/${record.id}/registrations`)
                 }}
                 style={{ color: 'var(--success-color)' }}
@@ -497,7 +492,6 @@ function MyActivities() {
                 type="text"
                 icon={<TeamOutlined />}
                 onClick={() => {
-                  console.log('点击查看报名按钮，活动ID:', record.id)
                   navigate(`/organizer/activities/${record.id}/registrations`)
                 }}
                 style={{ color: 'var(--primary-color)' }}

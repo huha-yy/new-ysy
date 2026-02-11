@@ -87,7 +87,6 @@ function RouteCreate() {
       form.setFieldValue('totalDistance', distanceInKm)
       // 同步更新到 routeData 中，供确认页面显示
       setRouteData(prev => ({ ...prev, totalDistance: distanceInKm }))
-      console.log('✓ 路线总距离更新:', distanceInKm, 'km')
       return distanceInKm
     }
     return '0.00'
@@ -120,7 +119,6 @@ function RouteCreate() {
 
       setCurrentStep(currentStep + 1)
     } catch (error) {
-      console.error('验证失败:', error)
     }
   }
 
@@ -196,13 +194,10 @@ function RouteCreate() {
         }))
       }
 
-      console.log('✓ 提交路线数据：', JSON.stringify(submitData, null, 2))
-
       const routeId = await createRoute(submitData)
       message.success('路线创建成功！')
       navigate('/organizer/routes')
     } catch (error) {
-      console.error('创建路线失败:', error)
       message.error('创建路线失败，请重试')
     } finally {
       setLoading(false)
@@ -210,7 +205,6 @@ function RouteCreate() {
   }
 
   const handleRouteChange = useCallback((points) => {
-    console.log('✓ 路线点更新:', points?.length, '个点')
     setRoutePoints(points)
     // 删除立即调用 updateTotalDistance()，改由 useEffect 自动触发
   }, [])
@@ -224,29 +218,24 @@ function RouteCreate() {
   }, [])
 
   const handleStartPointChange = useCallback((point) => {
-    console.log('✓ 起点更新:', point)
     setStartPoint(point)
     // 删除立即调用 updateTotalDistance()，改由 useEffect 自动触发
   }, [])
 
   const handleEndPointChange = useCallback((point) => {
-    console.log('✓ 终点更新:', point)
     setEndPoint(point)
     // 删除立即调用 updateTotalDistance()，改由 useEffect 自动触发
   }, [])
 
   const handleRiskPointsChange = useCallback((points) => {
-    console.log('✓ 风险点更新:', points?.length, '个点')
     setRiskPoints(points)
   }, [])
 
   const handleRestPointsChange = useCallback((points) => {
-    console.log('✓ 休息点更新:', points?.length, '个点')
     setRestPoints(points)
   }, [])
 
   const handleSupplyPointsChange = useCallback((points) => {
-    console.log('✓ 补给点更新:', points?.length, '个点')
     setSupplyPoints(points)
   }, [])
 

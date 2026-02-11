@@ -1,7 +1,9 @@
 package com.hiking.hikingbackend.module.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.hiking.hikingbackend.common.exception.BusinessException;
 import com.hiking.hikingbackend.common.result.Result;
+import com.hiking.hikingbackend.common.result.ResultCode;
 import com.hiking.hikingbackend.common.utils.SecurityUtils;
 import com.hiking.hikingbackend.module.admin.dto.ActivityAuditQuery;
 import com.hiking.hikingbackend.module.admin.dto.UserListQuery;
@@ -82,7 +84,7 @@ public class AdminController {
         // 获取当前操作人ID
         Long operatorId = SecurityUtils.getCurrentUserId();
         if (operatorId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         adminService.updateUserStatus(userId, dto.getStatus(), operatorId);
@@ -107,7 +109,7 @@ public class AdminController {
         // 获取当前操作人ID
         Long operatorId = SecurityUtils.getCurrentUserId();
         if (operatorId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         adminService.updateUserRole(userId, dto.getRole(), operatorId);

@@ -7,18 +7,18 @@
 }
 
 /* 页面头部 */
-.page-header {
+.my-activities-page .page-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 24px;
 }
 
-.header-left {
+.my-activities-page .header-left {
   flex: 1;
 }
 
-.page-title {
+.my-activities-page .page-title {
   font-size: 28px;
   font-weight: 700;
   color: var(--text-primary);
@@ -28,18 +28,18 @@
   gap: 12px;
 }
 
-.title-icon {
+.my-activities-page .title-icon {
   color: var(--primary-color);
   font-size: 32px;
 }
 
-.page-subtitle {
+.my-activities-page .page-subtitle {
   color: var(--text-secondary);
   font-size: 14px;
   margin: 0;
 }
 
-.create-btn {
+.my-activities-page .create-btn {
   height: 48px;
   font-size: 16px;
   padding: 0 32px;
@@ -50,7 +50,7 @@
   transition: all 0.3s ease;
 }
 
-.create-btn:hover {
+.my-activities-page .create-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(255, 167, 38, 0.5);
 }
@@ -63,7 +63,7 @@
   margin-bottom: 24px;
 }
 
-.stat-card {
+.my-activities-page .stat-card {
   background: white;
   border-radius: 16px;
   padding: 20px;
@@ -75,70 +75,70 @@
   border: 2px solid transparent;
 }
 
-.stat-card:hover {
+.my-activities-page .stat-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
 }
 
-.stat-card.total {
+.my-activities-page .stat-card.total {
   border-color: rgba(255, 167, 38, 0.3);
   background: linear-gradient(135deg, #FFF5EB 0%, white 100%);
 }
 
-.stat-card.draft {
+.my-activities-page .stat-card.draft {
   border-color: rgba(156, 163, 175, 0.3);
   background: linear-gradient(135deg, #F3F4F6 0%, white 100%);
 }
 
-.stat-card.pending {
+.my-activities-page .stat-card.pending {
   border-color: rgba(251, 191, 36, 0.3);
   background: linear-gradient(135deg, #FFFBEB 0%, white 100%);
 }
 
-.stat-card.published {
+.my-activities-page .stat-card.published {
   border-color: rgba(74, 222, 128, 0.3);
   background: linear-gradient(135deg, #F0FDF4 0%, white 100%);
 }
 
-.stat-card.progress {
+.my-activities-page .stat-card.progress {
   border-color: rgba(0, 217, 255, 0.3);
   background: linear-gradient(135deg, #ECFEFF 0%, white 100%);
 }
 
-.stat-icon {
+.my-activities-page .stat-icon {
   font-size: 36px;
   line-height: 1;
 }
 
-.stat-content {
+.my-activities-page .stat-content {
   flex: 1;
 }
 
-.stat-value {
+.my-activities-page .stat-value {
   font-size: 28px;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;
 }
 
-.stat-label {
+.my-activities-page .stat-label {
   font-size: 13px;
   color: var(--text-secondary);
   margin-top: 4px;
 }
 
 /* 活动列表卡片 */
-.activities-card {
+.my-activities-page .activities-card {
   border-radius: 20px;
   box-shadow: var(--shadow-md);
   border: none;
 }
 
-.activities-card .ant-card-body {
+.my-activities-page .activities-card .ant-card-body {
   padding: 0;
 }
 
-.card-header {
+.my-activities-page .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -148,55 +148,55 @@
   border-radius: 20px 20px 0 0;
 }
 
-.status-tabs .ant-tabs-nav {
+.my-activities-page .status-tabs .ant-tabs-nav {
   margin: 0;
 }
 
-.status-tabs .ant-tabs-tab {
+.my-activities-page .status-tabs .ant-tabs-tab {
   padding: 8px 16px;
   font-weight: 500;
 }
 
-.search-area {
+.my-activities-page .search-area {
   display: flex;
   gap: 12px;
 }
 
-.search-area .ant-input-affix-wrapper {
+.my-activities-page .search-area .ant-input-affix-wrapper {
   border-radius: 8px;
   border: 2px solid #FFE8CC;
 }
 
-.search-area .ant-input-affix-wrapper:focus,
-.search-area .ant-input-affix-wrapper-focused {
+.my-activities-page .search-area .ant-input-affix-wrapper:focus,
+.my-activities-page .search-area .ant-input-affix-wrapper-focused {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(255, 167, 38, 0.2);
 }
 
 /* 表格样式 */
-.activities-card .ant-table {
+.my-activities-page .activities-card .ant-table {
   border-radius: 0 0 20px 20px;
 }
 
-.activities-card .ant-table-thead > tr > th {
+.my-activities-page .activities-card .ant-table-thead > tr > th {
   background: #FFFAF5;
   color: var(--text-primary);
   font-weight: 600;
   border-bottom: 2px solid #FFE8CC;
 }
 
-.activities-card .ant-table-tbody > tr:hover > td {
+.my-activities-page .activities-card .ant-table-tbody > tr:hover > td {
   background: #FFF9E6;
 }
 
 /* 活动信息单元格 */
-.activity-info-cell {
+.my-activities-page .activity-info-cell {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.activity-cover-thumb {
+.my-activities-page .activity-cover-thumb {
   width: 80px;
   height: 60px;
   object-fit: cover;
@@ -204,19 +204,20 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.activity-info-text {
+.my-activities-page .activity-info-text {
   flex: 1;
   min-width: 0;
 }
 
-.activity-title-row {
+.my-activities-page .activity-title-row {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 6px;
 }
 
-.activity-title {
+.my-activities-page .activity-title {
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
   overflow: hidden;
@@ -225,24 +226,24 @@
   max-width: 180px;
 }
 
-.activity-time {
+.my-activities-page .activity-time {
   font-size: 12px;
   color: var(--text-secondary);
 }
 
 /* 报名进度 */
-.participants-cell {
+.my-activities-page .participants-cell {
   text-align: center;
 }
 
-.participants-count {
+.my-activities-page .participants-count {
   font-size: 13px;
   color: var(--text-primary);
   margin-bottom: 6px;
   transition: all 0.3s ease;
 }
 
-.participants-count.clickable {
+.my-activities-page .participants-count.clickable {
   cursor: pointer;
   color: var(--primary-color);
   font-weight: 600;
@@ -253,24 +254,24 @@
   border-radius: 4px;
 }
 
-.participants-count.clickable:hover {
+.my-activities-page .participants-count.clickable:hover {
   background-color: var(--primary-color);
   color: white;
   transform: scale(1.05);
 }
 
-.participants-count.clickable::after {
+.my-activities-page .participants-count.clickable::after {
   content: '→';
   margin-left: 4px;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-.participants-count.clickable:hover::after {
+.my-activities-page .participants-count.clickable:hover::after {
   opacity: 1;
 }
 
-.participants-progress {
+.my-activities-page .participants-progress {
   width: 100%;
   height: 6px;
   background: #E8E8E8;
@@ -278,7 +279,7 @@
   overflow: hidden;
 }
 
-.progress-bar {
+.my-activities-page .progress-bar {
   height: 100%;
   background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   border-radius: 3px;
@@ -286,13 +287,13 @@
 }
 
 /* 费用 */
-.fee-paid {
+.my-activities-page .fee-paid {
   color: var(--primary-color);
   font-weight: 600;
   font-size: 15px;
 }
 
-.fee-free {
+.my-activities-page .fee-free {
   color: var(--success-color);
   font-weight: 500;
 }
@@ -309,12 +310,12 @@
     padding: 16px;
   }
 
-  .page-header {
+  .my-activities-page .page-header {
     flex-direction: column;
     gap: 16px;
   }
 
-  .create-btn {
+  .my-activities-page .create-btn {
     width: 100%;
   }
 
@@ -322,34 +323,34 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .card-header {
+  .my-activities-page .card-header {
     flex-direction: column;
     gap: 12px;
     align-items: stretch;
   }
 
-  .search-area {
+  .my-activities-page .search-area {
     width: 100%;
   }
 
-  .search-area .ant-input-affix-wrapper {
+  .my-activities-page .search-area .ant-input-affix-wrapper {
     flex: 1;
   }
 
-  .activities-card .ant-table-wrapper {
+  .my-activities-page .activities-card .ant-table-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  .activities-card .ant-table {
+  .my-activities-page .activities-card .ant-table {
     min-width: 700px;
   }
 
-  .page-title {
+  .my-activities-page .page-title {
     font-size: 22px;
   }
 
-  .title-icon {
+  .my-activities-page .title-icon {
     font-size: 26px;
   }
 }
@@ -364,34 +365,34 @@
     gap: 8px;
   }
 
-  .stat-card {
+  .my-activities-page .stat-card {
     padding: 14px;
     gap: 12px;
   }
 
-  .stat-value {
+  .my-activities-page .stat-value {
     font-size: 22px;
   }
 
-  .stat-icon {
+  .my-activities-page .stat-icon {
     font-size: 28px;
   }
 
-  .page-title {
+  .my-activities-page .page-title {
     font-size: 20px;
     flex-wrap: wrap;
   }
 
-  .create-btn {
+  .my-activities-page .create-btn {
     height: 44px;
     font-size: 15px;
   }
 
-  .card-header {
+  .my-activities-page .card-header {
     padding: 12px 16px;
   }
 
-  .status-tabs .ant-tabs-tab {
+  .my-activities-page .status-tabs .ant-tabs-tab {
     padding: 6px 10px;
     font-size: 13px;
   }
@@ -409,9 +410,8 @@
   }
 }
 
-.stat-card:nth-child(1) { animation: fadeInUp 0.4s ease 0.1s both; }
-.stat-card:nth-child(2) { animation: fadeInUp 0.4s ease 0.15s both; }
-.stat-card:nth-child(3) { animation: fadeInUp 0.4s ease 0.2s both; }
-.stat-card:nth-child(4) { animation: fadeInUp 0.4s ease 0.25s both; }
-.stat-card:nth-child(5) { animation: fadeInUp 0.4s ease 0.3s both; }
-
+.my-activities-page .stat-card:nth-child(1) { animation: fadeInUp 0.4s ease 0.1s both; }
+.my-activities-page .stat-card:nth-child(2) { animation: fadeInUp 0.4s ease 0.15s both; }
+.my-activities-page .stat-card:nth-child(3) { animation: fadeInUp 0.4s ease 0.2s both; }
+.my-activities-page .stat-card:nth-child(4) { animation: fadeInUp 0.4s ease 0.25s both; }
+.my-activities-page .stat-card:nth-child(5) { animation: fadeInUp 0.4s ease 0.3s both; }

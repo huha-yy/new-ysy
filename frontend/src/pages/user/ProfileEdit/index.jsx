@@ -47,7 +47,6 @@ function ProfileEdit() {
         setAvatar(result.avatar)
       }
     } catch (error) {
-      console.error('获取用户档案失败:', error)
       message.error('获取用户档案失败，请刷新页面重试')
     } finally {
       setFetchLoading(false)
@@ -72,7 +71,6 @@ function ProfileEdit() {
 
       navigate('/user/profile')
     } catch (error) {
-      console.error('更新资料失败:', error)
       // 错误已在 request.js 的响应拦截器中处理
     } finally {
       setLoading(false)
@@ -89,7 +87,6 @@ function ProfileEdit() {
       setAvatar(result.url)
       message.success('头像上传成功')
     } catch (error) {
-      console.error('头像上传失败:', error)
       message.error('头像上传失败')
     }
   }

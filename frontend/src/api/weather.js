@@ -3,6 +3,8 @@
  * 使用Open-Meteo免费API（无需API Key，支持中文）
  */
 
+import { DEFAULT_MAP_CENTER } from '../utils/constants'
+
 const WEATHER_API_BASE = 'https://api.open-meteo.com/v1'
 
 /**
@@ -127,7 +129,6 @@ export const getCurrentPosition = () => {
                           window.location.hostname === '127.0.0.1'
 
     if (!isSecureContext) {
-      console.warn('当前不是安全上下文，地理定位可能受限')
     }
 
     // 首先尝试高精度定位
@@ -144,25 +145,21 @@ export const getCurrentPosition = () => {
         switch (error.code) {
           case error.PERMISSION_DENIED:
             errorMessage = '用户拒绝了定位请求，将使用默认位置'
-            console.warn('定位权限被拒绝')
             break
           case error.POSITION_UNAVAILABLE:
             errorMessage = '无法获取位置信息，将使用默认位置'
-            console.warn('位置信息不可用')
             break
           case error.TIMEOUT:
             errorMessage = '定位请求超时，将使用默认位置'
-            console.warn('定位超时')
             break
           default:
             errorMessage = '定位失败，将使用默认位置'
         }
         
-        // 返回默认位置（北京）
-        console.log('使用默认位置：北京')
+        // 返回默认位置
         resolve({
-          latitude: 39.9042,  // 北京纬度
-          longitude: 116.4074, // 北京经度
+          latitude: DEFAULT_MAP_CENTER.lat,
+          longitude: DEFAULT_MAP_CENTER.lng,
           accuracy: 0,
           isDefault: true
         })
@@ -215,10 +212,8 @@ export const getLocationName = async (latitude, longitude) => {
     
     return city
   } catch (error) {
-    console.error('获取位置名称失败:', error)
-    
-    // 如果是北京坐标，直接返回
-    if (Math.abs(latitude - 39.9042) < 0.01 && Math.abs(longitude - 116.4074) < 0.01) {
+    // 如果是默认坐标，直接返回
+    if (Math.abs(latitude - DEFAULT_MAP_CENTER.lat) < 0.01 && Math.abs(longitude - DEFAULT_MAP_CENTER.lng) < 0.01) {
       return '北京'
     }
     
@@ -261,7 +256,6 @@ export const getWeatherData = async (latitude, longitude) => {
       }))
     }
   } catch (error) {
-    console.error('获取天气数据失败:', error)
     throw error
   }
 }
@@ -285,7 +279,6 @@ export const getCurrentLocationWeather = async () => {
       ...weatherData
     }
   } catch (error) {
-    console.error('获取位置天气失败:', error)
     throw error
   }
 }
@@ -320,7 +313,6 @@ export const getCachedWeatherData = () => {
     
     return cacheData.data
   } catch (error) {
-    console.error('读取缓存失败:', error)
     localStorage.removeItem(WEATHER_CACHE_KEY)
     return null
   }

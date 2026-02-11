@@ -4,34 +4,34 @@
   min-height: 100vh;
 }
 
-.gathering-plan-card {
+.gathering-plan-page .gathering-plan-card {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.gathering-plan-loading {
+.gathering-plan-page .gathering-plan-loading {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 60vh;
 }
 
-.loading-spinner {
+.gathering-plan-page .loading-spinner {
   font-size: 18px;
   color: #1890ff;
 }
 
-.empty-state {
+.gathering-plan-page .empty-state {
   text-align: center;
   padding: 48px 24px;
 }
 
-.publish-alert {
+.gathering-plan-page .publish-alert {
   margin-bottom: 24px;
 }
 
 /* 表单分区 */
-.form-section {
+.gathering-plan-page .form-section {
   margin-bottom: 24px;
   padding: 20px;
   background-color: #fafafa;
@@ -39,13 +39,13 @@
   border: 1px solid #f0f0f0;
 }
 
-.form-row {
+.gathering-plan-page .form-row {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 16px;
 }
 
-.selected-location {
+.gathering-plan-page .selected-location {
   margin-top: 12px;
   padding: 12px;
   background-color: #e6f7ff;
@@ -54,18 +54,18 @@
 }
 
 /* 地图选择模态框 */
-.map-selection {
+.gathering-plan-page .map-selection {
   padding: 20px;
 }
 
-.map-tip {
+.gathering-plan-page .map-tip {
   text-align: center;
   color: #666;
   margin-bottom: 16px;
   font-size: 14px;
 }
 
-.map-placeholder {
+.gathering-plan-page .map-placeholder {
   min-height: 400px;
   display: flex;
   flex-direction: column;
@@ -77,56 +77,56 @@
   border: 2px dashed #d9d9d9;
 }
 
-.map-placeholder p {
+.gathering-plan-page .map-placeholder p {
   margin: 0;
   color: #666;
   font-size: 16px;
 }
 
-.map-placeholder svg {
+.gathering-plan-page .map-placeholder svg {
   font-size: 48px;
 }
 
-.map-note {
+.gathering-plan-page .map-note {
   font-size: 14px;
   color: #999;
   margin-top: 8px;
 }
 
 /* 操作按钮区 */
-.form-actions {
+.gathering-plan-page .form-actions {
   margin-top: 32px;
   padding-top: 24px;
   border-top: 2px solid #f0f0f0;
   text-align: center;
 }
 
-  .publish-time {
-    margin-left: 12px;
-    color: #666;
-    font-size: 14px;
+.gathering-plan-page .publish-time {
+  margin-left: 12px;
+  color: #666;
+  font-size: 14px;
 }
 
 /* 地图选择模态框 */
-.map-selection {
+.gathering-plan-page .map-selection {
   padding: 0;
   display: flex;
   flex-direction: column;
   height: 600px;
 }
 
-.map-search {
+.gathering-plan-page .map-search {
   padding: 16px;
   border-bottom: 1px solid #f0f0f0;
 }
 
-.map-tips {
+.gathering-plan-page .map-tips {
   padding: 16px;
   background-color: #fafafa;
   border-top: 1px solid #f0f0f0;
 }
 
-.map-placeholder {
+.gathering-plan-page .map-placeholder {
   min-height: 400px;
   display: flex;
   flex-direction: column;
@@ -138,39 +138,39 @@
   border: 2px dashed #d9d9d9;
 }
 
-.map-placeholder-loading {
+.gathering-plan-page .map-placeholder-loading {
   min-height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.map-placeholder p {
+.gathering-plan-page .map-placeholder p {
   margin: 0;
   color: #666;
   font-size: 16px;
 }
 
-.map-placeholder svg {
+.gathering-plan-page .map-placeholder svg {
   font-size: 48px;
   color: #999;
 }
 
-.map-note {
+.gathering-plan-page .map-note {
   font-size: 14px;
   color: #999;
   margin-top: 8px;
 }
 
 /* 搜索结果 */
-.search-results {
+.gathering-plan-page .search-results {
   max-height: 300px;
   overflow-y: auto;
   border-top: 1px solid #f0f0f0;
   background-color: #fff;
 }
 
-.search-results-header {
+.gathering-plan-page .search-results-header {
   padding: 12px 16px;
   background-color: #fafafa;
   border-bottom: 1px solid #f0f0f0;
@@ -182,11 +182,11 @@
   z-index: 10;
 }
 
-.search-results-list {
+.gathering-plan-page .search-results-list {
   padding: 8px 16px;
 }
 
-.search-result-item {
+.gathering-plan-page .search-result-item {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -197,18 +197,18 @@
   border: 1px solid transparent;
 }
 
-.search-result-item:hover {
+.gathering-plan-page .search-result-item:hover {
   background-color: #f0f2f5;
   border-color: #1890ff;
   transform: translateX(4px);
 }
 
-.search-result-item.selected {
+.gathering-plan-page .search-result-item.selected {
   background-color: #e6f7ff;
   border-color: #1890ff;
 }
 
-.search-result-icon {
+.gathering-plan-page .search-result-icon {
   width: 36px;
   height: 36px;
   display: flex;
@@ -220,24 +220,24 @@
   flex-shrink: 0;
 }
 
-.search-result-info {
+.gathering-plan-page .search-result-info {
   flex: 1;
   min-width: 0;
 }
 
-.search-result-name {
+.gathering-plan-page .search-result-name {
   font-size: 14px;
   font-weight: 500;
   color: #333;
   margin-bottom: 4px;
 }
 
-.search-result-address {
+.gathering-plan-page .search-result-address {
   font-size: 12px;
   color: #666;
 }
 
-.search-result-phone {
+.gathering-plan-page .search-result-phone {
   font-size: 12px;
   color: #999;
   display: flex;
@@ -245,20 +245,20 @@
   gap: 4px;
 }
 
-.search-result-action {
+.gathering-plan-page .search-result-action {
   width: 32px;
   text-align: center;
 }
 
 /* 地图提示 */
-.map-tips {
+.gathering-plan-page .map-tips {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-top: 12px;
 }
 
-.tip-item {
+.gathering-plan-page .tip-item {
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -267,14 +267,14 @@
   border-radius: 8px;
 }
 
-.tip-title {
+.gathering-plan-page .tip-title {
   font-size: 14px;
   font-weight: 500;
   color: #333;
   margin-bottom: 4px;
 }
 
-.tip-desc {
+.gathering-plan-page .tip-desc {
   font-size: 12px;
   color: #666;
   line-height: 1.5;
@@ -286,19 +286,19 @@
     padding: 12px;
   }
 
-  .form-row {
+  .gathering-plan-page .form-row {
     grid-template-columns: 1fr;
   }
 
-  .form-actions {
+  .gathering-plan-page .form-actions {
     flex-direction: column;
   }
 
-  .form-actions .ant-space {
+  .gathering-plan-page .form-actions .ant-space {
     width: 100%;
   }
 
-  .form-actions button {
+  .gathering-plan-page .form-actions button {
     width: 100%;
   }
 }
@@ -308,46 +308,45 @@
     padding: 8px;
   }
 
-  .form-section {
+  .gathering-plan-page .form-section {
     padding: 12px;
   }
 
-  .selected-location {
+  .gathering-plan-page .selected-location {
     padding: 8px;
   }
 
-  .map-selection {
+  .gathering-plan-page .map-selection {
     height: 400px;
   }
 
-  .map-placeholder {
+  .gathering-plan-page .map-placeholder {
     min-height: 280px;
   }
 
-  .map-placeholder-loading {
+  .gathering-plan-page .map-placeholder-loading {
     min-height: 280px;
   }
 
-  .map-tips {
+  .gathering-plan-page .map-tips {
     grid-template-columns: 1fr;
     gap: 8px;
   }
 
-  .tip-item {
+  .gathering-plan-page .tip-item {
     padding: 8px;
   }
 
-  .search-result-item {
+  .gathering-plan-page .search-result-item {
     padding: 8px;
   }
 
-  .form-actions button {
+  .gathering-plan-page .form-actions button {
     min-height: 44px;
     font-size: 15px;
   }
 
-  .publish-alert {
+  .gathering-plan-page .publish-alert {
     margin-bottom: 16px;
   }
 }
-

@@ -5,6 +5,7 @@ import { ArrowLeftOutlined, EnvironmentOutlined, PhoneOutlined, SaveOutlined, Se
 import { getGatheringPlan, updateGatheringPlan, publishGatheringPlan } from '../../../api/activity'
 import MapView from '../../../components/MapView/MapView'
 import { generateLocationUrl } from '../../../utils/map'
+import { DEFAULT_MAP_CENTER } from '../../../utils/constants'
 import dayjs from 'dayjs'
 import './GatheringPlan.css'
 
@@ -48,7 +49,6 @@ function GatheringPlan() {
   // 地图初始化
   const handleMapLoad = (mapInstance) => {
     setMap(mapInstance)
-    console.log('地图加载完成')
   }
 
   // 搜索地点
@@ -90,7 +90,6 @@ function GatheringPlan() {
         }
       })
     } catch (error) {
-      console.error('搜索失败:', error)
       message.error('搜索失败，请重试')
     }
   }
@@ -138,7 +137,6 @@ function GatheringPlan() {
         }
       }
     } catch (error) {
-      console.error('获取集合方案失败:', error)
       message.error('获取集合方案失败')
     } finally {
       setLoading(false)
@@ -236,7 +234,6 @@ function GatheringPlan() {
       await updateGatheringPlan(id, submitData)
       message.success('保存草稿成功')
     } catch (error) {
-      console.error('保存失败:', error)
       message.error('保存失败，请重试')
     } finally {
       setSubmitting(false)
@@ -254,7 +251,6 @@ function GatheringPlan() {
       // 刷新数据
       await fetchGatheringData()
     } catch (error) {
-      console.error('发布失败:', error)
       message.error('发布失败，请重试')
     } finally {
       setSubmitting(false)
@@ -549,10 +545,7 @@ function GatheringPlan() {
                       center={selectedLocation ? {
                         lng: selectedLocation.lng,
                         lat: selectedLocation.lat
-                      } : {
-                        lng: 116.397428,
-                        lat: 39.90923
-                      }}
+                      } : DEFAULT_MAP_CENTER}
                       zoom={13}
                       height="500px"
                       onMapLoad={handleMapLoad}

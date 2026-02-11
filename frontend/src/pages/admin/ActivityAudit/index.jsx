@@ -82,13 +82,11 @@ function ActivityAudit() {
           else if (status === 2) counts.approved = count
           else if (status === 6) counts.rejected = count
         } catch (e) {
-          console.error(`获取状态${status}统计失败:`, e)
         }
       }
 
       setStats(counts)
     } catch (error) {
-      console.error('获取统计数据失败:', error)
     }
   }
 
@@ -132,7 +130,6 @@ function ActivityAudit() {
         }))
       }
     } catch (error) {
-      console.error('获取活动列表失败:', error)
       message.error('获取活动列表失败')
     } finally {
       setLoading(false)

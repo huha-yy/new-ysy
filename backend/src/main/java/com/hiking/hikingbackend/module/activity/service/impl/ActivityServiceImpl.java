@@ -21,6 +21,7 @@ import com.hiking.hikingbackend.module.route.entity.Route;
 import com.hiking.hikingbackend.module.route.mapper.RouteMapper;
 import com.hiking.hikingbackend.module.user.entity.User;
 import com.hiking.hikingbackend.module.user.mapper.UserMapper;
+import com.hiking.hikingbackend.module.message.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,8 @@ public class ActivityServiceImpl implements ActivityService {
 
     private final RegistrationMapper registrationMapper;
 
+    private final MessageService messageService;
+
     private static final int STATUS_DRAFT = 0;      // 草稿
     private static final int STATUS_PENDING = 1;    // 待审核
     private static final int STATUS_PUBLISHED = 2;   // 已发布
@@ -56,6 +59,8 @@ public class ActivityServiceImpl implements ActivityService {
     private static final int STATUS_ENDED = 4;     // 已结束
     private static final int STATUS_CANCELLED = 5;   // 已取消
     private static final int STATUS_REJECTED = 6;   // 已驳回
+    private static final int MESSAGE_TYPE_ACTIVITY = 3; // 活动通知
+    private static final int REG_STATUS_APPROVED = 1;   // 报名已通过
 
     /**
      * 活动列表（分页查询）
@@ -407,8 +412,12 @@ public class ActivityServiceImpl implements ActivityService {
         // 4. 更新状态为已取消
         activity.setStatus(STATUS_CANCELLED);
         activityMapper.updateById(activity);
-        
+
         log.info("取消活动成功，活动ID：{}", activityId);
+
+        // 5. 通知所有已通过审核的参与者
+        notifyApprovedParticipants(activityId, "活动已取消",
+            "您报名的活动《" + activity.getTitle() + "》已被组织者取消，请知悉。");
     }
 
     /**
@@ -522,6 +531,7 @@ public class ActivityServiceImpl implements ActivityService {
                 .routeName(routeName)
                 .activityDate(activity.getActivityDate())
                 .startTime(activity.getStartTime() != null ? activity.getStartTime().toString() : null)
+                .endTime(activity.getEndTime() != null ? activity.getEndTime().toString() : null)
                 .difficultyLevel(activity.getDifficultyLevel())
                 .difficultyText(getDifficultyText(activity.getDifficultyLevel()))
                 .fee(activity.getFee())
@@ -732,6 +742,7 @@ public class ActivityServiceImpl implements ActivityService {
             vo.setDifficultyText(getDifficultyText(activity.getDifficultyLevel()));
             vo.setActivityDate(activity.getActivityDate());
             vo.setStartTime(activity.getStartTime() != null ? activity.getStartTime().toString() : null);
+            vo.setEndTime(activity.getEndTime() != null ? activity.getEndTime().toString() : null);
             vo.setMaxParticipants(activity.getMaxParticipants());
             vo.setCurrentParticipants(activity.getCurrentParticipants());
             vo.setIsFull(activity.getCurrentParticipants() != null && 
@@ -826,6 +837,7 @@ public class ActivityServiceImpl implements ActivityService {
             vo.setDifficultyText(getDifficultyText(activity.getDifficultyLevel()));
             vo.setActivityDate(activity.getActivityDate());
             vo.setStartTime(activity.getStartTime() != null ? activity.getStartTime().toString() : null);
+            vo.setEndTime(activity.getEndTime() != null ? activity.getEndTime().toString() : null);
             vo.setMaxParticipants(activity.getMaxParticipants());
             vo.setCurrentParticipants(activity.getCurrentParticipants());
             vo.setIsFull(activity.getCurrentParticipants() != null &&
@@ -895,6 +907,10 @@ public class ActivityServiceImpl implements ActivityService {
         activityMapper.updateById(activity);
 
         log.info("活动启动成功，活动ID：{}，操作人ID：{}", activityId, operatorId);
+
+        // 6. 通知所有已通过审核的参与者
+        notifyApprovedParticipants(activityId, "活动已开始",
+            "您报名的活动《" + activity.getTitle() + "》已正式开始，请按时前往集合地点。");
     }
 
     /**
@@ -924,6 +940,36 @@ public class ActivityServiceImpl implements ActivityService {
         activityMapper.updateById(activity);
 
         log.info("活动结束成功，活动ID：{}，操作人ID：{}", activityId, operatorId);
+
+        // 5. 通知所有已通过审核的参与者
+        notifyApprovedParticipants(activityId, "活动已结束",
+            "您参加的活动《" + activity.getTitle() + "》已结束，欢迎前往评价页面分享您的体验。");
+    }
+
+    /**
+     * 通知所有已通过审核的参与者
+     */
+    private void notifyApprovedParticipants(Long activityId, String title, String content) {
+        try {
+            LambdaQueryWrapper<Registration> regWrapper = new LambdaQueryWrapper<>();
+            regWrapper.eq(Registration::getActivityId, activityId)
+                      .eq(Registration::getStatus, REG_STATUS_APPROVED);
+            List<Registration> approvedList = registrationMapper.selectList(regWrapper);
+
+            for (Registration reg : approvedList) {
+                try {
+                    messageService.sendMessage(
+                        reg.getUserId(), title, content,
+                        MESSAGE_TYPE_ACTIVITY, activityId, "activity"
+                    );
+                } catch (Exception e) {
+                    log.warn("发送活动通知失败，用户ID：{}，错误：{}", reg.getUserId(), e.getMessage());
+                }
+            }
+            log.info("活动通知发送完成，活动ID：{}，通知 {} 位参与者", activityId, approvedList.size());
+        } catch (Exception e) {
+            log.warn("查询参与者列表失败，无法发送活动通知：{}", e.getMessage());
+        }
     }
 
     /**

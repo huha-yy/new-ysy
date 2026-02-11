@@ -1,7 +1,9 @@
 package com.hiking.hikingbackend.module.review.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.hiking.hikingbackend.common.exception.BusinessException;
 import com.hiking.hikingbackend.common.result.Result;
+import com.hiking.hikingbackend.common.result.ResultCode;
 import com.hiking.hikingbackend.common.utils.SecurityUtils;
 import com.hiking.hikingbackend.module.review.dto.ReviewCreateDTO;
 import com.hiking.hikingbackend.module.review.service.ReviewService;
@@ -48,7 +50,7 @@ public class ReviewController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         Long reviewId = reviewService.submitReview(userId, activityId, createDTO);
@@ -108,7 +110,7 @@ public class ReviewController {
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
         IPage<ReviewVO> page = reviewService.getUserReviews(userId, pageNum, pageSize);
         return Result.success(page);
@@ -125,7 +127,7 @@ public class ReviewController {
     public Result<com.hiking.hikingbackend.module.review.vo.ReviewStatsVO> getMyReviewStats() {
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
         com.hiking.hikingbackend.module.review.vo.ReviewStatsVO statsVO = reviewService.getUserReviewStats(userId);
         return Result.success(statsVO);
@@ -145,7 +147,7 @@ public class ReviewController {
             @PathVariable("reviewId") Long reviewId) {
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
         reviewService.deleteReview(userId, reviewId);
         return Result.success("删除成功");
@@ -167,7 +169,7 @@ public class ReviewController {
             @Valid @RequestBody ReviewCreateDTO createDTO) {
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
         reviewService.updateReview(userId, reviewId, createDTO);
         return Result.success("更新成功");

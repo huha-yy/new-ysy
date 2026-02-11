@@ -30,7 +30,6 @@ function Gathering() {
       const result = await getGatheringPlan(id)
       setGathering(result)
     } catch (error) {
-      console.error('获取集合方案失败:', error)
       message.error('获取集合方案失败')
     } finally {
       setLoading(false)

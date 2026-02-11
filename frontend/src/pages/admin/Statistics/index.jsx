@@ -55,7 +55,6 @@ function Statistics() {
         // 处理真实数据
       }
     } catch (error) {
-      console.error('获取统计数据失败:', error)
     } finally {
       // 使用模拟数据
       setStatsData({

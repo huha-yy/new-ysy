@@ -52,3 +52,9 @@ export const CHECKIN_STATUS = {
   PENDING: 0,  // 待签到
   COMPLETED: 1 // 已签到
 }
+
+// 默认地图中心坐标（北京天安门）
+export const DEFAULT_MAP_CENTER = {
+  lng: 116.397428,
+  lat: 39.90923
+}

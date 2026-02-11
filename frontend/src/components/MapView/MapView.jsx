@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { loadAmapScript } from '../../utils/map'
+import { DEFAULT_MAP_CENTER } from '../../utils/constants'
 import { Spin } from 'antd'
 import './MapView.css'
 
@@ -19,7 +20,7 @@ import './MapView.css'
  * @param {boolean} props.allowCenterChange - 是否允许动态改变地图中心（默认true）
  */
 const MapView = ({
-  center = { lng: 116.397428, lat: 39.90923 },
+  center = DEFAULT_MAP_CENTER,
   zoom = 13,
   width = '100%',
   height = '400px',
@@ -113,7 +114,7 @@ const MapView = ({
       const lat = parseFloat(center.lat)
       const mapCenter = (!isNaN(lng) && !isNaN(lat) && lng !== 0 && lat !== 0)
         ? [lng, lat]
-        : [116.397428, 39.90923] // 默认北京坐标
+        : [DEFAULT_MAP_CENTER.lng, DEFAULT_MAP_CENTER.lat] // 默认坐标
 
       // 创建地图实例
       mapInstance.current = new AMap.Map(mapRef.current, {
@@ -139,7 +140,6 @@ const MapView = ({
         onMapLoad(mapInstance.current)
       }
     } catch (error) {
-      console.error('地图初始化失败:', error)
       setLoading(false)
     }
   }
@@ -166,7 +166,6 @@ const MapView = ({
         }
       })
     } catch (error) {
-      console.error('获取当前位置失败:', error)
     }
   }
 
@@ -192,7 +191,6 @@ const MapView = ({
         })
       }
     } catch (error) {
-      console.error('⚠️ 清除标记点时出错:', error)
     }
 
     // 渲染新的标记点
@@ -202,7 +200,6 @@ const MapView = ({
       const lat = parseFloat(markerData.lat)
 
       if (isNaN(lng) || isNaN(lat) || lng === 0 || lat === 0) {
-        console.warn(`⚠️ 标记点 ${index + 1} 坐标无效:`, markerData)
         return
       }
 
@@ -232,7 +229,6 @@ const MapView = ({
 
         marker.setMap(mapInstance.current)
       } catch (error) {
-        console.error(`⚠️ 渲染标记点 ${index + 1} 失败:`, error)
       }
     })
 
@@ -262,14 +258,12 @@ const MapView = ({
           const lng = parseFloat(point.lng)
           const lat = parseFloat(point.lat)
           if (isNaN(lng) || isNaN(lat) || lng === 0 || lat === 0) {
-            console.warn(`⚠️ 路线点坐标无效:`, point)
             return null
           }
           return [lng, lat]
         }).filter(point => point !== null)
 
         if (path.length < 2) {
-          console.warn('⚠️ 有效路线点少于2个，无法绘制路线')
           return
         }
 
@@ -292,7 +286,6 @@ const MapView = ({
         }
 
       } catch (error) {
-        console.error('⚠️ 绘制路线时出错:', error)
       }
     }
   }

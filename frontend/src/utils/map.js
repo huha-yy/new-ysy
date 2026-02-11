@@ -143,11 +143,6 @@ export const getCurrentLocation = () => {
         // 进行坐标系转换（WGS84转GCJ02）
         const converted = wgs84ToGcj02(originalLng, originalLat)
 
-        console.log('浏览器定位成功:')
-        console.log('原始坐标(WGS84):', { latitude: originalLat, longitude: originalLng })
-        console.log('转换坐标(GCJ02):', { latitude: converted.lat, longitude: converted.lng })
-        console.log('精度:', position.coords.accuracy + '米')
-
         resolve({
           latitude: converted.lat,
           longitude: converted.lng,
@@ -170,7 +165,6 @@ export const getCurrentLocation = () => {
             errorMessage = '定位请求超时'
             break
         }
-        console.error('浏览器定位失败:', error)
         reject(new Error(errorMessage))
       },
       options
@@ -197,12 +191,6 @@ export const getAmapLocation = () => {
 
     geolocation.getCurrentPosition((status, result) => {
       if (status === 'complete') {
-        console.log('高德地图定位成功:', {
-          latitude: result.position.lat,
-          longitude: result.position.lng,
-          accuracy: result.accuracy,
-          address: result.formattedAddress
-        })
         resolve({
           latitude: result.position.lat,
           longitude: result.position.lng,
@@ -215,7 +203,6 @@ export const getAmapLocation = () => {
           coordinateSystem: 'GCJ02 (高德原生)'
         })
       } else {
-        console.error('高德地图定位失败:', result.message)
         reject(new Error('定位失败: ' + result.message))
       }
     })

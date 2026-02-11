@@ -1,6 +1,8 @@
 package com.hiking.hikingbackend.module.user.controller;
 
+import com.hiking.hikingbackend.common.exception.BusinessException;
 import com.hiking.hikingbackend.common.result.Result;
+import com.hiking.hikingbackend.common.result.ResultCode;
 import com.hiking.hikingbackend.common.utils.SecurityUtils;
 import com.hiking.hikingbackend.module.user.dto.UserProfileDTO;
 import com.hiking.hikingbackend.module.user.service.UserService;
@@ -42,7 +44,7 @@ public class UserController {
         // 从 SecurityContext 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         UserVO userVO = userService.getCurrentUser(userId);
@@ -62,7 +64,7 @@ public class UserController {
         // 从 SecurityContext 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         userService.updateUserProfile(userId, profileDTO);
@@ -81,7 +83,7 @@ public class UserController {
         // 从 SecurityContext 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         UserProfileVO userProfileVO = userService.getUserProfile(userId);
@@ -97,7 +99,7 @@ public class UserController {
     public Result<UserStatsVO> getUserStats() {
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
         UserStatsVO stats = userService.getUserStats(userId);
         return Result.success(stats);

@@ -1,6 +1,8 @@
 package com.hiking.hikingbackend.module.checkin.controller;
 
+import com.hiking.hikingbackend.common.exception.BusinessException;
 import com.hiking.hikingbackend.common.result.Result;
+import com.hiking.hikingbackend.common.result.ResultCode;
 import com.hiking.hikingbackend.common.utils.SecurityUtils;
 import com.hiking.hikingbackend.module.checkin.dto.CheckInDTO;
 import com.hiking.hikingbackend.module.checkin.dto.TrackRecordDTO;
@@ -54,7 +56,7 @@ public class CheckInController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         CheckInVO checkInVO = checkInService.performCheckIn(userId, activityId, checkInDTO);
@@ -77,7 +79,7 @@ public class CheckInController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         CheckInProgressVO progressVO = checkInService.getCheckInStatus(userId, activityId);
@@ -100,7 +102,7 @@ public class CheckInController {
         // 获取当前用户ID（可扩展用于权限校验）
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         List<Checkpoint> checkpoints = checkInService.getCheckpointsByActivity(activityId);
@@ -121,7 +123,7 @@ public class CheckInController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         checkInService.batchUploadTracks(userId, trackRecords);
@@ -144,7 +146,7 @@ public class CheckInController {
         // 获取当前用户ID
         Long organizerId = SecurityUtils.getCurrentUserId();
         if (organizerId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         List<CheckInProgressVO> participantsStatus = checkInService.getParticipantsCheckInStatus(organizerId, activityId);
@@ -167,7 +169,7 @@ public class CheckInController {
         // 获取当前用户ID
         Long organizerId = SecurityUtils.getCurrentUserId();
         if (organizerId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         List<ParticipantCheckInVO> participantsStatus = checkInService.getParticipantsCheckInWithUser(organizerId, activityId);
@@ -190,7 +192,7 @@ public class CheckInController {
         // 获取当前用户ID
         Long organizerId = SecurityUtils.getCurrentUserId();
         if (organizerId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         List<CheckpointStatsVO> checkpointStats = checkInService.getCheckpointStats(organizerId, activityId);

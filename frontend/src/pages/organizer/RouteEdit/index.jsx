@@ -78,8 +78,6 @@ function RouteEdit() {
       setFetching(true)
       const data = await getRouteDetail(id)
 
-      console.log('🔍 获取到的路线数据：', data)
-
       // 设置表单数据
       const formData = {
         name: data.name,
@@ -105,18 +103,15 @@ function RouteEdit() {
 
       // 转换路线点格式
       if (data.routePoints && data.routePoints.length > 0) {
-        console.log('🔍 原始路线点数据：', data.routePoints)
         const points = data.routePoints.map(point => ({
           lat: point.latitude,
           lng: point.longitude
         }))
-        console.log('🔍 转换后路线点：', points)
         setRoutePoints(points)
       }
 
       // 转换签到点格式
       if (data.checkpoints && data.checkpoints.length > 0) {
-        console.log('🔍 原始签到点数据：', data.checkpoints)
         const cps = data.checkpoints.map(cp => ({
           lat: parseFloat(cp.latitude),
           lng: parseFloat(cp.longitude),
@@ -126,13 +121,11 @@ function RouteEdit() {
           type: cp.checkpointType, // 修复：使用 checkpointType 而不是 type
           isRequired: cp.isRequired
         }))
-        console.log('🔍 转换后签到点：', cps)
         setCheckpoints(cps)
       }
 
       // 转换途经点格式
       if (data.waypoints && data.waypoints.length > 0) {
-        console.log('🔍 原始途经点数据：', data.waypoints)
         const wps = data.waypoints.map(wp => ({
           lat: parseFloat(wp.latitude),
           lng: parseFloat(wp.longitude),
@@ -140,41 +133,33 @@ function RouteEdit() {
           pointType: wp.pointType,
           sequence: wp.sequence
         }))
-        console.log('🔍 转换后途经点：', wps)
         setWaypoints(wps)
       }
 
       // 设置起点
       if (data.startPoint) {
-        console.log('🔍 原始起点数据：', data.startPoint)
         const startPt = {
           lat: parseFloat(data.startPoint.latitude),
           lng: parseFloat(data.startPoint.longitude),
           name: data.startPoint.name || '起点'
         }
-        console.log('🔍 转换后起点：', startPt)
         setStartPoint(startPt)
       } else {
-        console.log('🔍 没有起点数据')
       }
 
       // 设置终点
       if (data.endPoint) {
-        console.log('🔍 原始终点数据：', data.endPoint)
         const endPt = {
           lat: parseFloat(data.endPoint.latitude),
           lng: parseFloat(data.endPoint.longitude),
           name: data.endPoint.name || '终点'
         }
-        console.log('🔍 转换后终点：', endPt)
         setEndPoint(endPt)
       } else {
-        console.log('🔍 没有终点数据')
       }
 
       // 转换风险点格式
       if (data.riskPoints && data.riskPoints.length > 0) {
-        console.log('🔍 原始风险点数据：', data.riskPoints)
         const rps = data.riskPoints.map(rp => ({
           lat: parseFloat(rp.latitude),
           lng: parseFloat(rp.longitude),
@@ -185,13 +170,11 @@ function RouteEdit() {
           pointType: rp.pointType,
           sequence: rp.sequence
         }))
-        console.log('🔍 转换后风险点：', rps)
         setRiskPoints(rps)
       }
 
       // 转换休息点格式
       if (data.restPoints && data.restPoints.length > 0) {
-        console.log('🔍 原始休息点数据：', data.restPoints)
         const rps = data.restPoints.map(rp => ({
           lat: parseFloat(rp.latitude),
           lng: parseFloat(rp.longitude),
@@ -200,13 +183,11 @@ function RouteEdit() {
           pointType: rp.pointType,
           sequence: rp.sequence
         }))
-        console.log('🔍 转换后休息点：', rps)
         setRestPoints(rps)
       }
 
       // 转换补给点格式
       if (data.supplyPoints && data.supplyPoints.length > 0) {
-        console.log('🔍 原始补给点数据：', data.supplyPoints)
         const sps = data.supplyPoints.map(sp => ({
           lat: parseFloat(sp.latitude),
           lng: parseFloat(sp.longitude),
@@ -215,11 +196,9 @@ function RouteEdit() {
           pointType: sp.pointType,
           sequence: sp.sequence
         }))
-        console.log('🔍 转换后补给点：', sps)
         setSupplyPoints(sps)
       }
     } catch (error) {
-      console.error('获取路线详情失败:', error)
       message.error('获取路线详情失败')
       navigate('/organizer/routes')
     } finally {
@@ -249,7 +228,6 @@ function RouteEdit() {
 
       setCurrentStep(currentStep + 1)
     } catch (error) {
-      console.error('验证失败:', error)
     }
   }
 
@@ -319,13 +297,10 @@ function RouteEdit() {
         }))
       }
 
-      console.log('🚀 提交的数据：', submitData)
-
       await updateRoute(id, submitData)
       message.success('路线更新成功！')
       navigate('/organizer/routes')
     } catch (error) {
-      console.error('更新路线失败:', error)
       message.error('更新路线失败，请重试')
     } finally {
       setLoading(false)
@@ -359,17 +334,14 @@ function RouteEdit() {
   }, [])
 
   const handleRiskPointsChange = useCallback((points) => {
-    console.log('✓ 风险点更新:', points?.length, '个点')
     setRiskPoints(points)
   }, [])
 
   const handleRestPointsChange = useCallback((points) => {
-    console.log('✓ 休息点更新:', points?.length, '个点')
     setRestPoints(points)
   }, [])
 
   const handleSupplyPointsChange = useCallback((points) => {
-    console.log('✓ 补给点更新:', points?.length, '个点')
     setSupplyPoints(points)
   }, [])
 

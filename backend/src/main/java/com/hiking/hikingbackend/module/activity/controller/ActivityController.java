@@ -1,7 +1,9 @@
 package com.hiking.hikingbackend.module.activity.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.hiking.hikingbackend.common.exception.BusinessException;
 import com.hiking.hikingbackend.common.result.Result;
+import com.hiking.hikingbackend.common.result.ResultCode;
 import com.hiking.hikingbackend.common.utils.SecurityUtils;
 import com.hiking.hikingbackend.module.activity.dto.ActivityAuditDTO;
 import com.hiking.hikingbackend.module.activity.dto.ActivityCreateDTO;
@@ -79,7 +81,7 @@ public class ActivityController {
         // 获取当前用户ID
         Long organizerId = SecurityUtils.getCurrentUserId();
         if (organizerId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         Long activityId = activityService.createActivity(organizerId, createDTO);
@@ -104,7 +106,7 @@ public class ActivityController {
         // 获取当前用户ID
         Long organizerId = SecurityUtils.getCurrentUserId();
         if (organizerId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         activityService.updateActivity(organizerId, activityId, updateDTO);
@@ -127,7 +129,7 @@ public class ActivityController {
         // 获取当前用户ID
         Long organizerId = SecurityUtils.getCurrentUserId();
         if (organizerId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         activityService.submitForAudit(organizerId, activityId);
@@ -152,7 +154,7 @@ public class ActivityController {
         // 获取当前用户ID
         Long auditorId = SecurityUtils.getCurrentUserId();
         if (auditorId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         // 将路径参数中的活动ID设置到DTO中
@@ -178,7 +180,7 @@ public class ActivityController {
         // 获取当前用户ID
         Long organizerId = SecurityUtils.getCurrentUserId();
         if (organizerId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         activityService.deleteActivity(organizerId, activityId);
@@ -201,7 +203,7 @@ public class ActivityController {
         // 获取当前用户ID
         Long organizerId = SecurityUtils.getCurrentUserId();
         if (organizerId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         activityService.cancelActivity(organizerId, activityId);
@@ -221,7 +223,7 @@ public class ActivityController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         // 查询当前用户发布的活动
@@ -242,7 +244,7 @@ public class ActivityController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         // 查询当前用户参与的活动
@@ -268,7 +270,7 @@ public class ActivityController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         Long registrationId = activityService.registerActivity(activityId, userId, createDTO);
@@ -292,7 +294,7 @@ public class ActivityController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         activityService.startActivity(activityId, userId);
@@ -316,7 +318,7 @@ public class ActivityController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         activityService.endActivity(activityId, userId);

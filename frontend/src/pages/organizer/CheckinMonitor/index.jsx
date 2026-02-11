@@ -20,6 +20,7 @@ import { getActivityDetail } from '../../../api/activity'
 import { getParticipantsCheckin, getCheckpointStats } from '../../../api/checkin'
 import dayjs from 'dayjs'
 import MapView from '../../../components/MapView/MapView'
+import { DEFAULT_MAP_CENTER } from '../../../utils/constants'
 import './CheckinMonitor.css'
 
 function CheckinMonitor() {
@@ -31,7 +32,7 @@ function CheckinMonitor() {
   const [checkpointStats, setCheckpointStats] = useState([])
   const [participants, setParticipants] = useState([])
   const [refreshing, setRefreshing] = useState(false)
-  const [mapCenter, setMapCenter] = useState({ lng: 116.397428, lat: 39.90923 })
+  const [mapCenter, setMapCenter] = useState(DEFAULT_MAP_CENTER)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
 
   useEffect(() => {
@@ -51,7 +52,6 @@ function CheckinMonitor() {
       ])
       setIsInitialLoad(false)
     } catch (error) {
-      console.error('获取数据失败:', error)
     } finally {
       setLoading(false)
     }

@@ -20,7 +20,6 @@ function MyRegistrations() {
       const result = await getMyRegistrations({ pageNum: 1, pageSize: 20 })
       setRegistrations(result.records || [])
     } catch (error) {
-      console.error('获取报名列表失败:', error)
     } finally {
       setLoading(false)
     }
@@ -40,7 +39,6 @@ function MyRegistrations() {
           message.success('取消报名成功')
           fetchRegistrations()
         } catch (error) {
-          console.error('取消报名失败:', error)
           message.error(error.response?.data?.message || '取消报名失败')
         }
       }

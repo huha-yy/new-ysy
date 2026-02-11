@@ -1,7 +1,9 @@
 package com.hiking.hikingbackend.module.registration.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.hiking.hikingbackend.common.exception.BusinessException;
 import com.hiking.hikingbackend.common.result.Result;
+import com.hiking.hikingbackend.common.result.ResultCode;
 import com.hiking.hikingbackend.common.utils.SecurityUtils;
 import com.hiking.hikingbackend.module.registration.dto.RegistrationAuditDTO;
 import com.hiking.hikingbackend.module.registration.dto.RegistrationCreateDTO;
@@ -46,7 +48,7 @@ public class RegistrationController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         Long registrationId = registrationService.submitRegistration(userId, createDTO);
@@ -71,7 +73,7 @@ public class RegistrationController {
         // 获取当前用户ID
         Long organizerId = SecurityUtils.getCurrentUserId();
         if (organizerId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         // 将路径参数中的报名ID设置到DTO中
@@ -97,7 +99,7 @@ public class RegistrationController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         registrationService.cancelRegistration(userId, registrationId);
@@ -122,7 +124,7 @@ public class RegistrationController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         // 强制按活动ID查询
@@ -146,7 +148,7 @@ public class RegistrationController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         IPage<RegistrationVO> page = registrationService.getMyRegistrations(userId, query);

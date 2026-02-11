@@ -46,7 +46,6 @@ function Review() {
       message.success('评价提交成功')
       navigate(`/activities/${id}`)
     } catch (error) {
-      console.error('评价提交失败:', error)
       message.error('评价提交失败，请重试')
     } finally {
       setLoading(false)
@@ -67,7 +66,6 @@ function Review() {
       setUploadedImages(newImages)
       message.success('图片上传成功')
     } catch (error) {
-      console.error('图片上传失败:', error)
       message.error('图片上传失败')
     } finally {
       setUploading(false)

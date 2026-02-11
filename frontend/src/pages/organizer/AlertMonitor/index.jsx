@@ -7,7 +7,6 @@ import { getActivityDetail } from '../../../api/activity'
 import './AlertMonitor.css'
 
 const { TextArea } = Input
-const { TabPane } = Tabs
 
 // 预警类型配置
 const ALERT_TYPE_CONFIG = {
@@ -67,7 +66,6 @@ function AlertMonitor() {
       const res = await getAlertStats(id)
       setStats(res.data)
     } catch (error) {
-      console.error('获取预警统计失败', error)
     }
   }
 
@@ -241,13 +239,13 @@ function AlertMonitor() {
 
       {/* 预警列表 */}
       <Card title="预警列表" className="alert-list-card">
-        <Tabs activeKey={activeTab} onChange={handleTabChange}>
-          <TabPane tab={<Badge count={stats?.pendingCount || 0} offset={[10, 0]}>未处理</Badge>} key="0" />
-          <TabPane tab={<Badge count={stats?.processingCount || 0} offset={[10, 0]}>处理中</Badge>} key="1" />
-          <TabPane tab="已处理" key="2" />
-          <TabPane tab="已忽略" key="3" />
-          <TabPane tab="全部" key="all" />
-        </Tabs>
+        <Tabs activeKey={activeTab} onChange={handleTabChange} items={[
+          { key: '0', label: <Badge count={stats?.pendingCount || 0} offset={[10, 0]}>未处理</Badge> },
+          { key: '1', label: <Badge count={stats?.processingCount || 0} offset={[10, 0]}>处理中</Badge> },
+          { key: '2', label: '已处理' },
+          { key: '3', label: '已忽略' },
+          { key: 'all', label: '全部' },
+        ]} />
 
         <Spin spinning={loading}>
           {alerts.length > 0 ? (

@@ -68,7 +68,6 @@ export const forceGpsLocation = () => {
       return
     }
 
-    console.log('开始强制GPS定位诊断...')
     const startTime = Date.now()
 
     navigator.geolocation.getCurrentPosition(
@@ -91,12 +90,6 @@ export const forceGpsLocation = () => {
           source: position.coords.accuracy < 100 ? 'GPS' : 'Network'
         }
 
-        console.log('强制GPS定位完成:', {
-          originalCoords: { lat: originalLat, lng: originalLng },
-          convertedCoords: { lat: converted.lat, lng: converted.lng },
-          diagnostics
-        })
-
         resolve({
           latitude: converted.lat,
           longitude: converted.lng,
@@ -109,7 +102,6 @@ export const forceGpsLocation = () => {
         })
       },
       (error) => {
-        console.error('强制GPS定位失败:', error)
         let errorMessage = '强制GPS定位失败'
         switch (error.code) {
           case error.PERMISSION_DENIED:
@@ -138,8 +130,6 @@ export const locationDiagnostics = async () => {
   const results = []
 
   try {
-    console.log('开始定位诊断...')
-
     // 1. 普通浏览器定位
     try {
       const browserResult = await getBrowserLocation()
@@ -192,22 +182,18 @@ export const locationDiagnostics = async () => {
 
     return results
   } catch (error) {
-    console.error('定位诊断失败:', error)
     return results
   }
 }
 export const getLocation = async () => {
   // 优先使用浏览器GPS定位（精度更高），高德作为降级方案
   try {
-    console.log('尝试使用浏览器GPS定位（优先）...')
     const browserLocation = await getBrowserLocation()
-    console.log('浏览器GPS定位成功:', browserLocation)
     return {
       ...browserLocation,
       method: 'browser'
     }
   } catch (browserError) {
-    console.warn('浏览器GPS定位失败，降级使用高德定位:', browserError.message)
     try {
       // 确保高德地图API已加载
       if (!window.AMap) {
@@ -216,13 +202,11 @@ export const getLocation = async () => {
       }
 
       const amapLocation = await getAmapLocation()
-      console.log('高德地图定位成功:', amapLocation)
       return {
         ...amapLocation,
         method: 'amap'
       }
     } catch (amapError) {
-      console.error('所有定位方式都失败了:', amapError.message)
       let errorMessage = '定位失败'
       if (browserError.message.includes('用户拒绝')) {
         errorMessage = '请允许浏览器获取您的位置信息，并确保设备GPS功能已开启'
@@ -365,7 +349,6 @@ export class TrackRecorder {
    */
   start(onTrack, onError) {
     if (this.isRecording) {
-      console.warn('轨迹记录已在进行中')
       return
     }
 
@@ -404,7 +387,6 @@ export class TrackRecorder {
         }
       },
       (error) => {
-        console.error('轨迹记录错误:', error)
         if (onError) {
           onError(error)
         }
@@ -471,7 +453,6 @@ export class TrackRecorder {
         // 上传成功后清空已上传的轨迹
         this.tracks = []
       } catch (error) {
-        console.error('轨迹上传失败:', error)
       }
     }
   }

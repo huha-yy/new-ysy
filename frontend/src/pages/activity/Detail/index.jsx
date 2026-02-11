@@ -56,7 +56,6 @@ function ActivityDetail() {
       const result = await getActivityDetail(id)
       setActivity(result)
     } catch (error) {
-      console.error('获取活动详情失败:', error)
       message.error('获取活动详情失败')
     } finally {
       setLoading(false)
@@ -82,7 +81,6 @@ function ActivityDetail() {
       const myReg = result.records?.find(r => r.userId === currentUser.id)
       setMyRegistration(myReg || null)
     } catch (error) {
-      console.error('查询报名记录失败:', error)
       setMyRegistration(null)
     }
   }
@@ -171,7 +169,6 @@ function ActivityDetail() {
         navigate('/user/registrations')
       }, 1500)
     } catch (error) {
-      console.error('报名失败:', error)
       setRegisterLoading(false)
       message.error(error.response?.data?.message || '报名失败，请重试')
     }
@@ -199,7 +196,6 @@ function ActivityDetail() {
           message.success('取消报名成功')
           fetchMyRegistration() // 重新获取报名状态
         } catch (error) {
-          console.error('取消报名失败:', error)
           message.error(error.response?.data?.message || '取消报名失败')
         }
       }

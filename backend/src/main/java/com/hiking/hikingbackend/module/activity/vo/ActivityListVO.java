@@ -59,6 +59,10 @@ public class ActivityListVO {
     @JsonFormat(pattern = "HH:mm:ss", timezone = "GMT+8")
     private String startTime;
 
+    @Schema(description = "结束时间", example = "18:00:00")
+    @JsonFormat(pattern = "HH:mm:ss", timezone = "GMT+8")
+    private String endTime;
+
     @Schema(description = "难度：1休闲 2简单 3中等 4困难 5极限", example = "2")
     private Integer difficultyLevel;
 

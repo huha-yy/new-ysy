@@ -89,13 +89,11 @@ function RegistrationManage() {
           else if (status === 3) counts.waiting = count
           else counts.cancelled = count
         } catch (e) {
-          console.error(`获取状态${status}统计失败:`, e)
         }
       }
 
       setStatusCounts(counts)
     } catch (error) {
-      console.error('获取统计数据失败:', error)
     }
   }
 
@@ -140,7 +138,6 @@ function RegistrationManage() {
         setSelectedActivity(res.records[0].id)
       }
     } catch (error) {
-      console.error('获取活动列表失败:', error)
       message.error('获取活动列表失败')
     }
   }
@@ -174,7 +171,6 @@ function RegistrationManage() {
         }))
       }
     } catch (error) {
-      console.error('获取报名列表失败:', error)
       message.error('获取报名列表失败')
     } finally {
       setLoading(false)

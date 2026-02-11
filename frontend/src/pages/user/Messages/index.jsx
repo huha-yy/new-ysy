@@ -31,7 +31,6 @@ function MyMessages() {
       setMessages(result.records || [])
       setTotal(result.total || 0)
     } catch (error) {
-      console.error('获取消息列表失败:', error)
     } finally {
       setLoading(false)
     }
@@ -43,7 +42,6 @@ function MyMessages() {
       await markMessageAsRead(item.id)
       setMessages(prev => prev.map(m => m.id === item.id ? { ...m, isRead: 1 } : m))
     } catch (error) {
-      console.error('标记已读失败:', error)
     }
   }
 
@@ -54,7 +52,6 @@ function MyMessages() {
       setMessages(prev => prev.map(m => ({ ...m, isRead: 1 })))
       message.success('已全部标记为已读')
     } catch (error) {
-      console.error('全部标记已读失败:', error)
       message.error('操作失败，请重试')
     } finally {
       setMarkingAll(false)

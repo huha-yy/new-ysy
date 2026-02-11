@@ -44,7 +44,6 @@ function HikingProfile() {
       // 可以跳转到个人中心
       // navigate('/user/profile')
     } catch (error) {
-      console.error('保存失败:', error)
       message.error('保存失败，请重试')
     } finally {
       setLoading(false)

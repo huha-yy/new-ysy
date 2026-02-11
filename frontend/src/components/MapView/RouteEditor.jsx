@@ -3,6 +3,7 @@ import { Card, Button, Space, Input, InputNumber, Tag, message, Modal, Popconfir
 import { PlusOutlined, MinusCircleOutlined, EnvironmentOutlined, FlagOutlined, EyeOutlined, AimOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import MapView from './MapView'
 import { calculateRouteDistance, formatDistance } from '../../utils/map'
+import { DEFAULT_MAP_CENTER } from '../../utils/constants'
 import './RouteEditor.css'
 
 /**
@@ -511,7 +512,6 @@ const RouteEditor = ({
       map.setBounds(bounds, false, [20, 20, 20, 20]) // 添加一些边距
       message.success('已调整地图视野')
     } catch (error) {
-      console.error('调整地图视野失败:', error)
       message.error('调整地图视野失败')
     }
   }
@@ -1318,7 +1318,7 @@ const RouteEditor = ({
       </Card>
 
       <MapView
-        center={center || { lng: 116.397428, lat: 39.90923 }}
+        center={center || DEFAULT_MAP_CENTER}
         height="500px"
         markers={allMarkers}
         routePoints={routePoints}

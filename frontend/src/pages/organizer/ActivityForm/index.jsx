@@ -63,7 +63,6 @@ function ActivityForm() {
         setRoutes(res.records || res.list || [])
       }
     } catch (error) {
-      console.error('获取路线列表失败:', error)
     } finally {
       setLoadingRoutes(false)
     }
@@ -130,7 +129,6 @@ function ActivityForm() {
         }
       }
     } catch (error) {
-      console.error('获取路线详情失败:', error)
       message.error('获取路线详情失败')
     }
   }
@@ -231,7 +229,6 @@ function ActivityForm() {
       if (error.errorFields) {
         message.error('请填写必填字段')
       } else {
-        console.error('保存失败:', error)
         message.error(error.message || '保存失败')
       }
     } finally {
@@ -289,7 +286,6 @@ function ActivityForm() {
             message.success('已提交审核，请等待管理员审核')
             navigate('/organizer/activities')
           } catch (error) {
-            console.error('提交失败:', error)
             message.error(error.message || '提交失败')
           } finally {
             setSubmitting(false)
@@ -300,7 +296,6 @@ function ActivityForm() {
       if (error.errorFields) {
         message.error('请完善所有必填信息')
       } else {
-        console.error('提交审核失败:', error)
         message.error(error.message || '提交审核失败')
       }
     }
@@ -322,7 +317,6 @@ function ActivityForm() {
       setCoverImage(result.url)
       onSuccess({ url: result.url })
     } catch (error) {
-      console.error('上传失败:', error)
       message.error(error.message || '上传失败')
       onError(error)
     }

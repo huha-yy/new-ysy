@@ -70,7 +70,6 @@ function ActivityDetail() {
         total: result.total || 0
       })
     } catch (error) {
-      console.error('获取评价列表失败:', error)
     } finally {
       setReviewLoading(false)
     }
@@ -81,7 +80,6 @@ function ActivityDetail() {
       const stats = await getActivityRatingStats(id)
       setReviewStats(stats)
     } catch (error) {
-      console.error('获取评价统计失败:', error)
     }
   }
 
@@ -93,7 +91,6 @@ function ActivityDetail() {
       const result = await getActivityDetail(id)
       setActivity(result)
     } catch (error) {
-      console.error('获取活动详情失败:', error)
       message.error('获取活动详情失败')
     } finally {
       setLoading(false)
@@ -161,7 +158,6 @@ function ActivityDetail() {
         navigate('/user/registrations')
       }, 1500)
     } catch (error) {
-      console.error('报名失败:', error)
       message.error(error.response?.data?.message || '报名失败，请重试')
     }
   }
@@ -200,7 +196,6 @@ function ActivityDetail() {
         navigate('/user/registrations')
       }, 1500)
     } catch (error) {
-      console.error('报名失败:', error)
       setRegisterLoading(false)
       message.error(error.response?.data?.message || '报名失败，请重试')
     }

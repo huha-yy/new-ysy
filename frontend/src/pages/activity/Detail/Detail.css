@@ -33,7 +33,7 @@
 }
 
 /* 🌞 活动封面 - 修复版 */
-.activity-cover {
+.activity-detail-page .activity-cover {
   width: 100%;
   height: 450px;
   position: relative;
@@ -46,7 +46,7 @@
 }
 
 /* 图片容器 */
-.cover-image {
+.activity-detail-page .cover-image {
   width: 100%;
   height: 100%;
   object-fit: contain; /* 保持图片比例，不变形 */
@@ -56,21 +56,21 @@
   animation: fadeIn 0.5s ease 0.2s forwards;
 }
 
-.cover-image.loaded {
+.activity-detail-page .cover-image.loaded {
   opacity: 1;
 }
 
-.cover-image.loading {
+.activity-detail-page .cover-image.loading {
   opacity: 0.3;
 }
 
-.cover-image.error {
+.activity-detail-page .cover-image.error {
   opacity: 0.2;
   filter: grayscale(100%);
 }
 
 /* 图片加载遮罩 */
-.image-loading-overlay {
+.activity-detail-page .image-loading-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -85,7 +85,7 @@
 }
 
 /* 图片错误遮罩 */
-.image-error-overlay {
+.activity-detail-page .image-error-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -101,19 +101,19 @@
   animation: fadeIn 0.3s ease;
 }
 
-.image-error-overlay span {
+.activity-detail-page .image-error-overlay span {
   font-size: 18px;
   color: #666;
   font-weight: 600;
 }
 
-.image-error-overlay svg {
+.activity-detail-page .image-error-overlay svg {
   font-size: 48px;
   color: #ff4d4f;
 }
 
 /* 占位图 */
-.cover-placeholder {
+.activity-detail-page .cover-placeholder {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -124,19 +124,19 @@
   background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
 }
 
-.cover-placeholder span {
+.activity-detail-page .cover-placeholder span {
   font-size: 18px;
   color: #999;
   font-weight: 600;
 }
 
-.cover-placeholder svg {
+.activity-detail-page .cover-placeholder svg {
   font-size: 64px;
   color: #ccc;
 }
 
 /* 📝 活动标题和信息 */
-.activity-header {
+.activity-detail-page .activity-header {
   background: #fff;
   padding: 32px;
   border-radius: 24px;
@@ -156,7 +156,7 @@
   }
 }
 
-.activity-title {
+.activity-detail-page .activity-title {
   font-size: 36px;
   margin-bottom: 20px;
   color: #2D3436;
@@ -164,7 +164,7 @@
   line-height: 1.4;
 }
 
-.activity-tags {
+.activity-detail-page .activity-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -172,7 +172,7 @@
 }
 
 /* 📋 Tab 内容 */
-.activity-tabs {
+.activity-detail-page .activity-tabs {
   background: #fff;
   padding: 24px;
   border-radius: 24px;
@@ -181,11 +181,11 @@
   animation: slideUp 0.8s ease 0.4s;
 }
 
-.tab-content {
+.activity-detail-page .tab-content {
   padding: 16px 0;
 }
 
-.description-content {
+.activity-detail-page .description-content {
   line-height: 1.9;
   color: #636E72;
   font-size: 16px;
@@ -195,7 +195,7 @@
   border-left: 4px solid #FFA726;
 }
 
-.organizer-avatar {
+.activity-detail-page .organizer-avatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -204,14 +204,14 @@
   box-shadow: 0 2px 8px rgba(255, 167, 38, 0.2);
 }
 
-.organizer-name {
+.activity-detail-page .organizer-name {
   font-size: 16px;
   color: #2D3436;
   font-weight: 600;
 }
 
 /* 🗺️ 路线地图 */
-.route-map {
+.activity-detail-page .route-map {
   margin-top: 32px;
   height: 450px;
   background: linear-gradient(135deg, #FFE8CC 0%, #FFF9E6 100%);
@@ -223,7 +223,7 @@
   animation: fadeIn 0.8s ease 0.5s;
 }
 
-.map-placeholder {
+.activity-detail-page .map-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -233,14 +233,14 @@
   animation: pulse 2s ease-in-out infinite;
 }
 
-.map-placeholder svg {
+.activity-detail-page .map-placeholder svg {
   font-size: 64px;
   color: #FFA726;
   opacity: 0.6;
 }
 
 /* 🎯 底部操作栏 */
-.activity-footer {
+.activity-detail-page .activity-footer {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -255,19 +255,19 @@
   animation: slideUp 0.8s ease 0.6s;
 }
 
-.organizer-info {
+.activity-detail-page .organizer-info {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.organizer-name {
+.activity-detail-page .activity-footer .organizer-name {
   font-size: 16px;
   color: #fff;
   font-weight: 600;
 }
 
-.activity-footer .ant-btn {
+.activity-detail-page .activity-footer .ant-btn {
   height: 50px;
   font-size: 16px;
   font-weight: 600;
@@ -278,23 +278,23 @@
   animation: bounceIn 0.8s ease 0.7s;
 }
 
-.activity-footer .ant-btn-primary {
+.activity-detail-page .activity-footer .ant-btn-primary {
   background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
   box-shadow: 0 4px 15px rgba(255, 167, 38, 0.4);
   border: none;
 }
 
-.activity-footer .ant-btn-primary:hover {
+.activity-detail-page .activity-footer .ant-btn-primary:hover {
   background: linear-gradient(135deg, #FF8B4F 0%, #FFA726 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(255, 167, 38, 0.5);
 }
 
-.activity-footer .ant-btn-primary:active {
+.activity-detail-page .activity-footer .ant-btn-primary:active {
   transform: translateY(0);
 }
 
-.activity-footer .ant-btn:disabled {
+.activity-detail-page .activity-footer .ant-btn:disabled {
   background: rgba(255, 255, 255, 0.3);
   box-shadow: none;
   color: rgba(255, 255, 255, 0.5);
@@ -317,157 +317,157 @@
 
 /* 📱 响应式设计 */
 @media (max-width: 768px) {
-  .activity-cover {
+  .activity-detail-page .activity-cover {
     height: 300px;
     border-radius: 16px;
     margin-bottom: 24px;
   }
 
-  .activity-header {
+  .activity-detail-page .activity-header {
     padding: 24px;
     border-radius: 16px;
     margin-bottom: 24px;
   }
 
-  .activity-title {
+  .activity-detail-page .activity-title {
     font-size: 28px;
   }
 
-  .activity-tags {
+  .activity-detail-page .activity-tags {
     flex-direction: column;
     gap: 8px;
   }
 
-  .activity-tabs {
+  .activity-detail-page .activity-tabs {
     padding: 16px;
     border-radius: 16px;
     margin-bottom: 24px;
   }
 
-  .route-map {
+  .activity-detail-page .route-map {
     height: 350px;
     border-radius: 16px;
   }
 
-  .activity-footer {
+  .activity-detail-page .activity-footer {
     padding: 16px 20px;
     flex-direction: column;
     gap: 12px;
   }
 
-  .activity-footer .ant-btn {
+  .activity-detail-page .activity-footer .ant-btn {
     width: 100%;
     height: 48px;
   }
 
-  .organizer-name {
+  .activity-detail-page .organizer-name {
     display: none;
   }
 
-  .review-ratings {
+  .activity-detail-page .review-ratings {
     gap: 8px;
     padding: 10px;
   }
 
-  .review-item {
+  .activity-detail-page .review-item {
     padding: 16px;
   }
 
-  .review-header {
+  .activity-detail-page .review-header {
     flex-direction: column;
     gap: 8px;
   }
 
-  .review-image {
+  .activity-detail-page .review-image {
     width: 80px;
     height: 80px;
   }
 
-  .review-content-text {
+  .activity-detail-page .review-content-text {
     padding: 12px;
     font-size: 14px;
   }
 
-  .description-content {
+  .activity-detail-page .description-content {
     font-size: 15px;
     padding: 16px;
   }
 }
 
 @media (max-width: 480px) {
-  .activity-cover {
+  .activity-detail-page .activity-cover {
     height: 250px;
     border-radius: 12px;
     margin-bottom: 20px;
   }
 
-  .activity-header {
+  .activity-detail-page .activity-header {
     padding: 20px 16px;
     border-radius: 12px;
     margin-bottom: 20px;
   }
 
-  .activity-title {
+  .activity-detail-page .activity-title {
     font-size: 24px;
   }
 
-  .activity-tabs {
+  .activity-detail-page .activity-tabs {
     padding: 12px;
     border-radius: 12px;
     margin-bottom: 20px;
   }
 
-  .route-map {
+  .activity-detail-page .route-map {
     height: 280px;
     border-radius: 12px;
   }
 
-  .activity-footer {
+  .activity-detail-page .activity-footer {
     padding: 14px 16px;
   }
 
-  .activity-tags {
+  .activity-detail-page .activity-tags {
     flex-direction: column;
     gap: 6px;
   }
 
-  .review-ratings {
+  .activity-detail-page .review-ratings {
     flex-direction: column;
     gap: 6px;
   }
 
-  .review-image {
+  .activity-detail-page .review-image {
     width: 70px;
     height: 70px;
   }
 
-  .empty-reviews {
+  .activity-detail-page .empty-reviews {
     padding: 32px 16px;
   }
 
-  .review-awaiting {
+  .activity-detail-page .review-awaiting {
     padding: 40px 16px;
   }
 }
 
 /* 💬 评价相关样式 */
-.reviews-content {
+.activity-detail-page .reviews-content {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.review-stats-wrapper {
+.activity-detail-page .review-stats-wrapper {
   margin-bottom: 24px;
 }
 
-.reviews-list {
+.activity-detail-page .reviews-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.review-item {
+.activity-detail-page .review-item {
   padding: 20px;
   background-color: #fafafa;
   border-radius: 12px;
@@ -475,12 +475,12 @@
   transition: all 0.3s;
 }
 
-.review-item:hover {
+.activity-detail-page .review-item:hover {
   border-color: #1890ff;
   box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
 }
 
-.review-header {
+.activity-detail-page .review-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -489,30 +489,30 @@
   border-bottom: 1px solid #e8e8e8;
 }
 
-.review-user {
+.activity-detail-page .review-user {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.reviewer-name {
+.activity-detail-page .reviewer-name {
   font-size: 16px;
   font-weight: 600;
   color: #333;
 }
 
-.review-time {
+.activity-detail-page .review-time {
   font-size: 12px;
   color: #999;
 }
 
-.review-body {
+.activity-detail-page .review-body {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.review-ratings {
+.activity-detail-page .review-ratings {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
@@ -521,17 +521,17 @@
   border-radius: 8px;
 }
 
-.review-ratings span {
+.activity-detail-page .review-ratings span {
   font-size: 13px;
   color: #666;
 }
 
-.review-ratings b {
+.activity-detail-page .review-ratings b {
   color: #1890ff;
   margin-left: 4px;
 }
 
-.review-content-text {
+.activity-detail-page .review-content-text {
   padding: 16px;
   background-color: #fff;
   border-radius: 8px;
@@ -541,14 +541,14 @@
   word-wrap: break-word;
 }
 
-.review-images {
+.activity-detail-page .review-images {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 12px;
 }
 
-.review-image {
+.activity-detail-page .review-image {
   width: 100px;
   height: 100px;
   object-fit: cover;
@@ -558,12 +558,12 @@
   border: 2px solid #e8e8e8;
 }
 
-.review-image:hover {
+.activity-detail-page .review-image:hover {
   transform: scale(1.05);
   border-color: #1890ff;
 }
 
-.reviews-pagination {
+.activity-detail-page .reviews-pagination {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -571,18 +571,18 @@
   padding: 16px 0;
 }
 
-.reviews-pagination span {
+.activity-detail-page .reviews-pagination span {
   color: #666;
   font-size: 14px;
 }
 
-.review-action-bar {
+.activity-detail-page .review-action-bar {
   margin-top: 24px;
   padding-top: 24px;
   border-top: 2px solid #f0f0f0;
 }
 
-.empty-reviews {
+.activity-detail-page .empty-reviews {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -593,18 +593,18 @@
   text-align: center;
 }
 
-.empty-reviews svg {
+.activity-detail-page .empty-reviews svg {
   font-size: 64px;
   color: #d9d9d9;
 }
 
-.empty-reviews p {
+.activity-detail-page .empty-reviews p {
   margin: 0;
   font-size: 16px;
   color: #999;
 }
 
-.review-awaiting {
+.activity-detail-page .review-awaiting {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -615,12 +615,12 @@
   text-align: center;
 }
 
-.review-awaiting svg {
+.activity-detail-page .review-awaiting svg {
   font-size: 64px;
   color: #d9d9d9;
 }
 
-.review-awaiting p {
+.activity-detail-page .review-awaiting p {
   margin: 0;
   font-size: 16px;
   color: #999;

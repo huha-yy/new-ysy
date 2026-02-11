@@ -46,7 +46,6 @@ function Profile() {
       // 更新 localStorage 中的用户信息
       localStorage.setItem('user', JSON.stringify(result))
     } catch (error) {
-      console.error('获取用户信息失败:', error)
       // 如果获取失败，使用 localStorage 中的数据
       setUser(authUser)
     } finally {

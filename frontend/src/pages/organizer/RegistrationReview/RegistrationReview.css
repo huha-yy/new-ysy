@@ -1,4 +1,4 @@
-/* 🌞 报名审核页面样式 */
+/* 报名审核页面样式 */
 .registration-review-page {
   padding: 24px;
   max-width: 1400px;
@@ -7,7 +7,7 @@
 }
 
 /* 页面头部 */
-.page-header {
+.registration-review-page .page-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -18,26 +18,26 @@
   box-shadow: var(--shadow-sm);
 }
 
-.header-left {
+.registration-review-page .header-left {
   display: flex;
   align-items: flex-start;
   gap: 16px;
 }
 
-.back-btn {
+.registration-review-page .back-btn {
   color: var(--text-secondary);
   margin-top: 4px;
 }
 
-.back-btn:hover {
+.registration-review-page .back-btn:hover {
   color: var(--primary-color);
 }
 
-.header-title {
+.registration-review-page .header-title {
   flex: 1;
 }
 
-.page-title {
+.registration-review-page .page-title {
   font-size: 24px;
   font-weight: 700;
   color: var(--text-primary);
@@ -47,18 +47,18 @@
   gap: 12px;
 }
 
-.title-icon {
+.registration-review-page .title-icon {
   color: var(--primary-color);
   font-size: 28px;
 }
 
-.activity-info {
+.registration-review-page .activity-info {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.activity-name {
+.registration-review-page .activity-name {
   color: var(--text-secondary);
   font-size: 14px;
 }
@@ -68,39 +68,39 @@
   margin-bottom: 24px;
 }
 
-.stat-card {
+.registration-review-page .stat-card {
   border-radius: 16px;
   box-shadow: var(--shadow-sm);
   border: none;
   transition: all 0.3s ease;
 }
 
-.stat-card:hover {
+.registration-review-page .stat-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
 }
 
-.stat-card .ant-statistic-title {
+.registration-review-page .stat-card .ant-statistic-title {
   color: var(--text-secondary);
   font-size: 13px;
 }
 
-.stat-card .ant-statistic-content-prefix {
+.registration-review-page .stat-card .ant-statistic-content-prefix {
   margin-right: 8px;
 }
 
 /* 报名列表卡片 */
-.registrations-card {
+.registration-review-page .registrations-card {
   border-radius: 20px;
   box-shadow: var(--shadow-md);
   border: none;
 }
 
-.registrations-card .ant-card-body {
+.registration-review-page .registrations-card .ant-card-body {
   padding: 0;
 }
 
-.card-header {
+.registration-review-page .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -110,44 +110,44 @@
   border-radius: 20px 20px 0 0;
 }
 
-.status-tabs .ant-tabs-nav {
+.registration-review-page .status-tabs .ant-tabs-nav {
   margin: 0;
 }
 
-.search-area {
+.registration-review-page .search-area {
   display: flex;
   gap: 12px;
 }
 
 /* 表格样式 */
-.registrations-card .ant-table-thead > tr > th {
+.registration-review-page .registrations-card .ant-table-thead > tr > th {
   background: #FFFAF5;
   color: var(--text-primary);
   font-weight: 600;
   border-bottom: 2px solid #FFE8CC;
 }
 
-.registrations-card .ant-table-tbody > tr:hover > td {
+.registration-review-page .registrations-card .ant-table-tbody > tr:hover > td {
   background: #FFF9E6;
 }
 
 /* 用户单元格 */
-.user-cell {
+.registration-review-page .user-cell {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.user-avatar {
+.registration-review-page .user-avatar {
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
 }
 
-.user-info {
+.registration-review-page .user-info {
   flex: 1;
   min-width: 0;
 }
 
-.user-nickname {
+.registration-review-page .user-nickname {
   font-weight: 600;
   color: var(--text-primary);
   overflow: hidden;
@@ -155,54 +155,54 @@
   white-space: nowrap;
 }
 
-.user-username {
+.registration-review-page .user-username {
   font-size: 12px;
   color: var(--text-secondary);
 }
 
 /* 联系方式单元格 */
-.contact-cell {
+.registration-review-page .contact-cell {
   font-size: 13px;
   color: var(--text-secondary);
 }
 
-.contact-cell > div {
+.registration-review-page .contact-cell > div {
   margin-bottom: 4px;
 }
 
-.contact-cell .anticon {
+.registration-review-page .contact-cell .anticon {
   margin-right: 6px;
   color: var(--primary-color);
 }
 
 /* 备注 */
-.remark-text {
+.registration-review-page .remark-text {
   color: var(--text-secondary);
   font-size: 13px;
 }
 
 /* 审核按钮 */
-.approve-btn {
+.registration-review-page .approve-btn {
   background: linear-gradient(135deg, var(--success-color) 0%, #2ECC71 100%);
   border: none;
 }
 
-.approve-btn:hover {
+.registration-review-page .approve-btn:hover {
   background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
 }
 
 /* 拒绝弹窗 */
-.reject-modal-content p {
+.registration-review-page .reject-modal-content p {
   margin-bottom: 12px;
   color: var(--text-secondary);
 }
 
 /* 详情弹窗 */
-.detail-content {
+.registration-review-page .detail-content {
   padding: 16px 0;
 }
 
-.user-header {
+.registration-review-page .user-header {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -211,25 +211,25 @@
   margin-bottom: 20px;
 }
 
-.user-meta h3 {
+.registration-review-page .user-meta h3 {
   margin: 0 0 4px 0;
   font-size: 18px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.user-meta p {
+.registration-review-page .user-meta p {
   margin: 0;
   color: var(--text-secondary);
   font-size: 13px;
 }
 
-.detail-descriptions .ant-descriptions-item-label {
+.registration-review-page .detail-descriptions .ant-descriptions-item-label {
   color: var(--text-secondary);
   font-weight: 500;
 }
 
-.detail-descriptions .ant-descriptions-item-content {
+.registration-review-page .detail-descriptions .ant-descriptions-item-content {
   color: var(--text-primary);
 }
 
@@ -239,43 +239,43 @@
     padding: 16px;
   }
 
-  .page-header {
+  .registration-review-page .page-header {
     flex-direction: column;
     gap: 16px;
   }
 
-  .stats-row .ant-col {
+  .registration-review-page .stats-row .ant-col {
     margin-bottom: 12px;
   }
 
-  .card-header {
+  .registration-review-page .card-header {
     flex-direction: column;
     gap: 12px;
     align-items: stretch;
   }
 
-  .search-area {
+  .registration-review-page .search-area {
     width: 100%;
   }
 
-  .search-area .ant-input-affix-wrapper {
+  .registration-review-page .search-area .ant-input-affix-wrapper {
     flex: 1;
   }
 
-  .registrations-card .ant-table-wrapper {
+  .registration-review-page .registrations-card .ant-table-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  .registrations-card .ant-table {
+  .registration-review-page .registrations-card .ant-table {
     min-width: 650px;
   }
 
-  .page-title {
+  .registration-review-page .page-title {
     font-size: 20px;
   }
 
-  .title-icon {
+  .registration-review-page .title-icon {
     font-size: 24px;
   }
 }
@@ -285,36 +285,36 @@
     padding: 8px;
   }
 
-  .page-header {
+  .registration-review-page .page-header {
     padding: 12px 16px;
     gap: 12px;
   }
 
-  .page-title {
+  .registration-review-page .page-title {
     font-size: 18px;
     flex-wrap: wrap;
   }
 
-  .activity-info {
+  .registration-review-page .activity-info {
     flex-wrap: wrap;
     gap: 8px;
   }
 
-  .card-header {
+  .registration-review-page .card-header {
     padding: 12px 16px;
   }
 
-  .user-header {
+  .registration-review-page .user-header {
     flex-direction: column;
     text-align: center;
   }
 
-  .detail-content {
+  .registration-review-page .detail-content {
     padding: 8px 0;
   }
 
-  .approve-btn,
-  .registrations-card .ant-btn {
+  .registration-review-page .approve-btn,
+  .registration-review-page .registrations-card .ant-btn {
     min-height: 44px;
   }
 }
@@ -331,8 +331,7 @@
   }
 }
 
-.stat-card:nth-child(1) { animation: fadeInUp 0.4s ease 0.1s both; }
-.stat-card:nth-child(2) { animation: fadeInUp 0.4s ease 0.15s both; }
-.stat-card:nth-child(3) { animation: fadeInUp 0.4s ease 0.2s both; }
-.stat-card:nth-child(4) { animation: fadeInUp 0.4s ease 0.25s both; }
-
+.registration-review-page .stat-card:nth-child(1) { animation: fadeInUp 0.4s ease 0.1s both; }
+.registration-review-page .stat-card:nth-child(2) { animation: fadeInUp 0.4s ease 0.15s both; }
+.registration-review-page .stat-card:nth-child(3) { animation: fadeInUp 0.4s ease 0.2s both; }
+.registration-review-page .stat-card:nth-child(4) { animation: fadeInUp 0.4s ease 0.25s both; }

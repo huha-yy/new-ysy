@@ -50,7 +50,6 @@ function WeatherCard() {
       // 缓存数据
       cacheWeatherData(weatherData)
     } catch (err) {
-      console.error('加载天气失败:', err)
       setError(err.message || '获取天气信息失败')
       
       // 设置默认天气数据（避免页面空白）

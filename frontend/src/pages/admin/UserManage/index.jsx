@@ -73,7 +73,6 @@ function UserManage() {
         })
       }
     } catch (error) {
-      console.error('获取用户统计失败:', error)
       // 使用默认值
       setStats({
         total: 0,
@@ -103,7 +102,6 @@ function UserManage() {
         }))
       }
     } catch (error) {
-      console.error('获取用户列表失败:', error)
       // 使用模拟数据
       const mockData = [
         {

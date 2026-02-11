@@ -1,6 +1,8 @@
 package com.hiking.hikingbackend.module.activity.controller;
 
+import com.hiking.hikingbackend.common.exception.BusinessException;
 import com.hiking.hikingbackend.common.result.Result;
+import com.hiking.hikingbackend.common.result.ResultCode;
 import com.hiking.hikingbackend.common.utils.SecurityUtils;
 import com.hiking.hikingbackend.module.activity.dto.GatheringPlanDTO;
 import com.hiking.hikingbackend.module.activity.service.GatheringPlanService;
@@ -47,7 +49,7 @@ public class GatheringPlanController {
         // 获取当前用户ID
         Long organizerId = SecurityUtils.getCurrentUserId();
         if (organizerId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         Long planId = gatheringPlanService.createGatheringPlan(organizerId, activityId, planDTO);
@@ -72,7 +74,7 @@ public class GatheringPlanController {
         // 获取当前用户ID
         Long organizerId = SecurityUtils.getCurrentUserId();
         if (organizerId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         gatheringPlanService.updateGatheringPlan(organizerId, activityId, planDTO);
@@ -95,7 +97,7 @@ public class GatheringPlanController {
         // 获取当前用户ID
         Long organizerId = SecurityUtils.getCurrentUserId();
         if (organizerId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         gatheringPlanService.publishGatheringPlan(organizerId, activityId);
@@ -118,7 +120,7 @@ public class GatheringPlanController {
         // 获取当前用户ID（可扩展用于权限校验）
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         GatheringPlanVO gatheringPlanVO = gatheringPlanService.getGatheringPlan(activityId);

@@ -42,7 +42,6 @@ function RegistrationReview() {
 
   // 如果没有 activityId，返回活动列表
   useEffect(() => {
-    console.log('RegistrationReview 组件已加载，activityId:', activityId)
     if (!activityId) {
       message.error('活动ID不存在')
       navigate('/organizer/activities')
@@ -63,7 +62,6 @@ function RegistrationReview() {
   // 加载活动信息
   useEffect(() => {
     if (activityId) {
-      console.log('开始加载数据，activityId:', activityId)
       fetchActivityInfo()
       fetchRegistrations()
     }
@@ -71,12 +69,9 @@ function RegistrationReview() {
 
   const fetchActivityInfo = async () => {
     try {
-      console.log('获取活动信息，activityId:', activityId)
       const res = await getActivityDetail(activityId)
-      console.log('活动信息返回:', res)
       setActivity(res)
     } catch (error) {
-      console.error('获取活动信息失败:', error)
       // 使用模拟数据
       setActivity({
         id: activityId,
@@ -92,7 +87,6 @@ function RegistrationReview() {
     setLoading(true)
     setError(null)
     try {
-      console.log('获取报名列表，activityId:', activityId)
       const res = await getActivityRegistrations(activityId, {
         pageNum: pagination.current,
         pageSize: pagination.pageSize,
@@ -100,8 +94,6 @@ function RegistrationReview() {
         keyword,
         ...params
       })
-      console.log('报名列表返回数据:', res)
-      console.log('报名记录详情:', res?.records || res?.list)
       if (res) {
         setRegistrations(res.records || res.list || res || [])
         setPagination(prev => ({
@@ -110,7 +102,6 @@ function RegistrationReview() {
         }))
       }
     } catch (error) {
-      console.error('获取报名列表失败:', error)
       setError('获取报名列表失败，请稍后重试')
       // 使用模拟数据
       setRegistrations([

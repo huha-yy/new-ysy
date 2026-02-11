@@ -32,7 +32,6 @@ function ActivityList() {
         total: result.total
       })
     } catch (error) {
-      console.error('获取活动列表失败:', error)
     } finally {
       setLoading(false)
     }

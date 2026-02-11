@@ -59,7 +59,6 @@ function Routes() {
         total: result.total || 0
       })
     } catch (error) {
-      console.error('获取路线列表失败:', error)
       message.error('获取路线列表失败')
     } finally {
       setLoading(false)
@@ -95,7 +94,6 @@ function Routes() {
       message.success('删除成功')
       fetchRoutes()
     } catch (error) {
-      console.error('删除失败:', error)
       message.error('删除失败')
     }
   }

@@ -1,7 +1,9 @@
 package com.hiking.hikingbackend.module.message.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.hiking.hikingbackend.common.exception.BusinessException;
 import com.hiking.hikingbackend.common.result.Result;
+import com.hiking.hikingbackend.common.result.ResultCode;
 import com.hiking.hikingbackend.common.utils.SecurityUtils;
 import com.hiking.hikingbackend.module.message.dto.MessageQuery;
 import com.hiking.hikingbackend.module.message.service.MessageService;
@@ -43,7 +45,7 @@ public class MessageController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         IPage<MessageVO> page = messageService.getMyMessages(userId, query);
@@ -66,7 +68,7 @@ public class MessageController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         messageService.markAsRead(userId, messageId);
@@ -86,7 +88,7 @@ public class MessageController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         messageService.markAllAsRead(userId);
@@ -106,7 +108,7 @@ public class MessageController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         Long count = messageService.getUnreadCount(userId);

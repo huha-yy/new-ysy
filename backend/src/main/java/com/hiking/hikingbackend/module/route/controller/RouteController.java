@@ -1,7 +1,9 @@
 package com.hiking.hikingbackend.module.route.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.hiking.hikingbackend.common.exception.BusinessException;
 import com.hiking.hikingbackend.common.result.Result;
+import com.hiking.hikingbackend.common.result.ResultCode;
 import com.hiking.hikingbackend.common.utils.SecurityUtils;
 import com.hiking.hikingbackend.module.route.dto.CheckpointCreateDTO;
 import com.hiking.hikingbackend.module.route.dto.RouteCreateDTO;
@@ -46,7 +48,7 @@ public class RouteController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         Long routeId = routeService.createRoute(userId, createDTO);
@@ -79,7 +81,7 @@ public class RouteController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         IPage<RouteVO> page = routeService.getMyRoutes(userId, query);
@@ -119,7 +121,7 @@ public class RouteController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         Long checkpointId = routeService.addCheckpoint(userId, routeId, createDTO);
@@ -144,7 +146,7 @@ public class RouteController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         routeService.updateRoute(userId, routeId, createDTO);
@@ -167,7 +169,7 @@ public class RouteController {
         // 获取当前用户ID
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         routeService.deleteRoute(userId, routeId);

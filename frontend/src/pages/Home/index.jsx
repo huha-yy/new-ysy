@@ -45,10 +45,8 @@ function Home() {
         difficultyLevel: filters.difficulty,
         timeRange: filters.time
       })
-      console.log('活动数据:', result)
       setActivities(result.records || [])
     } catch (error) {
-      console.error('加载热门活动失败:', error)
       // 设置模拟数据用于测试
       setActivities([
         {
@@ -113,8 +111,6 @@ function Home() {
         pageSize: 10
       })
       const records = result?.records || result || []
-      console.log('用户报名活动数据:', records)
-      
       // 过滤出即将开始的活动
       const upcoming = records.filter(item => {
         const activityDate = item.activityDate
@@ -136,7 +132,6 @@ function Home() {
           : 100
       })
     } catch (error) {
-      console.error('加载用户活动失败:', error)
       setUpcomingActivities([])
       setUserStats({
         totalActivities: 0,

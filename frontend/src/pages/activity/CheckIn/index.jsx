@@ -55,14 +55,12 @@ function CheckIn() {
         fetchLocation()
       } else if (permission === 'prompt') {
         // 需要用户授权，主动请求
-        console.log('需要请求定位权限')
         fetchLocation() // 这会触发权限请求
       } else {
         // 权限被拒绝
         setLocationError('定位权限被拒绝，请在浏览器设置中允许此网站访问位置信息')
       }
     } catch (error) {
-      console.error('权限检查失败:', error)
       setPermissionStatus('denied')
     }
   }
@@ -85,7 +83,6 @@ function CheckIn() {
     // 自动获取位置（每2分钟，避免过度请求）
     const interval = setInterval(() => {
       if (!locating && !currentLocation) {
-        console.log('自动获取位置...')
         fetchLocation()
       }
     }, 120000) // 2分钟
@@ -114,7 +111,6 @@ function CheckIn() {
       // 获取当前位置
       fetchLocation()
     } catch (error) {
-      console.error('获取签到数据失败:', error)
       message.error('获取签到数据失败')
     } finally {
       setLoading(false)
@@ -125,20 +121,16 @@ function CheckIn() {
     try {
       setLocating(true)
       setLocationError(null)
-      console.log('开始获取位置（强制GPS）...')
       const location = await forceGpsLocation()
-      console.log('位置获取成功:', location)
       setCurrentLocation(location)
       message.success(`定位成功，精度 ±${Math.round(location.accuracy)}米`)
     } catch (error) {
-      console.warn('GPS定位失败，降级使用默认定位:', error.message)
       // GPS失败时降级到 getLocation
       try {
         const fallback = await getLocation()
         setCurrentLocation(fallback)
         message.success(`位置获取成功 (${fallback.method === 'browser' ? '浏览器定位' : '高德定位'})`)
       } catch (fallbackError) {
-        console.error('所有定位方式失败:', fallbackError)
         setLocationError(fallbackError.message)
         setCurrentLocation(null)
         Modal.error({
@@ -171,13 +163,10 @@ function CheckIn() {
     try {
       setLocating(true)
       setLocationError(null)
-      console.log('开始强制GPS定位...')
       const location = await forceGpsLocation()
-      console.log('强制GPS定位成功:', location)
       setCurrentLocation(location)
       message.success(`强制GPS定位成功！响应时间: ${location.diagnostics?.responseTime || 0}ms`)
     } catch (error) {
-      console.error('强制GPS定位失败:', error)
       setLocationError(error.message)
       message.error('强制GPS定位失败: ' + error.message)
     } finally {
@@ -189,7 +178,6 @@ function CheckIn() {
   const handleLocationDiagnostics = async () => {
     try {
       setDiagnosing(true)
-      console.log('开始定位诊断...')
       const results = await locationDiagnostics()
 
       // 显示诊断结果
@@ -236,7 +224,6 @@ function CheckIn() {
         okText: '我知道了'
       })
     } catch (error) {
-      console.error('定位诊断失败:', error)
       message.error('定位诊断失败')
     } finally {
       setDiagnosing(false)
@@ -277,7 +264,6 @@ function CheckIn() {
     setIsRecording(true)
     trackRecorder.start(
       (track) => {
-        console.log('轨迹记录:', track)
         // 上报轨迹到后端
         reportTrack([{
           activityId: Number(id),
@@ -285,11 +271,9 @@ function CheckIn() {
           longitude: track.longitude,
           recordTime: new Date(track.timestamp).toISOString().slice(0, 19).replace('T', ' ')
         }]).catch(error => {
-          console.error('轨迹上报失败:', error)
         })
       },
       (error) => {
-        console.error('轨迹记录错误:', error)
       }
     )
   }
@@ -359,7 +343,6 @@ function CheckIn() {
       // 重新获取签到状态
       await fetchCheckinData()
     } catch (error) {
-      console.error('签到失败:', error)
       message.error('签到失败，请重试')
     } finally {
       setLoading(false)

@@ -1,7 +1,9 @@
 package com.hiking.hikingbackend.module.checkin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.hiking.hikingbackend.common.exception.BusinessException;
 import com.hiking.hikingbackend.common.result.Result;
+import com.hiking.hikingbackend.common.result.ResultCode;
 import com.hiking.hikingbackend.common.utils.SecurityUtils;
 import com.hiking.hikingbackend.module.checkin.dto.AlertHandleDTO;
 import com.hiking.hikingbackend.module.checkin.dto.AlertQuery;
@@ -50,7 +52,7 @@ public class AlertController {
             AlertQuery query) {
         Long userId = SecurityUtils.getCurrentUserId();
         if (userId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         IPage<AlertVO> page = alertService.getActivityAlerts(activityId, query);
@@ -105,7 +107,7 @@ public class AlertController {
             @Valid @RequestBody AlertHandleDTO dto) {
         Long organizerId = SecurityUtils.getCurrentUserId();
         if (organizerId == null) {
-            throw new RuntimeException("无法获取当前用户ID");
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
         alertService.handleAlert(organizerId, alertId, dto);
