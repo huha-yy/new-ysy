@@ -9,6 +9,19 @@ import './RouteEdit.css'
 const { TextArea } = Input
 const { Option } = Select
 
+// 城市坐标映射
+const cityCoordinates = {
+  '北京': { lng: 116.397428, lat: 39.90923 },
+  '上海': { lng: 121.473701, lat: 31.230416 },
+  '广州': { lng: 113.264385, lat: 23.129112 },
+  '深圳': { lng: 114.057868, lat: 22.543099 },
+  '杭州': { lng: 120.153576, lat: 30.287459 },
+  '成都': { lng: 104.065735, lat: 30.659462 },
+  '重庆': { lng: 106.504962, lat: 29.533155 },
+  '西安': { lng: 108.948024, lat: 34.263161 },
+  '武汉': { lng: 114.298572, lat: 30.584355 },
+}
+
 // 步骤定义
 const steps = [
   {
@@ -49,6 +62,7 @@ function RouteEdit() {
   const [supplyPoints, setSupplyPoints] = useState([]) // 补给点
   const [startPoint, setStartPoint] = useState(null)
   const [endPoint, setEndPoint] = useState(null)
+  const [mapCenter, setMapCenter] = useState(null) // 地图中心点
   const [routeData, setRouteData] = useState({
     difficultyLevel: 1,
     isPublic: true
@@ -83,6 +97,11 @@ function RouteEdit() {
 
       // 设置路线数据
       setRouteData(formData)
+
+      // 根据已保存的地区初始化地图中心
+      if (data.region && cityCoordinates[data.region]) {
+        setMapCenter(cityCoordinates[data.region])
+      }
 
       // 转换路线点格式
       if (data.routePoints && data.routePoints.length > 0) {
@@ -429,7 +448,7 @@ function RouteEdit() {
                 name="region"
                 rules={[{ required: true, message: '请选择地区' }]}
               >
-                <Select placeholder="请选择地区">
+                <Select placeholder="请选择地区" onChange={(val) => setMapCenter(cityCoordinates[val] || null)}>
                   <Option value="北京">北京</Option>
                   <Option value="上海">上海</Option>
                   <Option value="广州">广州</Option>
@@ -560,6 +579,7 @@ function RouteEdit() {
                   onSupplyPointsChange={handleSupplyPointsChange}
                   onStartPointChange={handleStartPointChange}
                   onEndPointChange={handleEndPointChange}
+                  center={mapCenter}
                 />
               </>
             )}

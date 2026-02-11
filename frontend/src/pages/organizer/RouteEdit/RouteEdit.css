@@ -193,6 +193,62 @@
 
   .step-content {
     padding: 16px;
+    min-height: 300px;
+  }
+
+  .steps-nav {
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .step-actions {
+    padding: 16px;
+  }
+
+  .step-actions button {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .route-create-page {
+    padding: 8px;
+  }
+
+  .step-content {
+    padding: 12px;
+    min-height: 250px;
+  }
+
+  .steps-nav {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .confirm-section {
+    padding: 12px;
+  }
+
+  .confirm-section h3 {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+
+  .checkpoint-confirm-item {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .step-actions {
+    padding: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .step-actions button {
+    min-height: 44px;
+    flex: 1;
+    min-width: 120px;
   }
 }
 

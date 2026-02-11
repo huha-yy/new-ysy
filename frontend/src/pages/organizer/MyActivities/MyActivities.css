@@ -335,6 +335,66 @@
   .search-area .ant-input-affix-wrapper {
     flex: 1;
   }
+
+  .activities-card .ant-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .activities-card .ant-table {
+    min-width: 700px;
+  }
+
+  .page-title {
+    font-size: 22px;
+  }
+
+  .title-icon {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 480px) {
+  .my-activities-page {
+    padding: 8px;
+  }
+
+  .my-activities-page .stats-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+  }
+
+  .stat-icon {
+    font-size: 28px;
+  }
+
+  .page-title {
+    font-size: 20px;
+    flex-wrap: wrap;
+  }
+
+  .create-btn {
+    height: 44px;
+    font-size: 15px;
+  }
+
+  .card-header {
+    padding: 12px 16px;
+  }
+
+  .status-tabs .ant-tabs-tab {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
 }
 
 /* 动画 */

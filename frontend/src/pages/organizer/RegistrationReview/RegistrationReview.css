@@ -261,6 +261,62 @@
   .search-area .ant-input-affix-wrapper {
     flex: 1;
   }
+
+  .registrations-card .ant-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .registrations-card .ant-table {
+    min-width: 650px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .title-icon {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .registration-review-page {
+    padding: 8px;
+  }
+
+  .page-header {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .page-title {
+    font-size: 18px;
+    flex-wrap: wrap;
+  }
+
+  .activity-info {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .card-header {
+    padding: 12px 16px;
+  }
+
+  .user-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .detail-content {
+    padding: 8px 0;
+  }
+
+  .approve-btn,
+  .registrations-card .ant-btn {
+    min-height: 44px;
+  }
 }
 
 /* 动画 */

@@ -263,3 +263,40 @@
     min-width: 800px;
   }
 }
+
+@media (max-width: 480px) {
+  .registration-manage-page {
+    padding: 8px;
+  }
+
+  .registration-manage-page .page-header {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+
+  .registration-manage-page .page-title {
+    font-size: 18px;
+    flex-wrap: wrap;
+  }
+
+  .registration-manage-page .title-icon {
+    font-size: 22px;
+  }
+
+  .registration-manage-page .search-card .ant-card-body {
+    padding: 12px;
+  }
+
+  .registration-manage-page .table-card .ant-card-body {
+    padding: 12px;
+  }
+
+  .registration-manage-page .detail-item .label {
+    width: 80px;
+    font-size: 13px;
+  }
+
+  .registration-manage-page .detail-item .value {
+    font-size: 13px;
+  }
+}

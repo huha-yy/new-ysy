@@ -26,7 +26,8 @@ const RouteEditor = ({
   onSupplyPointsChange,
   onStartPointChange,
   onEndPointChange,
-  readOnly = false
+  readOnly = false,
+  center = null
 }) => {
   const [map, setMap] = useState(null)
   const [routePoints, setRoutePoints] = useState(initialRoute) // 路线轨迹点
@@ -1317,12 +1318,12 @@ const RouteEditor = ({
       </Card>
 
       <MapView
-        center={{ lng: 116.397428, lat: 39.90923 }}
+        center={center || { lng: 116.397428, lat: 39.90923 }}
         height="500px"
         markers={allMarkers}
         routePoints={routePoints}
         onMapLoad={handleMapLoad}
-        allowCenterChange={false}
+        allowCenterChange={true}
       />
 
       <Modal

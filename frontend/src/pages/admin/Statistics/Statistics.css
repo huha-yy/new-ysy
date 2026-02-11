@@ -362,11 +362,86 @@
     gap: 16px;
   }
 
+  .statistics-page .page-title {
+    font-size: 22px;
+  }
+
+  .statistics-page .title-icon {
+    font-size: 26px;
+  }
+
   .statistics-page .overview-row .ant-col {
     margin-bottom: 16px;
   }
 
   .statistics-page .chart-bars .bar {
     width: 30px;
+  }
+
+  .statistics-page .ranking-card .ant-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .statistics-page .ranking-card .ant-table {
+    min-width: 500px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statistics-page {
+    padding: 8px;
+  }
+
+  .statistics-page .page-title {
+    font-size: 18px;
+    flex-wrap: wrap;
+  }
+
+  .statistics-page .title-icon {
+    font-size: 22px;
+  }
+
+  .statistics-page .card-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    border-radius: 10px;
+  }
+
+  .statistics-page .card-stats .ant-statistic-content-value {
+    font-size: 22px;
+  }
+
+  .statistics-page .chart-bars .bar {
+    width: 20px;
+  }
+
+  .statistics-page .bar-label {
+    font-size: 11px;
+  }
+
+  .statistics-page .bar-value {
+    font-size: 10px;
+  }
+
+  .statistics-page .trend-chart {
+    height: 200px;
+  }
+
+  .statistics-page .health-card {
+    border-radius: 12px;
+  }
+
+  .statistics-page .health-header h3 {
+    font-size: 16px;
+  }
+
+  .statistics-page .header-right {
+    width: 100%;
+  }
+
+  .statistics-page .header-right .ant-picker {
+    width: 100%;
   }
 }

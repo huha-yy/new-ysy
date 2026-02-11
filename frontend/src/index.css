@@ -425,3 +425,79 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   height: 100%;
 }
+
+/* 📱 移动端全局响应式样式 */
+
+/* 表格横向滚动包装 */
+@media (max-width: 768px) {
+  .ant-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ant-table {
+    font-size: 13px;
+  }
+
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 8px 8px !important;
+    white-space: nowrap;
+  }
+
+  /* 容器移动端 padding */
+  .container {
+    padding: 0 16px;
+  }
+
+  /* Ant Design Col 响应式保底 */
+  .ant-col-xs-24 { display: block; flex: 0 0 100%; max-width: 100%; }
+  .ant-col-xs-12 { display: block; flex: 0 0 50%; max-width: 50%; }
+
+  /* Row gutter 移动端缩小 */
+  .ant-row {
+    margin-left: -8px !important;
+    margin-right: -8px !important;
+  }
+
+  .ant-row > .ant-col,
+  .ant-row > [class^="ant-col"] {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  /* 表单移动端适配 */
+  .ant-form-item-label {
+    padding-bottom: 4px !important;
+  }
+
+  /* 模态框移动端全宽 */
+  .ant-modal {
+    max-width: calc(100vw - 32px) !important;
+    margin: 16px auto !important;
+  }
+
+  /* 卡片移动端 padding 缩小 */
+  .ant-card-body {
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 12px;
+  }
+
+  .ant-table {
+    font-size: 12px;
+  }
+
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 6px 6px !important;
+  }
+
+  .ant-card-body {
+    padding: 12px !important;
+  }
+}

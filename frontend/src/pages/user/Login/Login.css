@@ -261,9 +261,31 @@
 
 /* 📱 响应式设计 */
 @media (max-width: 768px) {
+  .login-page {
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 16px;
+    padding-top: 24px;
+  }
+
   .login-card {
     max-width: 100%;
     padding: 20px;
+    animation: none;
+    border-radius: 20px;
+  }
+
+  .login-card:hover {
+    transform: none;
+    box-shadow: 0 12px 32px rgba(255, 167, 38, 0.25);
+  }
+
+  .login-logo {
+    font-size: 40px;
+  }
+
+  .login-brand-name {
+    font-size: 24px;
   }
 
   .login-card .ant-input,
@@ -275,16 +297,54 @@
     height: 48px;
     font-size: 16px;
   }
+
+  .login-options {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 }
 
 @media (max-width: 480px) {
+  .login-page {
+    padding: 12px;
+    padding-top: 16px;
+  }
+
   .login-card {
-    margin: 12px;
+    margin: 0;
+    border-radius: 16px;
+    border-width: 2px;
+  }
+
+  .login-card .ant-card-head {
+    padding: 16px 20px 10px;
+  }
+
+  .login-card .ant-card-head-title {
+    font-size: 18px;
+  }
+
+  .login-logo {
+    font-size: 36px;
+  }
+
+  .login-brand-name {
+    font-size: 20px;
   }
 
   .login-card .ant-input,
   .login-card .ant-input-password {
     height: 44px;
     padding: 0 16px;
+  }
+
+  .login-card .ant-form-item {
+    margin-bottom: 16px;
+  }
+
+  .login-footer {
+    padding-top: 16px;
+    margin-top: 16px;
+    font-size: 14px;
   }
 }

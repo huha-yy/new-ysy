@@ -195,5 +195,55 @@
   .checkin-progress-section {
     padding: 16px;
   }
+
+  .map-section {
+    margin-bottom: 16px;
+    border-radius: 8px;
+  }
+
+  .checkpoint-item {
+    padding: 14px;
+  }
+
+  .checkpoint-footer .ant-btn {
+    min-width: 120px;
+    min-height: 44px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .checkpoints-list {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkin-page {
+    padding: 8px;
+  }
+
+  .checkin-progress-section {
+    padding: 12px;
+    border-radius: 6px;
+  }
+
+  .progress-header h3 {
+    font-size: 15px;
+  }
+
+  .checkpoint-footer .ant-btn {
+    width: 100%;
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .checkpoint-distance {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+
+  .checkpoint-seq {
+    font-size: 11px;
+  }
 }
 

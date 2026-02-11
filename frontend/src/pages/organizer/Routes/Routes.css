@@ -44,3 +44,37 @@
   color: #333;
 }
 
+/* 响应式 */
+@media (max-width: 768px) {
+  .routes-page {
+    padding: 12px;
+  }
+
+  .filters-section {
+    padding: 12px;
+  }
+
+  .routes-card .ant-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .routes-card .ant-table {
+    min-width: 600px;
+  }
+}
+
+@media (max-width: 480px) {
+  .routes-page {
+    padding: 8px;
+  }
+
+  .filters-section {
+    padding: 8px;
+  }
+
+  .route-detail-modal p {
+    font-size: 13px;
+  }
+}
+

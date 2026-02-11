@@ -188,6 +188,25 @@
   .organizer-phone {
     font-size: 14px;
   }
+
+  .transport-guide,
+  .items-to-bring {
+    padding: 12px;
+  }
+
+  .notices {
+    padding: 12px;
+  }
+
+  .gathering-actions {
+    margin-top: 24px;
+    padding-top: 16px;
+  }
+
+  .gathering-actions .ant-btn {
+    width: 100%;
+    min-height: 44px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -197,6 +216,19 @@
 
   .section-divider {
     font-size: 14px;
+  }
+
+  .gathering-descriptions .ant-descriptions-item-label {
+    font-size: 13px;
+  }
+
+  .gathering-descriptions .ant-descriptions-item-content {
+    font-size: 13px;
+  }
+
+  .notice-list {
+    padding-left: 16px;
+    font-size: 13px;
   }
 }
 

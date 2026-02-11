@@ -328,4 +328,88 @@
   .admin-dashboard-page .shortcuts-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .admin-dashboard-page .pending-card .ant-table-wrapper,
+  .admin-dashboard-page .recent-card .ant-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-dashboard-page .pending-card .ant-table,
+  .admin-dashboard-page .recent-card .ant-table {
+    min-width: 600px;
+  }
+
+  .admin-dashboard-page .page-title {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-dashboard-page {
+    padding: 8px;
+  }
+
+  .admin-dashboard-page .welcome-banner {
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+
+  .admin-dashboard-page .banner-text h1 {
+    font-size: 20px;
+  }
+
+  .admin-dashboard-page .banner-text p {
+    font-size: 13px;
+  }
+
+  .admin-dashboard-page .stat-card .ant-card-body {
+    padding: 14px;
+    gap: 12px;
+    min-height: auto;
+  }
+
+  .admin-dashboard-page .stat-icon-wrapper {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+  }
+
+  .admin-dashboard-page .stat-icon {
+    font-size: 20px;
+  }
+
+  .admin-dashboard-page .stat-card .ant-statistic-content-value {
+    font-size: 22px;
+  }
+
+  .admin-dashboard-page .shortcuts-grid {
+    gap: 8px;
+  }
+
+  .admin-dashboard-page .shortcut-item {
+    padding: 14px;
+    gap: 8px;
+  }
+
+  .admin-dashboard-page .shortcut-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .admin-dashboard-page .shortcut-item span {
+    font-size: 13px;
+  }
+
+  .admin-dashboard-page .tips-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+
+  .admin-dashboard-page .tips-icon {
+    font-size: 28px;
+  }
 }

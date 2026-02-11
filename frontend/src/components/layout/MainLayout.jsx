@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
-import { Layout, Menu, Dropdown, Avatar, Button, Badge } from 'antd'
+import { Layout, Menu, Dropdown, Avatar, Button, Badge, Drawer } from 'antd'
 import {
   HomeOutlined,
   UserOutlined,
@@ -16,7 +16,9 @@ import {
   BarChartOutlined,
   CrownOutlined,
   FileTextOutlined,
-  CompassOutlined
+  CompassOutlined,
+  MenuOutlined,
+  CloseOutlined
 } from '@ant-design/icons'
 import { ROLE } from '../../utils/constants'
 import { getImageUrl } from '../../utils/imageUrl'
@@ -27,6 +29,7 @@ const { Header, Content, Footer } = Layout
 function MainLayout() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [currentUser, setCurrentUser] = useState(null)
+  const [drawerVisible, setDrawerVisible] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -189,6 +192,143 @@ function MainLayout() {
     }
   )
 
+  // 关闭抽屉并导航
+  const drawerNavigate = (path) => {
+    setDrawerVisible(false)
+    navigate(path)
+  }
+
+  // 抽屉菜单项（合并主菜单 + 用户菜单）
+  const drawerMenuItems = [
+    {
+      key: '/',
+      icon: <HomeOutlined />,
+      label: '首页',
+      onClick: () => drawerNavigate('/')
+    },
+    {
+      key: '/activities',
+      icon: <CalendarOutlined />,
+      label: '活动列表',
+      onClick: () => drawerNavigate('/activities')
+    }
+  ]
+
+  if (isLoggedIn) {
+    drawerMenuItems.push(
+      { type: 'divider' },
+      {
+        key: 'user-header',
+        type: 'group',
+        label: '个人中心'
+      },
+      {
+        key: '/user/profile',
+        icon: <UserOutlined />,
+        label: '个人中心',
+        onClick: () => drawerNavigate('/user/profile')
+      },
+      {
+        key: '/user/hiking-profile',
+        icon: <EnvironmentOutlined />,
+        label: '徒步档案',
+        onClick: () => drawerNavigate('/user/hiking-profile')
+      },
+      {
+        key: '/user/registrations',
+        icon: <TeamOutlined />,
+        label: '我的报名',
+        onClick: () => drawerNavigate('/user/registrations')
+      },
+      {
+        key: '/user/messages',
+        icon: <MessageOutlined />,
+        label: '消息通知',
+        onClick: () => drawerNavigate('/user/messages')
+      }
+    )
+  }
+
+  if (isOrganizer) {
+    drawerMenuItems.push(
+      { type: 'divider' },
+      {
+        key: 'organizer-drawer-header',
+        type: 'group',
+        label: '组织者功能'
+      },
+      {
+        key: '/organizer/activities',
+        icon: <CalendarOutlined />,
+        label: '我发布的活动',
+        onClick: () => drawerNavigate('/organizer/activities')
+      },
+      {
+        key: '/organizer/activities/create',
+        icon: <PlusOutlined />,
+        label: '发布新活动',
+        onClick: () => drawerNavigate('/organizer/activities/create')
+      },
+      {
+        key: '/organizer/routes',
+        icon: <CompassOutlined />,
+        label: '路线管理',
+        onClick: () => drawerNavigate('/organizer/routes')
+      }
+    )
+  }
+
+  if (isAdmin) {
+    drawerMenuItems.push(
+      { type: 'divider' },
+      {
+        key: 'admin-drawer-header',
+        type: 'group',
+        label: '管理员功能'
+      },
+      {
+        key: '/admin',
+        icon: <DashboardOutlined />,
+        label: '管理后台',
+        onClick: () => drawerNavigate('/admin')
+      },
+      {
+        key: '/admin/activities/audit',
+        icon: <FileTextOutlined />,
+        label: '活动审核',
+        onClick: () => drawerNavigate('/admin/activities/audit')
+      },
+      {
+        key: '/admin/users',
+        icon: <TeamOutlined />,
+        label: '用户管理',
+        onClick: () => drawerNavigate('/admin/users')
+      },
+      {
+        key: '/admin/statistics',
+        icon: <BarChartOutlined />,
+        label: '数据统计',
+        onClick: () => drawerNavigate('/admin/statistics')
+      }
+    )
+  }
+
+  if (isLoggedIn) {
+    drawerMenuItems.push(
+      { type: 'divider' },
+      {
+        key: 'logout-drawer',
+        icon: <LogoutOutlined />,
+        label: '退出登录',
+        danger: true,
+        onClick: () => {
+          setDrawerVisible(false)
+          handleLogout()
+        }
+      }
+    )
+  }
+
   // 获取角色标签
   const getRoleBadge = () => {
     if (isAdmin) {
@@ -235,9 +375,61 @@ function MainLayout() {
                 </Button>
               </div>
             )}
+            <Button
+              className="mobile-menu-btn"
+              type="text"
+              icon={<MenuOutlined />}
+              onClick={() => setDrawerVisible(true)}
+            />
           </div>
         </div>
       </Header>
+
+      <Drawer
+        title={
+          isLoggedIn ? (
+            <div className="mobile-drawer-user">
+              <Avatar
+                size={40}
+                icon={<UserOutlined />}
+                src={currentUser?.avatar ? getImageUrl(currentUser.avatar) : null}
+              />
+              <div className="mobile-drawer-user-info">
+                <span className="mobile-drawer-username">{currentUser?.nickname || currentUser?.username}</span>
+                {getRoleBadge()}
+              </div>
+            </div>
+          ) : (
+            <span>🏔️ 户外徒步</span>
+          )
+        }
+        placement="right"
+        onClose={() => setDrawerVisible(false)}
+        open={drawerVisible}
+        className="mobile-drawer"
+        width={280}
+        closeIcon={<CloseOutlined />}
+        footer={
+          !isLoggedIn ? (
+            <div className="mobile-drawer-auth">
+              <Button block onClick={() => drawerNavigate('/login')}>
+                <LoginOutlined /> 登录
+              </Button>
+              <Button block type="primary" onClick={() => drawerNavigate('/register')} style={{ marginTop: 8 }}>
+                注册
+              </Button>
+            </div>
+          ) : null
+        }
+      >
+        <Menu
+          mode="vertical"
+          selectedKeys={[location.pathname]}
+          items={drawerMenuItems}
+          className="mobile-drawer-menu"
+        />
+      </Drawer>
+
       <Content className="main-content">
         <Outlet />
       </Content>

@@ -363,6 +363,35 @@
   .organizer-name {
     display: none;
   }
+
+  .review-ratings {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .review-item {
+    padding: 16px;
+  }
+
+  .review-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .review-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .review-content-text {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .description-content {
+    font-size: 15px;
+    padding: 16px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -400,6 +429,24 @@
   .activity-tags {
     flex-direction: column;
     gap: 6px;
+  }
+
+  .review-ratings {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .review-image {
+    width: 70px;
+    height: 70px;
+  }
+
+  .empty-reviews {
+    padding: 32px 16px;
+  }
+
+  .review-awaiting {
+    padding: 40px 16px;
   }
 }
 

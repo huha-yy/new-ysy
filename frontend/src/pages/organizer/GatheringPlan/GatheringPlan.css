@@ -304,12 +304,50 @@
 }
 
 @media (max-width: 480px) {
+  .gathering-plan-page {
+    padding: 8px;
+  }
+
   .form-section {
-    padding: 16px;
+    padding: 12px;
   }
 
   .selected-location {
     padding: 8px;
+  }
+
+  .map-selection {
+    height: 400px;
+  }
+
+  .map-placeholder {
+    min-height: 280px;
+  }
+
+  .map-placeholder-loading {
+    min-height: 280px;
+  }
+
+  .map-tips {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .tip-item {
+    padding: 8px;
+  }
+
+  .search-result-item {
+    padding: 8px;
+  }
+
+  .form-actions button {
+    min-height: 44px;
+    font-size: 15px;
+  }
+
+  .publish-alert {
+    margin-bottom: 16px;
   }
 }
 

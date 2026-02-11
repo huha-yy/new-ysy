@@ -248,10 +248,30 @@
   }
 }
 
+/* 📱 移动端汉堡菜单按钮 */
+.mobile-menu-btn {
+  display: none;
+  color: #fff !important;
+  font-size: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
 /* 📱 响应式设计 */
 @media (max-width: 768px) {
   .header-menu {
     display: none;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
   }
 
   .header-content {
@@ -261,8 +281,12 @@
 
   .logo {
     font-size: 16px;
-    margin-right: 16px;
+    margin-right: auto;
     padding: 5px 12px;
+  }
+
+  .header-actions {
+    gap: 8px;
   }
 
   .main-content {
@@ -306,4 +330,102 @@
   .main-content {
     padding: 16px 0;
   }
+}
+
+/* 📱 移动端抽屉菜单样式 */
+.mobile-drawer .ant-drawer-header {
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  border-bottom: none;
+  padding: 16px 20px;
+}
+
+.mobile-drawer .ant-drawer-header-title {
+  flex-direction: row-reverse;
+}
+
+.mobile-drawer .ant-drawer-close {
+  color: #fff;
+  margin-right: 0;
+}
+
+.mobile-drawer .ant-drawer-title {
+  color: #fff;
+}
+
+.mobile-drawer .ant-drawer-body {
+  padding: 8px 0;
+  background: #fff;
+}
+
+.mobile-drawer .ant-drawer-footer {
+  border-top: 1px solid #f0f0f0;
+  padding: 16px;
+}
+
+.mobile-drawer-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobile-drawer-user .ant-avatar {
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.mobile-drawer-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobile-drawer-username {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.mobile-drawer-menu {
+  border-inline-end: none !important;
+}
+
+.mobile-drawer-menu .ant-menu-item {
+  height: 44px;
+  line-height: 44px;
+  margin: 2px 8px;
+  border-radius: 8px;
+  padding-left: 16px !important;
+}
+
+.mobile-drawer-menu .ant-menu-item:hover {
+  background: #FFF5EB;
+}
+
+.mobile-drawer-menu .ant-menu-item-selected {
+  background: rgba(255, 167, 38, 0.1) !important;
+  color: #FFA726 !important;
+}
+
+.mobile-drawer-menu .ant-menu-item-group-title {
+  padding-left: 16px;
+  font-size: 12px;
+  color: #999;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mobile-drawer-menu .ant-menu-item-divider {
+  margin: 8px 16px;
+}
+
+.mobile-drawer-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mobile-drawer-auth .ant-btn-primary {
+  background: linear-gradient(135deg, #FFA726 0%, #FFC93D 100%);
+  border: none;
 }

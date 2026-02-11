@@ -209,6 +209,19 @@
     padding: 16px;
   }
 
+  .activity-audit-page .page-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .activity-audit-page .page-title {
+    font-size: 22px;
+  }
+
+  .activity-audit-page .title-icon {
+    font-size: 26px;
+  }
+
   .activity-audit-page .stats-row .ant-col {
     margin-bottom: 12px;
   }
@@ -225,5 +238,46 @@
 
   .activity-audit-page .search-area .ant-input-affix-wrapper {
     flex: 1;
+  }
+
+  .activity-audit-page .activities-card .ant-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .activity-audit-page .activities-card .ant-table {
+    min-width: 700px;
+  }
+
+  .activity-audit-page .activity-cover {
+    width: 70px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .activity-audit-page {
+    padding: 8px;
+  }
+
+  .activity-audit-page .page-title {
+    font-size: 18px;
+    flex-wrap: wrap;
+  }
+
+  .activity-audit-page .title-icon {
+    font-size: 22px;
+  }
+
+  .activity-audit-page .card-header {
+    padding: 12px 16px;
+  }
+
+  .activity-audit-page .detail-title {
+    font-size: 17px;
+  }
+
+  .activity-audit-page .approve-btn {
+    min-height: 44px;
   }
 }

@@ -439,4 +439,46 @@
   .stat-content p {
     font-size: 13px;
   }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    flex-direction: row;
+    text-align: left;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .about-section {
+    padding: 40px 0;
+  }
+
+  .about-header {
+    margin-bottom: 40px;
+  }
+
+  .about-desc {
+    font-size: 15px;
+  }
+
+  .cta-section {
+    padding: 32px 16px;
+  }
+
+  .cta-section h3 {
+    font-size: 20px;
+  }
+
+  .cta-primary,
+  .cta-secondary {
+    height: 46px;
+    font-size: 15px;
+  }
+
+  .review-card {
+    padding: 20px;
+  }
 }
