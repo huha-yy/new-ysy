@@ -125,35 +125,42 @@ function CheckIn() {
     try {
       setLocating(true)
       setLocationError(null)
-      console.log('开始获取位置...')
-      const location = await getLocation()
+      console.log('开始获取位置（强制GPS）...')
+      const location = await forceGpsLocation()
       console.log('位置获取成功:', location)
       setCurrentLocation(location)
-      message.success(`位置获取成功 (${location.method === 'browser' ? '浏览器定位' : '高德定位'})`)
+      message.success(`定位成功，精度 ±${Math.round(location.accuracy)}米`)
     } catch (error) {
-      console.error('获取位置失败:', error)
-      setLocationError(error.message)
-      setCurrentLocation(null)
-      // 显示详细的错误信息
-      Modal.error({
-        title: '定位失败',
-        content: (
-          <div>
-            <p>无法获取您的当前位置：</p>
-            <p style={{ color: '#ff4d4f', margin: '8px 0' }}>{error.message}</p>
-            <p>请尝试以下解决方案：</p>
-            <ul style={{ marginLeft: 16, marginTop: 8 }}>
-              <li>确保浏览器定位权限已开启</li>
-              <li>检查设备GPS功能是否正常</li>
-              <li>确保网络连接正常</li>
-              <li>尝试在户外或信号更好的地方使用</li>
-              <li>如果是HTTPS网站，确保证书有效</li>
-            </ul>
-          </div>
-        ),
-        width: 480,
-        okText: '我知道了'
-      })
+      console.warn('GPS定位失败，降级使用默认定位:', error.message)
+      // GPS失败时降级到 getLocation
+      try {
+        const fallback = await getLocation()
+        setCurrentLocation(fallback)
+        message.success(`位置获取成功 (${fallback.method === 'browser' ? '浏览器定位' : '高德定位'})`)
+      } catch (fallbackError) {
+        console.error('所有定位方式失败:', fallbackError)
+        setLocationError(fallbackError.message)
+        setCurrentLocation(null)
+        Modal.error({
+          title: '定位失败',
+          content: (
+            <div>
+              <p>无法获取您的当前位置：</p>
+              <p style={{ color: '#ff4d4f', margin: '8px 0' }}>{fallbackError.message}</p>
+              <p>请尝试以下解决方案：</p>
+              <ul style={{ marginLeft: 16, marginTop: 8 }}>
+                <li>确保浏览器定位权限已开启</li>
+                <li>检查设备GPS功能是否正常</li>
+                <li>确保网络连接正常</li>
+                <li>尝试在户外或信号更好的地方使用</li>
+                <li>如果是HTTPS网站，确保证书有效</li>
+              </ul>
+            </div>
+          ),
+          width: 480,
+          okText: '我知道了'
+        })
+      }
     } finally {
       setLocating(false)
     }
@@ -291,6 +298,29 @@ function CheckIn() {
     if (!currentLocation) {
       message.warning('正在获取位置，请稍后...')
       await fetchLocation()
+      return
+    }
+
+    // 检查定位精度，精度 > 100米时提示用户
+    if (currentLocation.accuracy && currentLocation.accuracy > 100) {
+      Modal.confirm({
+        title: '定位精度较低',
+        content: `当前定位精度为 ±${Math.round(currentLocation.accuracy)} 米，可能导致签到失败。建议到空旷处重新定位后再签到。`,
+        okText: '重新定位',
+        cancelText: '继续签到',
+        onOk: async () => {
+          try {
+            setLocating(true)
+            const location = await forceGpsLocation()
+            setCurrentLocation(location)
+            message.success('重新定位成功')
+          } catch (error) {
+            message.error('重新定位失败: ' + error.message)
+          } finally {
+            setLocating(false)
+          }
+        }
+      })
       return
     }
 
@@ -551,6 +581,22 @@ function CheckIn() {
                       <span> · 精度: ±{Math.round(currentLocation.accuracy)}米</span>
                     )}
                   </div>
+                  {currentLocation.accuracy && currentLocation.accuracy > 100 && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Tag color="warning" icon={<WarningOutlined />}>
+                        定位精度较低（±{Math.round(currentLocation.accuracy)}米），建议到空旷处重新定位
+                      </Tag>
+                      <Button
+                        size="small"
+                        type="primary"
+                        onClick={handleForceGpsLocation}
+                        loading={locating}
+                        icon={<ReloadOutlined />}
+                      >
+                        重新定位
+                      </Button>
+                    </div>
+                  )}
                   {currentLocation.originalLatitude && (
                     <div style={{ fontSize: '11px', color: '#666' }}>
                       原始坐标(WGS84): {currentLocation.originalLatitude.toFixed(6)}, {currentLocation.originalLongitude.toFixed(6)}
@@ -563,7 +609,7 @@ function CheckIn() {
                   )}
                 </Space>
               }
-              type="info"
+              type={currentLocation.accuracy && currentLocation.accuracy > 100 ? 'warning' : 'info'}
               showIcon
               className="location-alert"
             />

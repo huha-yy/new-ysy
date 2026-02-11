@@ -23,6 +23,7 @@ const HikingProfile = lazy(() => import('../pages/user/HikingProfile'))
 const ProfileEdit = lazy(() => import('../pages/user/ProfileEdit'))
 const MyRegistrations = lazy(() => import('../pages/user/Registrations'))
 const MyMessages = lazy(() => import('../pages/user/Messages'))
+const MyLocation = lazy(() => import('../pages/user/MyLocation'))
 
 // 懒加载页面组件 - 组织者页面
 const OrganizerMyActivities = lazy(() => import('../pages/organizer/MyActivities'))
@@ -150,6 +151,14 @@ const router = createBrowserRouter([
         element: lazyWrapper(() => (
           <AuthRoute>
             <MyMessages />
+          </AuthRoute>
+        ))
+      },
+      {
+        path: 'user/my-location',
+        element: lazyWrapper(() => (
+          <AuthRoute>
+            <MyLocation />
           </AuthRoute>
         ))
       },

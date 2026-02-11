@@ -11,7 +11,7 @@ import { getCurrentLocation, getAmapLocation, isInRadius, calculateDistance, wgs
 const LOCATION_CONFIG = {
   enableHighAccuracy: true,    // 启用高精度定位
   timeout: 15000,              // 15秒超时
-  maximumAge: 60000            // 允许使用1分钟内的缓存
+  maximumAge: 0                // 签到场景必须使用实时位置，不使用缓存
 }
 
 /**
@@ -197,17 +197,17 @@ export const locationDiagnostics = async () => {
   }
 }
 export const getLocation = async () => {
+  // 优先使用浏览器GPS定位（精度更高），高德作为降级方案
   try {
-    // 优先使用浏览器原生定位（更稳定、兼容性更好）
-    console.log('尝试使用浏览器原生定位...')
+    console.log('尝试使用浏览器GPS定位（优先）...')
     const browserLocation = await getBrowserLocation()
-    console.log('浏览器原生定位成功:', browserLocation)
+    console.log('浏览器GPS定位成功:', browserLocation)
     return {
       ...browserLocation,
       method: 'browser'
     }
-  } catch (error) {
-    console.warn('浏览器原生定位失败，尝试高德地图定位:', error.message)
+  } catch (browserError) {
+    console.warn('浏览器GPS定位失败，降级使用高德定位:', browserError.message)
     try {
       // 确保高德地图API已加载
       if (!window.AMap) {
@@ -223,13 +223,12 @@ export const getLocation = async () => {
       }
     } catch (amapError) {
       console.error('所有定位方式都失败了:', amapError.message)
-      // 提供更详细的错误信息
       let errorMessage = '定位失败'
-      if (error.message.includes('用户拒绝')) {
+      if (browserError.message.includes('用户拒绝')) {
         errorMessage = '请允许浏览器获取您的位置信息，并确保设备GPS功能已开启'
-      } else if (error.message.includes('超时')) {
+      } else if (browserError.message.includes('超时')) {
         errorMessage = '定位超时，请检查GPS信号或网络连接'
-      } else if (error.message.includes('不可用')) {
+      } else if (browserError.message.includes('不可用')) {
         errorMessage = '位置信息不可用，请检查设备GPS功能'
       }
       throw new Error(errorMessage)
@@ -249,15 +248,23 @@ export const watchLocation = (callback) => {
 
   const watchId = navigator.geolocation.watchPosition(
     (position) => {
+      const originalLat = position.coords.latitude
+      const originalLng = position.coords.longitude
+
+      // WGS84→GCJ02 坐标转换，与其他定位方式保持一致
+      const converted = wgs84ToGcj02(originalLng, originalLat)
+
       const location = {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
+        latitude: converted.lat,
+        longitude: converted.lng,
         accuracy: position.coords.accuracy,
         altitude: position.coords.altitude,
         altitudeAccuracy: position.coords.altitudeAccuracy,
         heading: position.coords.heading,
         speed: position.coords.speed,
-        timestamp: position.timestamp
+        timestamp: position.timestamp,
+        originalLatitude: originalLat,
+        originalLongitude: originalLng
       }
       callback(null, location)
     },

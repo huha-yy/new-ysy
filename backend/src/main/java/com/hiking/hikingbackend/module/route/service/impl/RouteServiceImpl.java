@@ -49,7 +49,7 @@ public class RouteServiceImpl implements RouteService {
 
     private static final int ROUTE_STATUS_NORMAL = 1;    // 路线正常
     private static final int ROUTE_PUBLIC = 1;           // 路线公开
-    private static final int CHECKPOINT_RADIUS_DEFAULT = 50; // 默认签到半径（米）
+    private static final int CHECKPOINT_RADIUS_DEFAULT = 100; // 默认签到半径（米），与前端保持一致
     private static final int CHECKPOINT_TYPE_WAY = 2;      // 途中点（默认）
     private static final int CHECKPOINT_REQUIRED = 1;       // 必签（默认）
     private static final int ROUTE_POINT_TYPE_TRACK = 5;    // 路线轨迹点

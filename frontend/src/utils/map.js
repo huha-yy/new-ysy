@@ -132,7 +132,7 @@ export const getCurrentLocation = () => {
     const options = {
       enableHighAccuracy: true,  // 启用高精度定位
       timeout: 15000,            // 增加超时时间到15秒
-      maximumAge: 60000          // 允许使用1分钟内的缓存位置
+      maximumAge: 0              // 签到场景必须使用实时位置，不使用缓存
     }
 
     navigator.geolocation.getCurrentPosition(

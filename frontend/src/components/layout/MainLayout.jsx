@@ -18,7 +18,8 @@ import {
   FileTextOutlined,
   CompassOutlined,
   MenuOutlined,
-  CloseOutlined
+  CloseOutlined,
+  AimOutlined
 } from '@ant-design/icons'
 import { ROLE } from '../../utils/constants'
 import { getImageUrl } from '../../utils/imageUrl'
@@ -108,6 +109,11 @@ function MainLayout() {
       key: 'messages',
       icon: <MessageOutlined />,
       label: <Link to="/user/messages">消息通知</Link>
+    },
+    {
+      key: 'my-location',
+      icon: <AimOutlined />,
+      label: <Link to="/user/my-location">当前位置</Link>
     }
   ]
 

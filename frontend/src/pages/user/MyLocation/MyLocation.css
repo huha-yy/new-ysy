@@ -1,0 +1,74 @@
+.my-location-page {
+  padding: 24px;
+}
+
+.my-location-page .container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.location-map-section {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+}
+
+.location-loading {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0;
+}
+
+/* 定位对比 */
+.compare-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.compare-item {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.compare-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.compare-method {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.compare-body {
+  font-size: 12px;
+  color: #666;
+  line-height: 2;
+}
+
+.compare-deviations {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.compare-error {
+  color: #ff4d4f;
+  font-size: 12px;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .my-location-page {
+    padding: 12px;
+  }
+
+  .compare-results {
+    grid-template-columns: 1fr;
+  }
+}
