@@ -98,9 +98,14 @@ public class ActivityServiceImpl implements ActivityService {
             queryWrapper.le(Activity::getActivityDate, query.getEndDate());
         }
         
-        // 按活动日期升序排序
-        queryWrapper.orderByAsc(Activity::getActivityDate)
-                   .orderByDesc(Activity::getCreateTime);
+        // 排序
+        if ("hot".equals(query.getSortBy())) {
+            queryWrapper.orderByDesc(Activity::getViewCount)
+                       .orderByDesc(Activity::getCreateTime);
+        } else {
+            queryWrapper.orderByAsc(Activity::getActivityDate)
+                       .orderByDesc(Activity::getCreateTime);
+        }
         
         // 2. 分页查询
         Page<Activity> page = new Page<>(query.getPageNum(), query.getPageSize());

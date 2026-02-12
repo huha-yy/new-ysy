@@ -42,6 +42,7 @@ function Home() {
       const result = await getActivityList({
         pageNum: 1,
         pageSize: 8,
+        sortBy: 'hot',
         difficultyLevel: filters.difficulty,
         timeRange: filters.time
       })

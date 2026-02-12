@@ -38,5 +38,8 @@ public class ActivityQuery {
 
     @Schema(description = "每页数量", example = "10")
     private Integer pageSize = 10;
+
+    @Schema(description = "排序方式：date按日期（默认）、hot按热度", example = "date")
+    private String sortBy;
 }
 

@@ -1,234 +1,174 @@
-/* 集合方案页面样式 */
+/* 集合方案查看页面 */
 .gathering-page {
   padding: 20px 0;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f5f7fa;
 }
 
-.container {
-  max-width: 1000px;
+.gathering-container {
+  max-width: 720px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 16px;
 }
 
-/* 加载状态 */
-.loading-container {
+/* 页面头部 */
+.gathering-header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  min-height: 400px;
+  margin-bottom: 16px;
 }
 
-.loading-spinner {
-  font-size: 16px;
-  color: #fff;
+/* 注意事项提示 */
+.gathering-notice {
+  margin-bottom: 16px;
+  border-radius: 8px;
 }
 
-/* 空状态 */
-.empty-state {
+/* 集合信息卡片 */
+.gathering-info-card {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.gathering-info-card .ant-card-head-title {
+  font-weight: 600;
+}
+
+.info-grid {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-  color: #fff;
   gap: 20px;
 }
 
-/* 卡片样式 */
-.gathering-card {
-  margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
 }
 
-.gathering-card .ant-card-head {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-}
-
-.gathering-card .ant-card-head-title {
-  font-size: 20px;
-  font-weight: 600;
-}
-
-/* 重要提示 */
-.gathering-alert {
-  margin-bottom: 24px;
-}
-
-/* 分隔线 */
-.section-divider {
-  margin: 32px 0 16px 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #667eea;
-}
-
-.section-divider::before {
-  border-top-color: #667eea;
-}
-
-/* 集合描述 */
-.gathering-descriptions {
-  margin-bottom: 16px;
-}
-
-.gathering-descriptions .ant-descriptions-item-label {
-  font-weight: 600;
-  color: #333;
-}
-
-.gathering-descriptions .ant-descriptions-item-content {
-  color: #666;
-}
-
-.gathering-time {
+.info-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 18px;
-  font-weight: 600;
-  color: #FFA726;
+  flex-shrink: 0;
 }
 
-.gathering-address {
-  font-size: 16px;
-  font-weight: 500;
+.time-icon {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.location-icon {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.phone-icon {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.info-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.info-label {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 4px;
+}
+
+.info-value {
+  font-size: 15px;
   color: #333;
+  word-break: break-all;
 }
 
-.organizer-phone {
-  font-size: 16px;
-  font-weight: 500;
-  color: #00D9FF;
+.info-value a {
+  color: #1890ff;
 }
 
-.map-link {
-  margin-left: 8px;
-  color: #667eea;
+.time-value {
+  font-size: 17px;
+  font-weight: 600;
+  color: #fa8c16;
 }
 
-/* 交通指引 */
-.transport-guide {
-  display: flex;
-  align-items: flex-start;
-  padding: 16px;
-  background: #f5f5f5;
-  border-radius: 8px;
+/* 地图卡片 */
+.gathering-map-card {
   margin-bottom: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.gathering-map-card .ant-card-body {
+  padding: 0;
+}
+
+.gathering-map {
+  width: 100%;
+  height: 240px;
+  border-radius: 0 0 8px 8px;
+}
+
+/* 详情卡片（交通指引、携带物品） */
+.gathering-detail-card {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.gathering-detail-card .ant-card-head-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.detail-text {
+  color: #555;
   line-height: 1.8;
-  color: #666;
+  font-size: 14px;
 }
 
-/* 携带物品 */
-.items-to-bring {
-  display: flex;
-  align-items: flex-start;
-  padding: 16px;
-  background: #f5f5f5;
-  border-radius: 8px;
-  margin-bottom: 16px;
-}
-
-.items-content {
+.pre-text {
   margin: 0;
   white-space: pre-wrap;
-  line-height: 1.8;
-  color: #666;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-
-/* 注意事项 */
-.notices {
-  padding: 16px;
-  background: #fff7e6;
-  border-radius: 8px;
-  border-left: 4px solid #faad14;
-}
-
-.notice-list {
-  margin: 0;
-  padding-left: 20px;
-  line-height: 2;
-  color: #666;
-}
-
-.notice-list li {
-  margin-bottom: 8px;
+  font-family: inherit;
 }
 
 /* 底部操作 */
-.gathering-actions {
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid #f0f0f0;
+.gathering-footer {
+  margin-top: 8px;
+  padding-bottom: 24px;
 }
 
 /* 响应式 */
 @media (max-width: 768px) {
   .gathering-page {
-    padding: 10px 0;
+    padding: 12px 0;
   }
 
-  .container {
-    padding: 0 10px;
+  .gathering-container {
+    padding: 0 12px;
   }
 
-  .section-divider {
-    margin: 24px 0 12px 0;
-    font-size: 14px;
-  }
-
-  .gathering-time {
+  .info-icon {
+    width: 36px;
+    height: 36px;
     font-size: 16px;
   }
 
-  .gathering-address {
-    font-size: 14px;
+  .time-value {
+    font-size: 15px;
   }
 
-  .organizer-phone {
-    font-size: 14px;
-  }
-
-  .transport-guide,
-  .items-to-bring {
-    padding: 12px;
-  }
-
-  .notices {
-    padding: 12px;
-  }
-
-  .gathering-actions {
-    margin-top: 24px;
-    padding-top: 16px;
-  }
-
-  .gathering-actions .ant-btn {
-    width: 100%;
-    min-height: 44px;
+  .gathering-map {
+    height: 200px;
   }
 }
-
-@media (max-width: 480px) {
-  .gathering-card .ant-card-head-title {
-    font-size: 18px;
-  }
-
-  .section-divider {
-    font-size: 14px;
-  }
-
-  .gathering-descriptions .ant-descriptions-item-label {
-    font-size: 13px;
-  }
-
-  .gathering-descriptions .ant-descriptions-item-content {
-    font-size: 13px;
-  }
-
-  .notice-list {
-    padding-left: 16px;
-    font-size: 13px;
-  }
-}
-

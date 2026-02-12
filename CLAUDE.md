@@ -126,10 +126,22 @@ const activities = await request.get('/activities')  // 响应拦截器自动提
 ### 身份认证
 - 后端：`SecurityUtils.getCurrentUserId()` 获取当前用户 ID
 - 前端：Token 由拦截器自动附加，通过 `utils/storage.js` 管理
+- 角色常量：USER (0)、ORGANIZER (1)、ADMIN (2)
+
+### 状态常量 (`frontend/src/utils/constants.js`)
+- ACTIVITY_STATUS: DRAFT (0) → PENDING (1) → PUBLISHED (2) → IN_PROGRESS (3) → ENDED (4)，另有 CANCELLED (5)、REJECTED (6)
+- REGISTRATION_STATUS: PENDING (0)、APPROVED (1)、REJECTED (2)、WAITING (3)、CANCELLED (4)、ABSENT (5)
+- DIFFICULTY: EASY (1)、SIMPLE (2)、MEDIUM (3)、HARD (4)、EXTREME (5)
 
 ### 路线点位类型
 START（起点）、END（终点）、WAYPOINT（路点）、REST_POINT（休息点）、SCENIC_POINT（景点）、DANGER_POINT（危险点）
 每个点位：`{latitude, longitude, altitude, pointType, description, sequence}`
+
+### 高德地图集成 (`frontend/src/utils/map.js`)
+- API 版本：2.0，需要同时配置 API Key 和 securityJsCode
+- 加载方式：`loadAmapScript()` 返回 `window.AMap`
+- 已加载插件：Geolocation、Marker、Polyline、Polygon、Scale、ToolBar、PlaceSearch、Geocoder
+- 地图组件：`src/components/MapView/MapView.jsx`，支持 `onMapClick` 回调
 
 ## 数据库约定
 
