@@ -18,10 +18,9 @@ const request = axios.create({
  */
 request.interceptors.request.use(
   (config) => {
-    // 从 localStorage 获取 token
     const token = getToken()
+    console.log(`[Request] ${config.method?.toUpperCase()} ${config.url}`, token ? '(有token)' : '(无token)')
     if (token) {
-      // 去除 token 前后的空格
       config.headers['Authorization'] = `Bearer ${token.trim()}`
     }
     return config
@@ -38,44 +37,46 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   (response) => {
     const res = response.data
+    console.log(`[Response] ${response.config.url} code=${res.code}`)
 
-    // 根据后端统一响应格式处理
     if (res.code === 200) {
-      // 成功返回 data
       return res.data
     } else if (res.code === 401) {
-      // 未授权，跳转登录
+      console.error('[Response] 401 未授权:', response.config.url)
       message.error('登录已过期，请重新登录')
       removeToken()
       removeUser()
-      window.location.href = '/login'
+      // 暂时注释掉，用于调试
+      // window.location.href = '/login'
       return Promise.reject(new Error(res.message || '未授权'))
     } else {
-      // 其他错误
       message.error(res.message || '请求失败')
       return Promise.reject(new Error(res.message || '请求失败'))
     }
   },
   (error) => {
-    console.error('响应错误:', error)
+    console.error('[Response Error]', error.response?.status, error.response?.config?.url, error.response?.data)
 
-    // 处理 HTTP 错误状态码
     if (error.response) {
       switch (error.response.status) {
         case 400:
           message.error('请求参数错误')
           break
         case 401:
+          console.error('[Response] 401 HTTP错误:', error.response.config.url)
           message.error('未授权，请重新登录')
           removeToken()
           removeUser()
-          window.location.href = '/login'
+          // 暂时注释掉，用于调试
+          // window.location.href = '/login'
           break
         case 403:
+          console.error('[Response] 403 拒绝访问:', error.response.config.url, error.response.data)
           message.error('拒绝访问：登录已过期或权限不足')
           removeToken()
           removeUser()
-          window.location.href = '/login'
+          // 暂时注释掉，用于调试
+          // window.location.href = '/login'
           break
         case 404:
           message.error('请求资源不存在')
@@ -87,10 +88,8 @@ request.interceptors.response.use(
           message.error(`网络错误: ${error.response.status}`)
       }
     } else if (error.request) {
-      // 请求已发出但没有响应
       message.error('网络连接失败，请检查网络')
     } else {
-      // 请求配置错误
       message.error('请求配置错误')
     }
 
@@ -122,4 +121,3 @@ export default {
     return request.patch(url, data, config)
   }
 }
-

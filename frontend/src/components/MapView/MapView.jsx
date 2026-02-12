@@ -29,6 +29,7 @@ const MapView = ({
   routePoints = [],
   showCurrentLocation = false,
   onMarkerClick,
+  onMapClick,
   autoFitView = false,
   allowCenterChange = true,
   children
@@ -42,6 +43,7 @@ const MapView = ({
   const markersRef = useRef(markers)
   const routePointsRef = useRef(routePoints)
   const onMarkerClickRef = useRef(onMarkerClick)
+  const onMapClickRef = useRef(onMapClick)
 
   // 同步 ref 到最新值
   useEffect(() => {
@@ -53,6 +55,9 @@ const MapView = ({
   useEffect(() => {
     onMarkerClickRef.current = onMarkerClick
   }, [onMarkerClick])
+  useEffect(() => {
+    onMapClickRef.current = onMapClick
+  }, [onMapClick])
 
   useEffect(() => {
     initMap()
@@ -127,6 +132,13 @@ const MapView = ({
       // 添加控件
       mapInstance.current.addControl(new AMap.Scale())
       mapInstance.current.addControl(new AMap.ToolBar())
+
+      // 绑定地图点击事件
+      mapInstance.current.on('click', (e) => {
+        if (onMapClickRef.current) {
+          onMapClickRef.current(e)
+        }
+      })
 
       setLoading(false)
 

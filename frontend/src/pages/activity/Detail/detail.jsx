@@ -18,6 +18,7 @@ import { getActivityDetail, registerActivity } from '../../../api/activity'
 import { getActivityReviews, getActivityRatingStats } from '../../../api/review'
 import { DIFFICULTY_MAP } from '../../../utils/constants'
 import { getImageUrl } from '../../../utils/imageUrl'
+import { useAuth } from '../../../hooks/useAuth'
 import ReviewStats from '../../../components/ReviewStats/ReviewStats'
 import dayjs from 'dayjs'
 import './Detail.css'
@@ -25,6 +26,7 @@ import './Detail.css'
 function ActivityDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [activity, setActivity] = useState(null)
   const [imageLoading, setImageLoading] = useState(true)
@@ -208,7 +210,12 @@ function ActivityDetail() {
   }
 
   const handleGathering = () => {
-    window.location.href = `/activities/${id}/gathering`
+    // 如果当前用户是该活动的组织者，跳转到组织者管理页面
+    if (user && activity && user.id === activity.organizerId) {
+      navigate(`/organizer/activities/${id}/gathering`)
+    } else {
+      navigate(`/activities/${id}/gathering`)
+    }
   }
 
   const handleReview = () => {
@@ -540,13 +547,13 @@ function ActivityDetail() {
                 label: '集合信息',
                 children: (
                   <div className="tab-content gathering-content">
-                    <Button 
-                      type="default" 
-                      size="large" 
+                    <Button
+                      type="default"
+                      size="large"
                       icon={<SettingOutlined />}
                       onClick={handleGathering}
                     >
-                      查看集合方案
+                      {user && activity && user.id === activity.organizerId ? '管理集合方案' : '查看集合方案'}
                     </Button>
                     {activity.gatheringPublished && (
                       <Tag color="green" className="gathering-published">
@@ -576,7 +583,7 @@ function ActivityDetail() {
               onClick={handleGathering}
               icon={<SettingOutlined />}
             >
-              集合信息
+              {user && activity && user.id === activity.organizerId ? '管理集合方案' : '集合信息'}
             </Button>
             {activity.status === 3 && (
               <Button

@@ -137,6 +137,24 @@ START（起点）、END（终点）、WAYPOINT（路点）、REST_POINT（休息
 - 软删除：`deleted` 字段（MyBatis-Plus 管理）
 - 自动时间戳：`create_time`、`update_time`
 - 常见外键：`user_id`、`activity_id`、`route_id`
+- SQL 文件：`系统实现与设计/hiking_system.sql`
+
+### 核心数据表
+`user`、`user_profile`、`activity`、`registration`、`gathering_plan`、`route`、`route_point`、`checkpoint`、`check_in_record`、`track_record`、`alert_event`、`review`、`message`、`dict_type`、`dict_data`
+
+## 主要 API 端点
+
+- 认证：`POST /auth/login`、`POST /auth/register`、`GET /auth/profile`
+- 活动：`GET/POST /activities`、`GET/PUT /activities/{id}`、`POST /activities/{id}/audit`
+- 报名：`POST /registrations`、`GET /registrations/my`、`PUT /registrations/{id}/status`
+- 签到：`GET /checkin/points/{activityId}`、`POST /checkin/record`、`GET /checkin/track/{activityId}`、`GET /checkin/alerts`
+- 路线：`GET/POST /routes`、`GET/PUT /routes/{id}`
+
+注意：所有端点实际前缀为 `/api`（context-path）
+
+## 环境要求
+
+JDK 17+、Node.js 16+、MySQL 8.0+、Maven 3.6+
 
 ## 配置文件
 

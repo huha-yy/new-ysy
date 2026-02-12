@@ -26,9 +26,11 @@ function Login() {
   const onFinish = async (values) => {
     setLoading(true)
     try {
+      console.log('[Login] 开始登录请求...', values.username)
       const result = await login(values)
+      console.log('[Login] 登录响应:', result)
       message.success('登录成功')
-      
+
       // 存储token和用户信息
       setToken(result.token)
       setUser({
@@ -39,6 +41,10 @@ function Login() {
         role: result.role
       })
 
+      console.log('[Login] token已存储:', localStorage.getItem('token')?.substring(0, 30))
+      console.log('[Login] user已存储:', localStorage.getItem('user'))
+      console.log('[Login] 即将跳转到:', from)
+
       // 处理记住我功能
       if (values.remember) {
         setRememberMe({
@@ -48,11 +54,11 @@ function Login() {
       } else {
         localStorage.removeItem('rememberMe')
       }
-      
+
       // 跳转到之前的页面或首页
       navigate(from, { replace: true })
     } catch (error) {
-      // 错误已在 request.js 的响应拦截器中处理
+      console.error('[Login] 登录失败:', error)
     } finally {
       setLoading(false)
     }

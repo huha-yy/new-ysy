@@ -1,6 +1,7 @@
 package com.hiking.hikingbackend.module.activity.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -19,6 +20,7 @@ public class GatheringPlanDTO {
 
     @Schema(description = "集合时间", example = "2024-12-28 07:30:00", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "集合时间不能为空")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime gatheringTime;
 
     @Schema(description = "集合地点详细地址", example = "香山公园东门广场", requiredMode = Schema.RequiredMode.REQUIRED)

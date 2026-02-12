@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Card, Button, message, Space, Tag, Progress, Modal, Alert, Form, Input, InputNumber } from 'antd'
+import { Card, Button, message, Space, Tag, Progress, Modal, Alert, Form, Input, InputNumber, Dropdown } from 'antd'
 import {
   EnvironmentOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
   WarningOutlined,
-  ReloadOutlined
+  ReloadOutlined,
+  MoreOutlined,
+  AimOutlined,
+  EditOutlined,
+  InfoCircleOutlined
 } from '@ant-design/icons'
 import MapView from '../../../components/MapView/MapView'
 import { getCheckpoints, getCheckinStatus, checkin as checkinApi, reportTrack } from '../../../api/checkin'
@@ -409,7 +413,7 @@ function CheckIn() {
           <div className="checkin-progress-section">
             <div className="progress-header">
               <h3>签到进度</h3>
-              <Space>
+              <div className="progress-actions">
                 <Tag color="blue">
                   {checkinProgress}%
                 </Tag>
@@ -421,68 +425,68 @@ function CheckIn() {
                 >
                   刷新位置
                 </Button>
-                <Button
-                  size="small"
-                  type="default"
-                  onClick={handleForceGpsLocation}
-                  loading={locating}
-                  style={{ color: '#1890ff' }}
+                <Dropdown
+                  menu={{
+                    items: [
+                      {
+                        key: 'force-gps',
+                        label: '强制GPS定位',
+                        icon: <AimOutlined />,
+                        onClick: handleForceGpsLocation,
+                        disabled: locating
+                      },
+                      {
+                        key: 'diagnostics',
+                        label: '定位诊断',
+                        icon: <InfoCircleOutlined />,
+                        onClick: handleLocationDiagnostics,
+                        disabled: diagnosing
+                      },
+                      {
+                        key: 'manual',
+                        label: '手动定位',
+                        icon: <EditOutlined />,
+                        onClick: handleManualLocation
+                      },
+                      ...(currentLocation && currentLocation.originalLatitude ? [{
+                        key: 'conversion',
+                        label: '坐标转换详情',
+                        icon: <InfoCircleOutlined />,
+                        onClick: () => {
+                          Modal.info({
+                            title: '坐标转换详情',
+                            content: (
+                              <div>
+                                <p><strong>GPS原始坐标 (WGS84):</strong></p>
+                                <p>纬度: {currentLocation.originalLatitude.toFixed(7)}</p>
+                                <p>经度: {currentLocation.originalLongitude.toFixed(7)}</p>
+                                <br />
+                                <p><strong>转换后坐标 (GCJ02):</strong></p>
+                                <p>纬度: {currentLocation.latitude.toFixed(7)}</p>
+                                <p>经度: {currentLocation.longitude.toFixed(7)}</p>
+                                <br />
+                                <p style={{ fontSize: '12px', color: '#666' }}>
+                                  * 中国境内GPS定位需要进行坐标系转换才能在地图上正确显示
+                                </p>
+                              </div>
+                            ),
+                            width: 420
+                          })
+                        }
+                      }] : [])
+                    ]
+                  }}
+                  placement="bottomRight"
                 >
-                  强制GPS
-                </Button>
-                <Button
-                  size="small"
-                  type="default"
-                  onClick={handleLocationDiagnostics}
-                  loading={diagnosing}
-                  style={{ color: '#722ed1' }}
-                >
-                  定位诊断
-                </Button>
-                <Button
-                  size="small"
-                  type="default"
-                  onClick={handleManualLocation}
-                  style={{ color: '#f5222d' }}
-                >
-                  手动定位
-                </Button>
-                {currentLocation && currentLocation.originalLatitude && (
-                  <Button
-                    size="small"
-                    type="link"
-                    onClick={() => {
-                      Modal.info({
-                        title: '坐标转换详情',
-                        content: (
-                          <div>
-                            <p><strong>GPS原始坐标 (WGS84):</strong></p>
-                            <p>纬度: {currentLocation.originalLatitude.toFixed(7)}</p>
-                            <p>经度: {currentLocation.originalLongitude.toFixed(7)}</p>
-                            <br />
-                            <p><strong>转换后坐标 (GCJ02):</strong></p>
-                            <p>纬度: {currentLocation.latitude.toFixed(7)}</p>
-                            <p>经度: {currentLocation.longitude.toFixed(7)}</p>
-                            <br />
-                            <p style={{ fontSize: '12px', color: '#666' }}>
-                              * 中国境内GPS定位需要进行坐标系转换才能在地图上正确显示
-                            </p>
-                          </div>
-                        ),
-                        width: 420
-                      })
-                    }}
-                  >
-                    查看转换详情
-                  </Button>
-                )}
-              </Space>
+                  <Button size="small" icon={<MoreOutlined />} />
+                </Dropdown>
+              </div>
             </div>
             <Progress
               percent={checkinProgress}
               strokeColor={{
-                '0%': '#108ee9',
-                '100%': '#87d068'
+                '0%': '#FFA726',
+                '100%': '#52c41a'
               }}
               format={() => `${checkinStatus?.checkInRecords?.length || 0} / ${checkpoints.length}`}
             />
@@ -516,7 +520,7 @@ function CheckIn() {
               }
               type="warning"
               showIcon
-              style={{ marginBottom: 16 }}
+              className="location-error-bar"
             />
           )}
 
@@ -540,62 +544,41 @@ function CheckIn() {
               }
               type="error"
               showIcon
-              className="location-error-alert"
-              style={{ marginBottom: 16 }}
+              className="location-error-bar"
             />
           )}
 
           {/* 当前位置信息 */}
           {currentLocation && (
-            <Alert
-              message="当前位置"
-              description={
-                <Space direction="vertical" style={{ width: '100%' }}>
-                  <div>
-                    <EnvironmentOutlined />
-                    <span style={{ marginLeft: 8 }}>
-                      纬度: {currentLocation.latitude.toFixed(6)}，
-                      经度: {currentLocation.longitude.toFixed(6)}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#999' }}>
-                    坐标系: {currentLocation.coordinateSystem || 'GCJ02'}
-                    {currentLocation.accuracy && (
-                      <span> · 精度: ±{Math.round(currentLocation.accuracy)}米</span>
-                    )}
-                  </div>
-                  {currentLocation.accuracy && currentLocation.accuracy > 100 && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <Tag color="warning" icon={<WarningOutlined />}>
-                        定位精度较低（±{Math.round(currentLocation.accuracy)}米），建议到空旷处重新定位
-                      </Tag>
-                      <Button
-                        size="small"
-                        type="primary"
-                        onClick={handleForceGpsLocation}
-                        loading={locating}
-                        icon={<ReloadOutlined />}
-                      >
-                        重新定位
-                      </Button>
-                    </div>
+            <>
+              <div className="location-status-bar">
+                <div className="location-status-left">
+                  <EnvironmentOutlined />
+                  <span>已获取当前位置</span>
+                </div>
+                <div className="location-status-right">
+                  {currentLocation.accuracy && (
+                    <Tag color={currentLocation.accuracy < 50 ? 'success' : currentLocation.accuracy < 100 ? 'warning' : 'error'}>
+                      精度 ±{Math.round(currentLocation.accuracy)}米
+                    </Tag>
                   )}
-                  {currentLocation.originalLatitude && (
-                    <div style={{ fontSize: '11px', color: '#666' }}>
-                      原始坐标(WGS84): {currentLocation.originalLatitude.toFixed(6)}, {currentLocation.originalLongitude.toFixed(6)}
-                    </div>
-                  )}
-                  {currentLocation.address && (
-                    <div style={{ fontSize: '12px', color: '#666' }}>
-                      地址: {currentLocation.address}
-                    </div>
-                  )}
-                </Space>
-              }
-              type={currentLocation.accuracy && currentLocation.accuracy > 100 ? 'warning' : 'info'}
-              showIcon
-              className="location-alert"
-            />
+                </div>
+              </div>
+              {currentLocation.accuracy && currentLocation.accuracy > 100 && (
+                <div className="location-low-accuracy">
+                  <WarningOutlined />
+                  <span>定位精度较低，建议到空旷处重新定位</span>
+                  <Button
+                    size="small"
+                    type="primary"
+                    onClick={handleForceGpsLocation}
+                    loading={locating}
+                  >
+                    重新定位
+                  </Button>
+                </div>
+              )}
+            </>
           )}
 
           {/* 地图显示 */}
@@ -630,40 +613,40 @@ function CheckIn() {
                     key={checkpoint.id}
                     className={`checkpoint-item ${status} ${isNext ? 'next' : ''}`}
                   >
-                    <div className="checkpoint-header">
-                      <Space>
-                        <span className="checkpoint-seq">序号{checkpoint.sequence}</span>
+                    {/* 序号圆圈 */}
+                    <div className="checkpoint-seq-circle">
+                      {status === 'completed' ? '✓' : checkpoint.sequence}
+                    </div>
+
+                    {/* 信息区 */}
+                    <div className="checkpoint-info-area">
+                      <div className="checkpoint-name-row">
                         <span className="checkpoint-name">{checkpoint.name}</span>
                         {isNext && (
-                          <Tag color="orange">下一签到点</Tag>
+                          <Tag color="orange">下一站</Tag>
                         )}
-                      </Space>
-                    </div>
-
-                    <div className="checkpoint-body">
-                      <Space direction="vertical" style={{ width: '100%' }}>
+                      </div>
+                      <div className="checkpoint-meta">
                         {distance !== null && status === 'pending' && (
-                          <div className="checkpoint-distance">
+                          <span>
                             <EnvironmentOutlined />
-                            <span>距离: {formatDistance(distance)}</span>
-                          </div>
+                            距离 {formatDistance(distance)}
+                          </span>
                         )}
-
-                        <div className="checkpoint-info">
-                          <span>签到半径: {checkpoint.radius}米</span>
-                          {checkpoint.expectedArriveMinutes && (
-                            <span>
-                              <ClockCircleOutlined />
-                              预计到达: {dayjs().startOf('day').add(checkpoint.expectedArriveMinutes, 'minute').format('HH:mm')}
-                            </span>
-                          )}
-                        </div>
-                      </Space>
+                        <span>半径 {checkpoint.radius}m</span>
+                        {checkpoint.expectedArriveMinutes && (
+                          <span>
+                            <ClockCircleOutlined />
+                            {dayjs().startOf('day').add(checkpoint.expectedArriveMinutes, 'minute').format('HH:mm')}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="checkpoint-footer">
+                    {/* 操作区 */}
+                    <div className="checkpoint-action">
                       {status === 'completed' && (
-                        <Tag icon={<CheckCircleOutlined />} color="success">
+                        <Tag icon={<CheckCircleOutlined />} color="success" style={{ fontSize: '14px', padding: '4px 12px' }}>
                           已签到 {checkinStatus?.checkInRecords?.find(r => r.checkpointId === checkpoint.id)?.checkInTime &&
                             dayjs(checkinStatus.checkInRecords.find(r => r.checkpointId === checkpoint.id).checkInTime).format('HH:mm')
                           }
@@ -676,11 +659,10 @@ function CheckIn() {
                           onClick={() => handleCheckIn(checkpoint.id)}
                           loading={loading}
                           disabled={!currentLocation || distance > checkpoint.radius}
-                          block
                         >
                           {distance !== null && distance > checkpoint.radius
-                            ? `距离${formatDistance(distance)}，未到签到范围`
-                            : '立即签到'
+                            ? `${formatDistance(distance)}`
+                            : '签到'
                           }
                         </Button>
                       )}
@@ -693,13 +675,11 @@ function CheckIn() {
 
           {/* 完成提示 */}
           {checkinProgress === 100 && (
-            <Alert
-              message="🎉 恭喜！"
-              description="您已完成所有签到点签到，请等待活动结束"
-              type="success"
-              showIcon
-              className="complete-alert"
-            />
+            <div className="complete-celebration">
+              <div className="celebration-icon">🎉</div>
+              <div className="celebration-title">恭喜完成所有签到！</div>
+              <div className="celebration-desc">您已完成所有签到点签到，请等待活动结束</div>
+            </div>
           )}
         </Card>
 

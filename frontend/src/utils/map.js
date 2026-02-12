@@ -96,6 +96,7 @@ function transformLng(lng, lat) {
  * 高德地图JS API密钥 - 需要替换为实际的Key
  */
 const AMAP_KEY = '4e498e7dde5c0916ebd506fb723f1706'
+const AMAP_SECURITY_CODE = '42110f9ac5f74499b873d7db060c558a'
 
 /**
  * 动态加载高德地图JS API
@@ -108,9 +109,14 @@ export const loadAmapScript = () => {
       return
     }
 
+    // 高德地图 JS API 2.0 要求配置安全密钥
+    window._AMapSecurityConfig = {
+      securityJsCode: AMAP_SECURITY_CODE
+    }
+
     const script = document.createElement('script')
     script.type = 'text/javascript'
-    script.src = `https://webapi.amap.com/maps?v=2.0&key=${AMAP_KEY}&plugin=AMap.Geolocation,AMap.Marker,AMap.Polyline,AMap.Polygon,AMap.Scale,AMap.ToolBar`
+    script.src = `https://webapi.amap.com/maps?v=2.0&key=${AMAP_KEY}&plugin=AMap.Geolocation,AMap.Marker,AMap.Polyline,AMap.Polygon,AMap.Scale,AMap.ToolBar,AMap.PlaceSearch,AMap.Geocoder`
     script.onload = () => resolve(window.AMap)
     script.onerror = () => reject(new Error('加载高德地图脚本失败'))
     document.head.appendChild(script)
