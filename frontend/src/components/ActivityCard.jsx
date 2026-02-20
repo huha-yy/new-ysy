@@ -27,6 +27,20 @@ function ActivityCard({ activity }) {
     return colors[level] || 'default'
   }
 
+  // 获取状态对应的颜色
+  const getStatusColor = (status) => {
+    const colors = {
+      0: '#999',     // 草稿
+      1: '#fa8c16',  // 待审核
+      2: '#52c41a',  // 已发布
+      3: '#1890ff',  // 进行中
+      4: '#999',     // 已结束
+      5: '#ff4d4f',  // 已取消
+      6: '#ff4d4f'   // 已驳回
+    }
+    return colors[status] || '#999'
+  }
+
   // 格式化日期 - 兼容多种字段名
   const formatDate = (activity) => {
     const dateStr = activity.activityDate || activity.startDate
@@ -80,6 +94,11 @@ function ActivityCard({ activity }) {
           {activity.isHot && (
             <div className="hot-badge">
               <FireOutlined /> 热门
+            </div>
+          )}
+          {activity.statusText && (
+            <div className="status-badge" style={{ backgroundColor: getStatusColor(activity.status) }}>
+              {activity.statusText}
             </div>
           )}
           <div className="difficulty-badge">

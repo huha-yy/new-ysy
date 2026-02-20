@@ -20,6 +20,7 @@ mvn test                   # 运行测试
 - Swagger：http://localhost:8080/api/swagger-ui.html
 - 注意：`server.servlet.context-path` 为 `/api`，所有后端接口实际路径为 `/api/...`
 - 目前项目无单元测试
+- `maven-enforcer-plugin` 强制要求 JDK 17（不接受其他版本）
 
 ### 前端 (React 18 + Vite 5)
 ```bash
@@ -29,6 +30,8 @@ npm run dev                # 运行开发服务器 (http://localhost:5173)
 npm run build              # 生产环境构建
 npm run preview            # 预览生产构建
 ```
+
+- 无 ESLint/Prettier 配置，项目未设置代码格式化工具
 
 ### 数据库
 ```bash
@@ -67,6 +70,14 @@ CREATE DATABASE hiking_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 - 公开端点：`/auth/**`、`/activities/**`、`/routes/**`、`/dict/data/**`、`/file/**`、`/uploads/**`
 - 角色：USER、ORGANIZER、ADMIN
 
+**异常处理**：`GlobalExceptionHandler` 统一捕获异常，返回 `Result` 格式
+- 业务异常使用 `throw new BusinessException("错误信息")` 或 `throw new BusinessException(code, "错误信息")`
+- 参数校验异常（`@Valid`/`@Validated`）自动捕获并返回字段级错误信息
+
+**定时任务**（`checkin/scheduler/AlertScheduledTasks.java`）：
+- 每 5 分钟检测超时未签到用户和失联用户
+- 每小时输出预警任务汇总日志
+
 **数据层**：MyBatis-Plus
 - 实体类使用 `@TableName`、`@TableId(type = IdType.AUTO)`
 - 逻辑删除：`deleted` 字段（0=有效，1=已删除）
@@ -93,6 +104,7 @@ CREATE DATABASE hiking_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 - 响应拦截器：自动提取 `data` 字段，401/403 清除 token 并跳转 `/login`
 
 **状态管理**：React hooks + localStorage（无 Redux/Context）
+- Token/用户信息通过 `utils/storage.js` 管理（`getToken`、`setToken`、`getUser`、`setUser`、`clearAuth`）
 
 **UI**：Ant Design 5.12.0 + @ant-design/icons + Day.js
 
@@ -137,10 +149,15 @@ const activities = await request.get('/activities')  // 响应拦截器自动提
 START（起点）、END（终点）、WAYPOINT（路点）、REST_POINT（休息点）、SCENIC_POINT（景点）、DANGER_POINT（危险点）
 每个点位：`{latitude, longitude, altitude, pointType, description, sequence}`
 
+### 前端 API 层组织 (`frontend/src/api/`)
+每个业务模块对应一个 API 文件：`activity.js`、`checkin.js`、`registration.js`、`route.js`、`user.js`、`message.js`、`review.js`、`alert.js`、`admin.js`、`file.js`、`dict.js`、`weather.js`
+- 所有文件 import `request` from `@/api/request` 并导出具名函数
+
 ### 高德地图集成 (`frontend/src/utils/map.js`)
-- API 版本：2.0，需要同时配置 API Key 和 securityJsCode
+- API 版本：2.0，需要同时配置 API Key 和 securityJsCode（当前硬编码在文件中）
 - 加载方式：`loadAmapScript()` 返回 `window.AMap`
 - 已加载插件：Geolocation、Marker、Polyline、Polygon、Scale、ToolBar、PlaceSearch、Geocoder
+- 坐标系转换：内置 WGS84 ↔ GCJ02 ↔ BD09 转换函数（GPS 原始坐标需转 GCJ02 后才能在高德地图上使用）
 - 地图组件：`src/components/MapView/MapView.jsx`，支持 `onMapClick` 回调
 
 ## 数据库约定

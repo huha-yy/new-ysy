@@ -74,6 +74,19 @@
   animation: pulse 2s ease-in-out infinite;
 }
 
+.status-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
 @keyframes pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.05); }

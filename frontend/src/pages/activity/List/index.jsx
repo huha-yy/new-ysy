@@ -79,6 +79,11 @@ function ActivityList() {
                     cover={
                       activity.coverImage && (
                         <div className="card-cover" style={{ backgroundImage: `url(${getImageUrl(activity.coverImage)})` }}>
+                          {activity.statusText && (
+                            <div className="card-status-tag" style={{ backgroundColor: getStatusColor(activity.status) }}>
+                              {activity.statusText}
+                            </div>
+                          )}
                           {activity.isFull && (
                             <div className="card-tag">已满员</div>
                           )}
@@ -145,6 +150,20 @@ const getDifficultyColor = (level) => {
     5: 'magenta'   // 极限
   }
   return colors[level] || 'default'
+}
+
+// 获取状态对应的颜色
+const getStatusColor = (status) => {
+  const colors = {
+    0: '#999',     // 草稿
+    1: '#fa8c16',  // 待审核
+    2: '#52c41a',  // 已发布
+    3: '#1890ff',  // 进行中
+    4: '#999',     // 已结束
+    5: '#ff4d4f',  // 已取消
+    6: '#ff4d4f'   // 已驳回
+  }
+  return colors[status] || '#999'
 }
 
 export default ActivityList

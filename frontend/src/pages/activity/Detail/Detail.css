@@ -171,6 +171,52 @@
   margin-bottom: 24px;
 }
 
+/* 活动时间区块 */
+.activity-detail-page .activity-time-block {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFF3D6 100%);
+  border-radius: 12px;
+  border-left: 4px solid #FFA726;
+}
+
+.activity-detail-page .time-block-icon {
+  font-size: 28px;
+  color: #FFA726;
+}
+
+.activity-detail-page .time-block-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.activity-detail-page .time-block-date {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2D3436;
+}
+
+.activity-detail-page .time-block-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: #636E72;
+}
+
+.activity-detail-page .time-block-range .anticon {
+  color: #FFA726;
+  font-size: 14px;
+}
+
+.activity-detail-page .time-separator {
+  color: #b0b0b0;
+}
+
 /* 📋 Tab 内容 */
 .activity-detail-page .activity-tabs {
   background: #fff;

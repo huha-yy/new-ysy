@@ -4,6 +4,7 @@ import { Card, Form, Rate, Input, Button, Upload, Switch, message, Modal, Space,
 import { 
   UserOutlined,
   CalendarOutlined,
+  ClockCircleOutlined,
   TeamOutlined,
   EnvironmentOutlined,
   StarOutlined,
@@ -211,7 +212,7 @@ function ActivityDetail() {
 
   const handleGathering = () => {
     // 如果当前用户是该活动的组织者，跳转到组织者管理页面
-    if (user && activity && user.id === activity.organizerId) {
+    if (user && activity && (user.id == activity.organizerId || user.role == 2)) {
       navigate(`/organizer/activities/${id}/gathering`)
     } else {
       navigate(`/activities/${id}/gathering`)
@@ -273,23 +274,36 @@ function ActivityDetail() {
         {/* 活动标题和基本信息 */}
         <div className="activity-header">
           <h1 className="activity-title">{activity.title}</h1>
+
+          {/* 活动时间区块 */}
+          <div className="activity-time-block">
+            <CalendarOutlined className="time-block-icon" />
+            <div className="time-block-content">
+              <div className="time-block-date">{activity.activityDate}</div>
+              <div className="time-block-range">
+                <ClockCircleOutlined />
+                <span>{activity.startTime || '待定'}</span>
+                <span className="time-separator">—</span>
+                <span>{activity.endTime || '待定'}</span>
+              </div>
+            </div>
+          </div>
+
           <Space className="activity-tags" size="middle">
             <Tag color={getDifficultyColor(activity.difficultyLevel)}>
               {activity.difficultyText}
             </Tag>
-            <Tag icon={<CalendarOutlined />}>
-              {activity.activityDate}
-            </Tag>
             <Tag icon={<TeamOutlined />}>
-              <Badge count={activity.currentParticipants} showZero>
-                {activity.currentParticipants}/{activity.maxParticipants}人
-              </Badge>
+              {activity.currentParticipants}/{activity.maxParticipants}人
             </Tag>
           </Space>
         </div>
 
         {/* 活动详细描述 */}
         <Descriptions bordered column={1} className="activity-description">
+          <Descriptions.Item label="活动时间">
+            {activity.activityDate} {activity.startTime || '待定'} ~ {activity.endTime || '待定'}
+          </Descriptions.Item>
           <Descriptions.Item label="活动描述">
             <div className="description-content">
               {activity.description}
@@ -552,8 +566,10 @@ function ActivityDetail() {
                       size="large"
                       icon={<SettingOutlined />}
                       onClick={handleGathering}
+                      disabled={!activity.isRegistered && !(user && (user.id == activity.organizerId || user.role == 2))}
+                      title={!activity.isRegistered && !(user && (user.id == activity.organizerId || user.role == 2)) ? '报名通过后可查看集合信息' : ''}
                     >
-                      {user && activity && user.id === activity.organizerId ? '管理集合方案' : '查看集合方案'}
+                      {user && (user.id == activity.organizerId || user.role == 2) ? '管理集合方案' : '集合信息'}
                     </Button>
                     {activity.gatheringPublished && (
                       <Tag color="green" className="gathering-published">
@@ -582,8 +598,10 @@ function ActivityDetail() {
               size="large"
               onClick={handleGathering}
               icon={<SettingOutlined />}
+              disabled={!activity.isRegistered && !(user && (user.id == activity.organizerId || user.role == 2))}
+              title={!activity.isRegistered && !(user && (user.id == activity.organizerId || user.role == 2)) ? '报名通过后可查看集合信息' : ''}
             >
-              {user && activity && user.id === activity.organizerId ? '管理集合方案' : '集合信息'}
+              {user && (user.id == activity.organizerId || user.role == 2) ? '管理集合方案' : '集合信息'}
             </Button>
             {activity.status === 3 && (
               <Button
@@ -591,6 +609,8 @@ function ActivityDetail() {
                 size="large"
                 onClick={() => navigate(`/activities/${id}/checkin`)}
                 icon={<EnvironmentOutlined />}
+                disabled={!activity.isRegistered}
+                title={!activity.isRegistered ? '请先报名后再签到' : ''}
               >
                 活动签到
               </Button>
