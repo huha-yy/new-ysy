@@ -38,7 +38,7 @@ export const getCheckpoints = (activityId) => {
  * @returns {Promise}
  */
 export const reportTrack = (data) => {
-  return request.post('/track/report', data)
+  return request.post('/track/report', data, { silentError: true })
 }
 
 /**

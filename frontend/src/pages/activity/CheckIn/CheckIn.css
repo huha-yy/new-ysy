@@ -419,3 +419,73 @@
     padding: 24px 16px;
   }
 }
+
+/* 用户位置蓝色脉冲圆点 */
+.user-location-marker {
+  position: relative;
+  width: 56px;
+  height: 56px;
+}
+
+.user-pulse {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 56px;
+  height: 56px;
+  background: rgba(24, 144, 255, 0.2);
+  border-radius: 50%;
+  animation: mapUserPulse 2s ease-in-out infinite;
+}
+
+.user-dot {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 28px;
+  height: 28px;
+  background: #1890ff;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.5);
+}
+
+@keyframes mapUserPulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(2); opacity: 0; }
+  100% { transform: scale(1); opacity: 0.6; }
+}
+
+/* 签到点橙色标记 */
+.checkpoint-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.checkpoint-seq {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, #FFA726, #FF8B4F);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(255, 167, 38, 0.5);
+}
+
+.checkpoint-label {
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}

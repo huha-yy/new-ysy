@@ -31,6 +31,7 @@ function CheckIn() {
   const [locationError, setLocationError] = useState(null)
   const [checkinProgress, setCheckinProgress] = useState(0)
   const [nextCheckpoint, setNextCheckpoint] = useState(null)
+  const [mapCenter, setMapCenter] = useState(null)
 
   const [trackRecorder] = useState(new TrackRecorder())
   const [isRecording, setIsRecording] = useState(false)
@@ -40,7 +41,6 @@ function CheckIn() {
 
   useEffect(() => {
     fetchCheckinData()
-    checkPermissionAndLocation()
     return () => {
       // 停止轨迹记录
       if (isRecording) {
@@ -84,15 +84,15 @@ function CheckIn() {
   }, [checkinStatus, checkpoints])
 
   useEffect(() => {
-    // 自动获取位置（每2分钟，避免过度请求）
+    // 自动刷新位置（每2分钟，仅在已有位置时更新）
     const interval = setInterval(() => {
-      if (!locating && !currentLocation) {
+      if (!locating && currentLocation) {
         fetchLocation()
       }
     }, 120000) // 2分钟
 
     return () => clearInterval(interval)
-  }, [locating, currentLocation])
+  }, [])
 
   const fetchCheckinData = async () => {
     try {
@@ -125,38 +125,15 @@ function CheckIn() {
     try {
       setLocating(true)
       setLocationError(null)
-      const location = await forceGpsLocation()
+      const location = await getLocation()
+      const isFirstLocate = !currentLocation
       setCurrentLocation(location)
-      message.success(`定位成功，精度 ±${Math.round(location.accuracy)}米`)
-    } catch (error) {
-      // GPS失败时降级到 getLocation
-      try {
-        const fallback = await getLocation()
-        setCurrentLocation(fallback)
-        message.success(`位置获取成功 (${fallback.method === 'browser' ? '浏览器定位' : '高德定位'})`)
-      } catch (fallbackError) {
-        setLocationError(fallbackError.message)
-        setCurrentLocation(null)
-        Modal.error({
-          title: '定位失败',
-          content: (
-            <div>
-              <p>无法获取您的当前位置：</p>
-              <p style={{ color: '#ff4d4f', margin: '8px 0' }}>{fallbackError.message}</p>
-              <p>请尝试以下解决方案：</p>
-              <ul style={{ marginLeft: 16, marginTop: 8 }}>
-                <li>确保浏览器定位权限已开启</li>
-                <li>检查设备GPS功能是否正常</li>
-                <li>确保网络连接正常</li>
-                <li>尝试在户外或信号更好的地方使用</li>
-                <li>如果是HTTPS网站，确保证书有效</li>
-              </ul>
-            </div>
-          ),
-          width: 480,
-          okText: '我知道了'
-        })
+      if (isFirstLocate) {
+        message.success(`定位成功，精度 ±${Math.round(location.accuracy)}米`)
       }
+    } catch (error) {
+      setLocationError(error.message)
+      setCurrentLocation(null)
     } finally {
       setLocating(false)
     }
@@ -584,18 +561,28 @@ function CheckIn() {
           {/* 地图显示 */}
           <div className="map-section">
             <MapView
-              center={currentLocation ? {
+              center={mapCenter || (currentLocation ? {
                 lng: currentLocation.longitude,
                 lat: currentLocation.latitude
-              } : undefined}
+              } : undefined)}
+              zoom={16}
               height="400px"
               showCurrentLocation={true}
-              markers={checkpoints.map(cp => ({
-                lng: cp.longitude,
-                lat: cp.latitude,
-                title: cp.name,
-                content: `<div>${cp.name}</div>`
-              }))}
+              markers={[
+                ...(currentLocation ? [{
+                  lng: currentLocation.longitude,
+                  lat: currentLocation.latitude,
+                  title: '我的位置',
+                  content: '<div class="user-location-marker"><div class="user-pulse"></div><div class="user-dot"></div></div>',
+                  offset: { x: -28, y: -28 }
+                }] : []),
+                ...checkpoints.map((cp, index) => ({
+                  lng: cp.longitude,
+                  lat: cp.latitude,
+                  title: cp.name,
+                  content: `<div class="checkpoint-marker"><span class="checkpoint-seq">${cp.sequence || index + 1}</span><div class="checkpoint-label">${cp.name}</div></div>`
+                }))
+              ]}
             />
           </div>
 
@@ -612,6 +599,8 @@ function CheckIn() {
                   <div
                     key={checkpoint.id}
                     className={`checkpoint-item ${status} ${isNext ? 'next' : ''}`}
+                    onClick={() => setMapCenter({ lng: checkpoint.longitude, lat: checkpoint.latitude })}
+                    style={{ cursor: 'pointer' }}
                   >
                     {/* 序号圆圈 */}
                     <div className="checkpoint-seq-circle">

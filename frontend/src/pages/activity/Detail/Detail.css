@@ -6,6 +6,21 @@
   animation: fadeIn 0.8s ease;
 }
 
+/* 返回按钮 */
+.activity-detail-page .back-btn {
+  margin-bottom: 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  color: #636E72;
+  border-color: #ddd;
+  transition: all 0.3s ease;
+}
+
+.activity-detail-page .back-btn:hover {
+  color: #FFA726;
+  border-color: #FFA726;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

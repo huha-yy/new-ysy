@@ -28,6 +28,7 @@ const MapView = ({
   markers = [],
   routePoints = [],
   showCurrentLocation = false,
+  userLocation = null,
   onMarkerClick,
   onMapClick,
   autoFitView = false,
@@ -39,11 +40,13 @@ const MapView = ({
   const [loading, setLoading] = useState(true)
   const [currentLocation, setCurrentLocation] = useState(null)
   const routeLineRef = useRef(null)
+  const userMarkerRef = useRef(null)
   // 用 ref 保存最新的 markers 和 routePoints，解决 initMap 异步闭包拿不到最新值的问题
   const markersRef = useRef(markers)
   const routePointsRef = useRef(routePoints)
   const onMarkerClickRef = useRef(onMarkerClick)
   const onMapClickRef = useRef(onMapClick)
+  const userLocationRef = useRef(userLocation)
 
   // 同步 ref 到最新值
   useEffect(() => {
@@ -58,6 +61,9 @@ const MapView = ({
   useEffect(() => {
     onMapClickRef.current = onMapClick
   }, [onMapClick])
+  useEffect(() => {
+    userLocationRef.current = userLocation
+  }, [userLocation])
 
   useEffect(() => {
     initMap()
@@ -88,6 +94,10 @@ const MapView = ({
   useEffect(() => {
     if (mapInstance.current) {
       renderMarkers() // 即使 markers 为空也要调用，以便清除旧标记
+      // markers 渲染后重新渲染用户位置，防止被清除
+      if (userLocation) {
+        renderUserLocation(userLocation)
+      }
     }
   }, [markers])
 
@@ -106,6 +116,13 @@ const MapView = ({
       showCurrentPosition()
     }
   }, [showCurrentLocation])
+
+  // 渲染用户位置标记
+  useEffect(() => {
+    if (mapInstance.current && userLocation) {
+      renderUserLocation(userLocation)
+    }
+  }, [userLocation])
 
   const initMap = async () => {
     try {
@@ -147,6 +164,11 @@ const MapView = ({
       renderMarkersFromData(markersRef.current)
       renderRouteLineFromData(routePointsRef.current)
 
+      // 渲染用户位置
+      if (userLocationRef.current) {
+        renderUserLocation(userLocationRef.current)
+      }
+
       // 触发地图加载完成回调
       if (onMapLoad) {
         onMapLoad(mapInstance.current)
@@ -181,6 +203,51 @@ const MapView = ({
     }
   }
 
+  const renderUserLocation = (location) => {
+    if (!mapInstance.current || !location) return
+    const AMap = window.AMap
+    const lng = parseFloat(location.lng)
+    const lat = parseFloat(location.lat)
+    if (isNaN(lng) || isNaN(lat)) return
+
+    // 清除旧的用户位置标记
+    if (userMarkerRef.current) {
+      userMarkerRef.current.setMap(null)
+      userMarkerRef.current = null
+    }
+
+    // 蓝色脉冲圆点
+    const content = `
+      <div style="position:relative;width:24px;height:24px;">
+        <div style="
+          position:absolute;top:0;left:0;
+          width:24px;height:24px;
+          background:rgba(24,144,255,0.25);
+          border-radius:50%;
+          animation:userPulse 2s ease-in-out infinite;
+        "></div>
+        <div style="
+          position:absolute;top:6px;left:6px;
+          width:12px;height:12px;
+          background:#1890ff;
+          border:2px solid #fff;
+          border-radius:50%;
+          box-shadow:0 2px 6px rgba(24,144,255,0.5);
+        "></div>
+      </div>
+    `
+
+    userMarkerRef.current = new AMap.Marker({
+      position: [lng, lat],
+      content: content,
+      offset: new AMap.Pixel(-12, -12),
+      title: '我的位置',
+      zIndex: 200
+    })
+
+    userMarkerRef.current.setMap(mapInstance.current)
+  }
+
   const renderMarkers = () => {
     renderMarkersFromData(markers)
   }
@@ -197,7 +264,8 @@ const MapView = ({
       const allOverlays = mapInstance.current.getAllOverlays()
       if (allOverlays && allOverlays.length > 0) {
         allOverlays.forEach(overlay => {
-          if (overlay instanceof AMap.Marker) {
+          // 跳过用户位置标记
+          if (overlay instanceof AMap.Marker && overlay !== userMarkerRef.current) {
             overlay.setMap(null)
           }
         })

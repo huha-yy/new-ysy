@@ -37,9 +37,16 @@ npm run preview            # 预览生产构建
 ```bash
 mysql -u root -p
 CREATE DATABASE hiking_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-# 从 系统实现与设计/hiking_system.sql 导入数据库架构
+# 从 sql/hiking_system0210.sql 导入数据库架构
 # 数据库凭据在 backend/src/main/resources/application.yml
 ```
+
+- **MySQL 服务**：使用 Homebrew 安装的 MySQL 9.5.0（`brew services start mysql`）
+- **注意**：本机同时存在 `/usr/local/mysql`（官方 DMG 安装）和 Homebrew 两个 MySQL 实例，重启电脑后官方版可能自动启动并占用 3306 端口，导致 Homebrew 版无法连接。如遇 `Access denied` 错误，先确认 Homebrew MySQL 是否在运行：
+  ```bash
+  brew services list | grep mysql   # 检查状态
+  brew services start mysql          # 启动 Homebrew MySQL
+  ```
 
 ## 系统架构
 
@@ -53,7 +60,7 @@ CREATE DATABASE hiking_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
   - `registration/` - 报名工作流（申请、审核、候补）
   - `checkin/` - GPS 签到、轨迹记录（TrackRecord）、偏离预警（AlertEvent）
   - `route/` - 路线规划及路点
-  - `user/` - 用户认证（JWT）、个人资料、徒步档案
+  - `user/` - 用户认证（JWT）、个人资料、徒步档案（hiking-profile）
   - `admin/` - 管理员操作（审核、用户管理、统计）
   - `message/` - 站内消息通知
   - `review/` - 活动评价与评分
@@ -82,7 +89,7 @@ CREATE DATABASE hiking_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 - 实体类使用 `@TableName`、`@TableId(type = IdType.AUTO)`
 - 逻辑删除：`deleted` 字段（0=有效，1=已删除）
 - 时间戳自动填充：`create_time`、`update_time`（通过 `MyMetaObjectHandler`）
-- Mapper XML 文件位于 `backend/src/main/resources/mapper/`
+- Mapper XML 文件位于 `backend/src/main/resources/mapper/`（目前仅 `AdminMapper.xml` 使用 XML，其余 Mapper 均通过 MyBatis-Plus 注解实现）
 
 **文件上传**：`application.yml` 中 `file.upload-path` 配置，项目支持 Windows 和 macOS 双平台：
 - **macOS**：`/Users/yangshuyun/Desktop/毕业设计/new-ysy/uploads`
@@ -166,7 +173,7 @@ START（起点）、END（终点）、WAYPOINT（路点）、REST_POINT（休息
 - 软删除：`deleted` 字段（MyBatis-Plus 管理）
 - 自动时间戳：`create_time`、`update_time`
 - 常见外键：`user_id`、`activity_id`、`route_id`
-- SQL 文件：`系统实现与设计/hiking_system.sql`
+- SQL 文件：`sql/hiking_system0210.sql`
 
 ### 核心数据表
 `user`、`user_profile`、`activity`、`registration`、`gathering_plan`、`route`、`route_point`、`checkpoint`、`check_in_record`、`track_record`、`alert_event`、`review`、`message`、`dict_type`、`dict_data`
@@ -183,7 +190,7 @@ START（起点）、END（终点）、WAYPOINT（路点）、REST_POINT（休息
 
 ## 环境要求
 
-JDK 17+、Node.js 16+、MySQL 8.0+、Maven 3.6+
+JDK 17+、Node.js 16+、MySQL 8.0+（当前开发环境为 Homebrew MySQL 9.5.0）、Maven 3.6+
 
 ## 配置文件
 

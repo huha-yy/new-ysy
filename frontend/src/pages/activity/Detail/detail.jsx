@@ -13,7 +13,8 @@ import {
   PictureOutlined,
   PhoneOutlined,
   CheckCircleOutlined,
-  CloseCircleOutlined
+  CloseCircleOutlined,
+  ArrowLeftOutlined
 } from '@ant-design/icons'
 import { getActivityDetail, registerActivity } from '../../../api/activity'
 import { getActivityReviews, getActivityRatingStats } from '../../../api/review'
@@ -242,6 +243,15 @@ function ActivityDetail() {
   return (
     <div className="activity-detail-page">
       <div className="container">
+        {/* 返回按钮 */}
+        <Button
+          className="back-btn"
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate('/activities')}
+        >
+          返回活动列表
+        </Button>
+
         {/* 活动封面 */}
         <div className="activity-cover">
           {imageLoading && (
