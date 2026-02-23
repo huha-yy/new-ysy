@@ -49,66 +49,7 @@ function AdminDashboard() {
         setRecentActivities(res.recentActivities || [])
       }
     } catch (error) {
-      // 使用模拟数据
-      setDashboardData({
-        userCount: 1256,
-        activityCount: 89,
-        registrationCount: 3420,
-        pendingAuditCount: 5,
-        todayNewUsers: 12,
-        todayNewActivities: 3,
-        weeklyActiveUsers: 458,
-        monthlyRegistrations: 856
-      })
-      setPendingActivities([
-        {
-          id: 1,
-          title: '长城野长城穿越之旅',
-          organizerName: '户外探险家',
-          createdAt: '2024-12-25 14:30:00',
-          maxParticipants: 20
-        },
-        {
-          id: 2,
-          title: '青海湖环湖骑行',
-          organizerName: '骑行俱乐部',
-          createdAt: '2024-12-24 10:15:00',
-          maxParticipants: 30
-        },
-        {
-          id: 3,
-          title: '秦岭徒步露营',
-          organizerName: '山野行者',
-          createdAt: '2024-12-23 16:45:00',
-          maxParticipants: 15
-        }
-      ])
-      setRecentActivities([
-        {
-          id: 1,
-          title: '周末香山登顶徒步',
-          status: 3,
-          currentParticipants: 25,
-          maxParticipants: 30,
-          startTime: '2024-12-28 08:00:00'
-        },
-        {
-          id: 2,
-          title: '密云水库环湖徒步',
-          status: 2,
-          currentParticipants: 18,
-          maxParticipants: 25,
-          startTime: '2024-12-30 07:30:00'
-        },
-        {
-          id: 3,
-          title: '慕田峪长城穿越',
-          status: 2,
-          currentParticipants: 12,
-          maxParticipants: 20,
-          startTime: '2025-01-01 06:00:00'
-        }
-      ])
+      console.error('获取仪表盘数据失败:', error)
     } finally {
       setLoading(false)
     }
@@ -141,8 +82,8 @@ function AdminDashboard() {
     },
     {
       title: '提交时间',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      dataIndex: 'createTime',
+      key: 'createTime',
       width: 140,
       render: (time) => dayjs(time).format('MM-DD HH:mm')
     },
