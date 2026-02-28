@@ -13,7 +13,7 @@ import {
   LineChartOutlined,
   PieChartOutlined
 } from '@ant-design/icons'
-import { getDashboard } from '../../../api/admin'
+import { getStatistics } from '../../../api/admin'
 import dayjs from 'dayjs'
 import './Statistics.css'
 
@@ -26,21 +26,13 @@ function Statistics() {
     dayjs()
   ])
   const [statsData, setStatsData] = useState({
-    overview: {
-      totalUsers: 1256,
-      totalActivities: 89,
-      totalRegistrations: 3420,
-      totalCheckins: 2890
-    },
-    growth: {
-      userGrowth: 12.5,
-      activityGrowth: 8.3,
-      registrationGrowth: 15.7
-    },
+    overview: {},
+    growth: {},
     topActivities: [],
     topOrganizers: [],
     activityByDifficulty: [],
-    registrationByMonth: []
+    registrationByMonth: [],
+    health: {}
   })
 
   useEffect(() => {
@@ -50,60 +42,13 @@ function Statistics() {
   const fetchStatistics = async () => {
     setLoading(true)
     try {
-      const res = await getDashboard()
+      const res = await getStatistics()
       if (res) {
-        // 处理真实数据
+        setStatsData(res)
       }
     } catch (error) {
+      console.error('获取统计数据失败:', error)
     } finally {
-      // 使用模拟数据
-      setStatsData({
-        overview: {
-          totalUsers: 1256,
-          totalActivities: 89,
-          totalRegistrations: 3420,
-          totalCheckins: 2890,
-          newUsersThisMonth: 156,
-          newActivitiesThisMonth: 12,
-          completedActivities: 67,
-          ongoingActivities: 5
-        },
-        growth: {
-          userGrowth: 12.5,
-          activityGrowth: 8.3,
-          registrationGrowth: 15.7,
-          checkinRate: 84.5
-        },
-        topActivities: [
-          { id: 1, title: '周末香山登顶徒步', registrations: 28, rating: 4.8 },
-          { id: 2, title: '长城野长城穿越之旅', registrations: 25, rating: 4.9 },
-          { id: 3, title: '密云水库环湖骑行', registrations: 22, rating: 4.7 },
-          { id: 4, title: '青海湖三日游', registrations: 20, rating: 4.6 },
-          { id: 5, title: '张家界徒步探险', registrations: 18, rating: 4.8 }
-        ],
-        topOrganizers: [
-          { id: 1, name: '户外探险家', activities: 12, totalParticipants: 245 },
-          { id: 2, name: '骑行俱乐部', activities: 8, totalParticipants: 180 },
-          { id: 3, name: '山野行者', activities: 7, totalParticipants: 156 },
-          { id: 4, name: '自然之友', activities: 6, totalParticipants: 132 },
-          { id: 5, name: '徒步达人', activities: 5, totalParticipants: 98 }
-        ],
-        activityByDifficulty: [
-          { level: '休闲', count: 25, percent: 28 },
-          { level: '简单', count: 30, percent: 34 },
-          { level: '中等', count: 22, percent: 25 },
-          { level: '困难', count: 10, percent: 11 },
-          { level: '极限', count: 2, percent: 2 }
-        ],
-        registrationByMonth: [
-          { month: '7月', count: 320 },
-          { month: '8月', count: 450 },
-          { month: '9月', count: 520 },
-          { month: '10月', count: 680 },
-          { month: '11月', count: 750 },
-          { month: '12月', count: 700 }
-        ]
-      })
       setLoading(false)
     }
   }
@@ -209,17 +154,19 @@ function Statistics() {
                 <UserOutlined />
               </div>
               <div className="card-stats">
-                <Statistic 
-                  title="用户总数" 
-                  value={statsData.overview.totalUsers}
+                <Statistic
+                  title="用户总数"
+                  value={statsData.overview?.totalUsers || 0}
                   suffix={
-                    <span className="growth positive">
-                      <RiseOutlined /> {statsData.growth.userGrowth}%
-                    </span>
+                    statsData.growth?.userGrowth != null && (
+                      <span className={`growth ${statsData.growth.userGrowth >= 0 ? 'positive' : 'negative'}`}>
+                        {statsData.growth.userGrowth >= 0 ? <RiseOutlined /> : <FallOutlined />} {Math.abs(statsData.growth.userGrowth)}%
+                      </span>
+                    )
                   }
                 />
                 <div className="sub-stat">
-                  本月新增 <strong>{statsData.overview.newUsersThisMonth}</strong>
+                  本月新增 <strong>{statsData.overview?.newUsersThisMonth || 0}</strong>
                 </div>
               </div>
             </div>
@@ -232,17 +179,19 @@ function Statistics() {
                 <CalendarOutlined />
               </div>
               <div className="card-stats">
-                <Statistic 
-                  title="活动总数" 
-                  value={statsData.overview.totalActivities}
+                <Statistic
+                  title="活动总数"
+                  value={statsData.overview?.totalActivities || 0}
                   suffix={
-                    <span className="growth positive">
-                      <RiseOutlined /> {statsData.growth.activityGrowth}%
-                    </span>
+                    statsData.growth?.activityGrowth != null && (
+                      <span className={`growth ${statsData.growth.activityGrowth >= 0 ? 'positive' : 'negative'}`}>
+                        {statsData.growth.activityGrowth >= 0 ? <RiseOutlined /> : <FallOutlined />} {Math.abs(statsData.growth.activityGrowth)}%
+                      </span>
+                    )
                   }
                 />
                 <div className="sub-stat">
-                  进行中 <strong>{statsData.overview.ongoingActivities}</strong> 个
+                  进行中 <strong>{statsData.overview?.ongoingActivities || 0}</strong> 个
                 </div>
               </div>
             </div>
@@ -255,17 +204,19 @@ function Statistics() {
                 <TeamOutlined />
               </div>
               <div className="card-stats">
-                <Statistic 
-                  title="报名总数" 
-                  value={statsData.overview.totalRegistrations}
+                <Statistic
+                  title="报名总数"
+                  value={statsData.overview?.totalRegistrations || 0}
                   suffix={
-                    <span className="growth positive">
-                      <RiseOutlined /> {statsData.growth.registrationGrowth}%
-                    </span>
+                    statsData.growth?.registrationGrowth != null && (
+                      <span className={`growth ${statsData.growth.registrationGrowth >= 0 ? 'positive' : 'negative'}`}>
+                        {statsData.growth.registrationGrowth >= 0 ? <RiseOutlined /> : <FallOutlined />} {Math.abs(statsData.growth.registrationGrowth)}%
+                      </span>
+                    )
                   }
                 />
                 <div className="sub-stat">
-                  月均增长 <strong>856</strong>
+                  本月新增 <strong>{statsData.overview?.newRegistrationsThisMonth || 0}</strong>
                 </div>
               </div>
             </div>
@@ -278,12 +229,12 @@ function Statistics() {
                 <EnvironmentOutlined />
               </div>
               <div className="card-stats">
-                <Statistic 
-                  title="签到完成" 
-                  value={statsData.overview.totalCheckins}
+                <Statistic
+                  title="签到完成"
+                  value={statsData.overview?.totalCheckins || 0}
                 />
                 <div className="sub-stat">
-                  签到率 <strong>{statsData.growth.checkinRate}%</strong>
+                  签到率 <strong>{statsData.growth?.checkinRate || 0}%</strong>
                 </div>
               </div>
             </div>
@@ -410,9 +361,9 @@ function Statistics() {
           <Col span={6}>
             <div className="health-item">
               <div className="health-label">用户活跃度</div>
-              <Progress 
-                type="dashboard" 
-                percent={78} 
+              <Progress
+                type="dashboard"
+                percent={statsData.health?.userActivityRate || 0}
                 size={100}
                 strokeColor={{
                   '0%': '#108ee9',
@@ -424,9 +375,9 @@ function Statistics() {
           <Col span={6}>
             <div className="health-item">
               <div className="health-label">活动完成率</div>
-              <Progress 
-                type="dashboard" 
-                percent={92} 
+              <Progress
+                type="dashboard"
+                percent={statsData.health?.activityCompletionRate || 0}
                 size={100}
                 strokeColor={{
                   '0%': '#108ee9',
@@ -438,9 +389,9 @@ function Statistics() {
           <Col span={6}>
             <div className="health-item">
               <div className="health-label">用户满意度</div>
-              <Progress 
-                type="dashboard" 
-                percent={88} 
+              <Progress
+                type="dashboard"
+                percent={statsData.health?.userSatisfaction || 0}
                 size={100}
                 strokeColor={{
                   '0%': '#faad14',
@@ -452,9 +403,9 @@ function Statistics() {
           <Col span={6}>
             <div className="health-item">
               <div className="health-label">签到完成率</div>
-              <Progress 
-                type="dashboard" 
-                percent={85} 
+              <Progress
+                type="dashboard"
+                percent={statsData.health?.checkinCompletionRate || 0}
                 size={100}
                 strokeColor={{
                   '0%': '#ff4d4f',

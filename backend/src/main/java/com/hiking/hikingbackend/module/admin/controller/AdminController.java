@@ -15,6 +15,7 @@ import com.hiking.hikingbackend.module.admin.vo.DashboardVO;
 import com.hiking.hikingbackend.module.admin.vo.UserListVO;
 import com.hiking.hikingbackend.module.admin.vo.UserManageVO;
 import com.hiking.hikingbackend.module.admin.vo.UserStatsVO;
+import com.hiking.hikingbackend.module.admin.vo.StatisticsVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -171,6 +172,14 @@ public class AdminController {
     public Result<UserStatsVO> getUserStats() {
         UserStatsVO userStatsVO = adminService.getUserStats();
         return Result.success(userStatsVO);
+    }
+
+    @Operation(summary = "获取数据统计", description = "获取系统运营数据统计概览", security = {@SecurityRequirement(name = "Bearer Authentication")})
+    @SecurityRequirement(name = "Bearer Authentication")
+    @GetMapping("/statistics")
+    public Result<StatisticsVO> getStatistics() {
+        StatisticsVO statisticsVO = adminService.getStatistics();
+        return Result.success(statisticsVO);
     }
 }
 

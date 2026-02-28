@@ -9,6 +9,7 @@ import com.hiking.hikingbackend.module.admin.vo.DashboardVO;
 import com.hiking.hikingbackend.module.admin.vo.UserListVO;
 import com.hiking.hikingbackend.module.admin.vo.UserManageVO;
 import com.hiking.hikingbackend.module.admin.vo.UserStatsVO;
+import com.hiking.hikingbackend.module.admin.vo.StatisticsVO;
 import com.hiking.hikingbackend.module.user.entity.User;
 
 /**
@@ -82,5 +83,12 @@ public interface AdminService {
      * @return 用户统计信息
      */
     UserStatsVO getUserStats();
+
+    /**
+     * 获取数据统计
+     *
+     * @return 统计数据
+     */
+    StatisticsVO getStatistics();
 }
 

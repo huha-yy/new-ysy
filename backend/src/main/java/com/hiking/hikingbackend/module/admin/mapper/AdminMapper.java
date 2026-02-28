@@ -6,8 +6,12 @@ import com.hiking.hikingbackend.module.admin.dto.ActivityAuditQuery;
 import com.hiking.hikingbackend.module.admin.dto.UserListQuery;
 import com.hiking.hikingbackend.module.admin.vo.ActivityAuditVO;
 import com.hiking.hikingbackend.module.admin.vo.DashboardVO;
+import com.hiking.hikingbackend.module.admin.vo.StatisticsVO;
 import com.hiking.hikingbackend.module.admin.vo.UserListVO;
 import com.hiking.hikingbackend.module.admin.vo.UserStatsVO;
+
+import java.util.List;
+import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -61,5 +65,19 @@ public interface AdminMapper {
      * @return 用户统计信息
      */
     UserStatsVO getUserStats();
+
+    StatisticsVO.OverviewVO getStatisticsOverview();
+
+    StatisticsVO.OverviewVO getLastMonthCounts();
+
+    List<StatisticsVO.TopActivityVO> getTopActivities();
+
+    List<StatisticsVO.TopOrganizerVO> getTopOrganizers();
+
+    List<StatisticsVO.DifficultyDistVO> getActivityByDifficulty();
+
+    List<StatisticsVO.MonthlyRegistrationVO> getRegistrationByMonth();
+
+    Map<String, Object> getHealthRawData();
 }
 
