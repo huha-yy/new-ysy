@@ -11,6 +11,7 @@ import com.hiking.hikingbackend.module.admin.mapper.AdminMapper;
 import com.hiking.hikingbackend.module.admin.service.AdminService;
 import com.hiking.hikingbackend.module.admin.vo.ActivityAuditVO;
 import com.hiking.hikingbackend.module.admin.vo.DashboardVO;
+import com.hiking.hikingbackend.module.admin.vo.StatisticsVO;
 import com.hiking.hikingbackend.module.admin.vo.UserListVO;
 import com.hiking.hikingbackend.module.admin.vo.UserManageVO;
 import com.hiking.hikingbackend.module.admin.vo.UserStatsVO;
@@ -21,6 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Map;
 
 /**
  * 管理员服务实现
@@ -214,6 +218,94 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public UserStatsVO getUserStats() {
         return adminMapper.getUserStats();
+    }
+
+    @Override
+    public StatisticsVO getStatistics() {
+        StatisticsVO.OverviewVO overview = adminMapper.getStatisticsOverview();
+        StatisticsVO.OverviewVO lastMonth = adminMapper.getLastMonthCounts();
+        StatisticsVO.GrowthVO growth = computeGrowth(overview, lastMonth);
+        StatisticsVO.HealthVO health = computeHealth();
+
+        return StatisticsVO.builder()
+                .overview(overview)
+                .growth(growth)
+                .topActivities(adminMapper.getTopActivities())
+                .topOrganizers(adminMapper.getTopOrganizers())
+                .activityByDifficulty(adminMapper.getActivityByDifficulty())
+                .registrationByMonth(adminMapper.getRegistrationByMonth())
+                .health(health)
+                .build();
+    }
+
+    private StatisticsVO.GrowthVO computeGrowth(StatisticsVO.OverviewVO current, StatisticsVO.OverviewVO lastMonth) {
+        BigDecimal userGrowth = calcGrowthRate(current.getNewUsersThisMonth(), lastMonth.getNewUsersThisMonth());
+        BigDecimal activityGrowth = calcGrowthRate(current.getNewActivitiesThisMonth(), lastMonth.getNewActivitiesThisMonth());
+        BigDecimal registrationGrowth = calcGrowthRate(current.getNewRegistrationsThisMonth(), lastMonth.getNewRegistrationsThisMonth());
+
+        // 签到率 = 签到人次 / 已通过报名数 * 100
+        BigDecimal checkinRate = BigDecimal.ZERO;
+        if (current.getTotalRegistrations() != null && current.getTotalRegistrations() > 0) {
+            checkinRate = new BigDecimal(current.getTotalCheckins())
+                    .multiply(BigDecimal.valueOf(100))
+                    .divide(new BigDecimal(current.getTotalRegistrations()), 1, RoundingMode.HALF_UP);
+        }
+
+        return StatisticsVO.GrowthVO.builder()
+                .userGrowth(userGrowth)
+                .activityGrowth(activityGrowth)
+                .registrationGrowth(registrationGrowth)
+                .checkinRate(checkinRate)
+                .build();
+    }
+
+    private BigDecimal calcGrowthRate(Integer current, Integer previous) {
+        if (previous == null || previous == 0) {
+            return current != null && current > 0 ? BigDecimal.valueOf(100) : BigDecimal.ZERO;
+        }
+        return new BigDecimal(current - previous)
+                .multiply(BigDecimal.valueOf(100))
+                .divide(new BigDecimal(previous), 1, RoundingMode.HALF_UP);
+    }
+
+    private StatisticsVO.HealthVO computeHealth() {
+        Map<String, Object> raw = adminMapper.getHealthRawData();
+
+        long activeUsers = toLong(raw.get("active_users"));
+        long totalUsers = toLong(raw.get("total_users"));
+        long completedActivities = toLong(raw.get("completed_activities"));
+        long publishedActivities = toLong(raw.get("published_activities"));
+        double avgRating = toDouble(raw.get("avg_rating"));
+        long checkinUsers = toLong(raw.get("checkin_users"));
+        long approvedRegs = toLong(raw.get("approved_registrations"));
+
+        BigDecimal userActivityRate = totalUsers > 0
+                ? BigDecimal.valueOf(activeUsers * 100.0 / totalUsers).setScale(1, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO;
+        BigDecimal activityCompletionRate = publishedActivities > 0
+                ? BigDecimal.valueOf(completedActivities * 100.0 / publishedActivities).setScale(1, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO;
+        BigDecimal userSatisfaction = BigDecimal.valueOf(avgRating * 20).setScale(1, RoundingMode.HALF_UP);
+        BigDecimal checkinCompletionRate = approvedRegs > 0
+                ? BigDecimal.valueOf(checkinUsers * 100.0 / approvedRegs).setScale(1, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO;
+
+        return StatisticsVO.HealthVO.builder()
+                .userActivityRate(userActivityRate)
+                .activityCompletionRate(activityCompletionRate)
+                .userSatisfaction(userSatisfaction)
+                .checkinCompletionRate(checkinCompletionRate)
+                .build();
+    }
+
+    private long toLong(Object val) {
+        if (val == null) return 0;
+        return ((Number) val).longValue();
+    }
+
+    private double toDouble(Object val) {
+        if (val == null) return 0.0;
+        return ((Number) val).doubleValue();
     }
 }
 

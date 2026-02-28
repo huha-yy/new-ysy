@@ -155,5 +155,107 @@
             (SELECT COUNT(*) FROM `user` WHERE status = 0) AS disabled
     </select>
 
+    <!-- 统计概览数据 -->
+    <select id="getStatisticsOverview" resultType="com.hiking.hikingbackend.module.admin.vo.StatisticsVO$OverviewVO">
+        SELECT
+            (SELECT COUNT(*) FROM `user`) AS total_users,
+            (SELECT COUNT(*) FROM `activity`) AS total_activities,
+            (SELECT COUNT(*) FROM `registration`) AS total_registrations,
+            (SELECT COUNT(*) FROM `check_in_record`) AS total_checkins,
+            (SELECT COUNT(*) FROM `user`
+             WHERE YEAR(create_time) = YEAR(NOW()) AND MONTH(create_time) = MONTH(NOW())) AS new_users_this_month,
+            (SELECT COUNT(*) FROM `activity`
+             WHERE YEAR(create_time) = YEAR(NOW()) AND MONTH(create_time) = MONTH(NOW())) AS new_activities_this_month,
+            (SELECT COUNT(*) FROM `activity` WHERE status = 4) AS completed_activities,
+            (SELECT COUNT(*) FROM `activity` WHERE status = 3) AS ongoing_activities,
+            (SELECT COUNT(*) FROM `registration`
+             WHERE YEAR(create_time) = YEAR(NOW()) AND MONTH(create_time) = MONTH(NOW())) AS new_registrations_this_month
+    </select>
+
+    <!-- 上月统计数据（用于计算增长率） -->
+    <select id="getLastMonthCounts" resultType="com.hiking.hikingbackend.module.admin.vo.StatisticsVO$OverviewVO">
+        SELECT
+            (SELECT COUNT(*) FROM `user`
+             WHERE YEAR(create_time) = YEAR(DATE_SUB(NOW(), INTERVAL 1 MONTH))
+               AND MONTH(create_time) = MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH))) AS new_users_this_month,
+            (SELECT COUNT(*) FROM `activity`
+             WHERE YEAR(create_time) = YEAR(DATE_SUB(NOW(), INTERVAL 1 MONTH))
+               AND MONTH(create_time) = MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH))) AS new_activities_this_month,
+            (SELECT COUNT(*) FROM `registration`
+             WHERE YEAR(create_time) = YEAR(DATE_SUB(NOW(), INTERVAL 1 MONTH))
+               AND MONTH(create_time) = MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH))) AS new_registrations_this_month
+    </select>
+
+    <!-- 热门活动排行（按报名数降序，TOP 5） -->
+    <select id="getTopActivities" resultType="com.hiking.hikingbackend.module.admin.vo.StatisticsVO$TopActivityVO">
+        SELECT
+            a.id,
+            a.title,
+            COUNT(r.id) AS registrations,
+            IFNULL(ROUND(AVG(rv.overall_rating), 1), 0) AS rating
+        FROM `activity` a
+        LEFT JOIN `registration` r ON a.id = r.activity_id AND r.status = 1
+        LEFT JOIN `review` rv ON a.id = rv.activity_id
+        WHERE a.status IN (2, 3, 4)
+        GROUP BY a.id, a.title
+        ORDER BY registrations DESC
+        LIMIT 5
+    </select>
+
+    <!-- 优秀组织者排行（按总参与人次降序，TOP 5） -->
+    <select id="getTopOrganizers" resultType="com.hiking.hikingbackend.module.admin.vo.StatisticsVO$TopOrganizerVO">
+        SELECT
+            u.id,
+            u.nickname AS name,
+            COUNT(DISTINCT a.id) AS activities,
+            IFNULL(SUM(a.current_participants), 0) AS total_participants
+        FROM `user` u
+        INNER JOIN `activity` a ON u.id = a.organizer_id AND a.status IN (2, 3, 4)
+        GROUP BY u.id, u.nickname
+        ORDER BY total_participants DESC
+        LIMIT 5
+    </select>
+
+    <!-- 活动难度分布 -->
+    <select id="getActivityByDifficulty" resultType="com.hiking.hikingbackend.module.admin.vo.StatisticsVO$DifficultyDistVO">
+        SELECT
+            CASE difficulty_level
+                WHEN 1 THEN '休闲'
+                WHEN 2 THEN '简单'
+                WHEN 3 THEN '中等'
+                WHEN 4 THEN '困难'
+                WHEN 5 THEN '极限'
+            END AS level,
+            COUNT(*) AS count,
+            ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM `activity`), 1) AS percent
+        FROM `activity`
+        GROUP BY difficulty_level
+        ORDER BY difficulty_level
+    </select>
+
+    <!-- 近6个月报名趋势 -->
+    <select id="getRegistrationByMonth" resultType="com.hiking.hikingbackend.module.admin.vo.StatisticsVO$MonthlyRegistrationVO">
+        SELECT
+            DATE_FORMAT(create_time, '%Y-%m') AS month,
+            COUNT(*) AS count
+        FROM `registration`
+        WHERE create_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+        GROUP BY DATE_FORMAT(create_time, '%Y-%m')
+        ORDER BY month
+    </select>
+
+    <!-- 系统健康度原始数据 -->
+    <select id="getHealthRawData" resultType="java.util.HashMap">
+        SELECT
+            (SELECT COUNT(DISTINCT user_id) FROM `registration`
+             WHERE create_time >= DATE_SUB(NOW(), INTERVAL 30 DAY)) AS active_users,
+            (SELECT COUNT(*) FROM `user`) AS total_users,
+            (SELECT COUNT(*) FROM `activity` WHERE status = 4) AS completed_activities,
+            (SELECT COUNT(*) FROM `activity` WHERE status IN (2, 3, 4)) AS published_activities,
+            (SELECT IFNULL(AVG(overall_rating), 0) FROM `review`) AS avg_rating,
+            (SELECT COUNT(DISTINCT CONCAT(user_id, '-', activity_id)) FROM `check_in_record`) AS checkin_users,
+            (SELECT COUNT(*) FROM `registration` WHERE status = 1) AS approved_registrations
+    </select>
+
 </mapper>
 

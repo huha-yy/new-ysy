@@ -67,3 +67,11 @@ export const getUserStats = () => {
   return request.get('/admin/users/stats')
 }
 
+/**
+ * 获取数据统计
+ * @returns {Promise} 统计数据
+ */
+export const getStatistics = () => {
+  return request.get('/admin/statistics')
+}
+

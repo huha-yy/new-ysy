@@ -190,7 +190,7 @@ START（起点）、END（终点）、WAYPOINT（路点）、REST_POINT（休息
 
 ## 环境要求
 
-JDK 17+、Node.js 16+、MySQL 8.0+（当前开发环境为 Homebrew MySQL 9.5.0）、Maven 3.6+
+JDK 17（enforcer 限制 `[17,18)`，不接受其他版本）、Node.js 16+、MySQL 8.0+、Maven 3.6+
 
 ## 配置文件
 
