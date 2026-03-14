@@ -51,6 +51,15 @@ export const getParticipantsCheckin = (activityId) => {
 }
 
 /**
+ * 获取活动参与者轨迹监控数据
+ * @param {number} activityId - 活动ID
+ * @returns {Promise} 参与者最近位置和轨迹片段
+ */
+export const getTrackMonitor = (activityId) => {
+  return request.get(`/activities/${activityId}/track-monitor`)
+}
+
+/**
  * 获取活动签到点统计信息
  * @param {number} activityId - 活动ID
  * @returns {Promise} 签到点统计列表

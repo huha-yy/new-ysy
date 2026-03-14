@@ -6,6 +6,7 @@ import com.hiking.hikingbackend.module.checkin.vo.CheckInVO;
 import com.hiking.hikingbackend.module.checkin.vo.CheckInProgressVO;
 import com.hiking.hikingbackend.module.checkin.vo.CheckpointStatsVO;
 import com.hiking.hikingbackend.module.checkin.vo.ParticipantCheckInVO;
+import com.hiking.hikingbackend.module.checkin.vo.ParticipantTrackMonitorVO;
 import com.hiking.hikingbackend.module.route.entity.Checkpoint;
 
 import java.util.List;
@@ -70,6 +71,15 @@ public interface CheckInService {
      * @return 参与者签到状态列表（含用户信息）
      */
     List<ParticipantCheckInVO> getParticipantsCheckInWithUser(Long organizerId, Long activityId);
+
+    /**
+     * 获取活动参与者的轨迹监控数据（组织者）
+     *
+     * @param organizerId 组织者ID
+     * @param activityId 活动ID
+     * @return 参与者轨迹监控列表
+     */
+    List<ParticipantTrackMonitorVO> getTrackMonitor(Long organizerId, Long activityId);
 
     /**
      * 获取活动各签到点的统计信息

@@ -75,9 +75,9 @@ knife4j:
 file:
   # 文件存储路径（使用项目根目录下的uploads文件夹）
   # Windows 环境：
-  upload-path: E:/1huah毕业设计/new-户外徒步/ysy/uploads
+  # upload-path: E:/1huah毕业设计/new-户外徒步/ysy/uploads
   # macOS 环境：
-#  upload-path: /Users/yangshuyun/Desktop/毕业设计/new-ysy/uploads
+  upload-path: /Users/yangshuyun/Desktop/毕业设计/new-ysy/uploads
   # 文件访问路径前缀
   access-path: /uploads
 
@@ -94,4 +94,3 @@ logging:
     com.hiking.hikingbackend.mapper: debug
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
-

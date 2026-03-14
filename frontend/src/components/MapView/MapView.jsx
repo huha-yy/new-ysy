@@ -14,6 +14,7 @@ import './MapView.css'
  * @param {Function} props.onMapLoad - 地图加载完成回调
  * @param {Array} props.markers - 标记点数组
  * @param {Array} props.routePoints - 路线点数组（用于绘制连线）
+ * @param {Array} props.polylines - 额外折线数组
  * @param {boolean} props.showCurrentLocation - 是否显示当前位置
  * @param {Function} props.onMarkerClick - 标记点击回调
  * @param {boolean} props.autoFitView - 是否在绘制路线时自动调整视野（默认false，避免打断用户操作）
@@ -27,6 +28,7 @@ const MapView = ({
   onMapLoad,
   markers = [],
   routePoints = [],
+  polylines = [],
   showCurrentLocation = false,
   userLocation = null,
   onMarkerClick,
@@ -40,10 +42,12 @@ const MapView = ({
   const [loading, setLoading] = useState(true)
   const [currentLocation, setCurrentLocation] = useState(null)
   const routeLineRef = useRef(null)
+  const polylineRefs = useRef([])
   const userMarkerRef = useRef(null)
   // 用 ref 保存最新的 markers 和 routePoints，解决 initMap 异步闭包拿不到最新值的问题
   const markersRef = useRef(markers)
   const routePointsRef = useRef(routePoints)
+  const polylinesRef = useRef(polylines)
   const onMarkerClickRef = useRef(onMarkerClick)
   const onMapClickRef = useRef(onMapClick)
   const userLocationRef = useRef(userLocation)
@@ -55,6 +59,9 @@ const MapView = ({
   useEffect(() => {
     routePointsRef.current = routePoints
   }, [routePoints])
+  useEffect(() => {
+    polylinesRef.current = polylines
+  }, [polylines])
   useEffect(() => {
     onMarkerClickRef.current = onMarkerClick
   }, [onMarkerClick])
@@ -68,6 +75,7 @@ const MapView = ({
   useEffect(() => {
     initMap()
     return () => {
+      clearPolylines()
       if (mapInstance.current) {
         mapInstance.current.destroy()
         mapInstance.current = null
@@ -110,6 +118,12 @@ const MapView = ({
       routeLineRef.current = null
     }
   }, [routePoints])
+
+  useEffect(() => {
+    if (mapInstance.current) {
+      renderPolylinesFromData(polylines)
+    }
+  }, [polylines])
 
   useEffect(() => {
     if (showCurrentLocation && mapInstance.current) {
@@ -163,6 +177,7 @@ const MapView = ({
       // 使用 ref 获取最新数据，避免闭包捕获旧值
       renderMarkersFromData(markersRef.current)
       renderRouteLineFromData(routePointsRef.current)
+      renderPolylinesFromData(polylinesRef.current)
 
       // 渲染用户位置
       if (userLocationRef.current) {
@@ -288,7 +303,9 @@ const MapView = ({
         const markerConfig = {
           position: [lng, lat],
           title: markerData.title || `标记${index + 1}`,
-          offset: markerData.offset || new AMap.Pixel(-10, -10)
+          offset: markerData.offset
+            ? new AMap.Pixel(markerData.offset.x || 0, markerData.offset.y || 0)
+            : new AMap.Pixel(-10, -10)
         }
 
         // 如果有自定义content，使用content；否则使用icon
@@ -316,6 +333,13 @@ const MapView = ({
 
   const renderRouteLine = () => {
     renderRouteLineFromData(routePoints)
+  }
+
+  const clearPolylines = () => {
+    if (polylineRefs.current.length > 0) {
+      polylineRefs.current.forEach(polyline => polyline.setMap(null))
+      polylineRefs.current = []
+    }
   }
 
   const renderRouteLineFromData = (points) => {
@@ -370,6 +394,53 @@ const MapView = ({
     }
   }
 
+  const renderPolylinesFromData = (lineList) => {
+    if (!mapInstance.current) {
+      return
+    }
+
+    const AMap = window.AMap
+    clearPolylines()
+
+    if (!lineList || lineList.length === 0) {
+      return
+    }
+
+    lineList.forEach(line => {
+      if (!line?.path || line.path.length < 2) {
+        return
+      }
+
+      const path = line.path.map(point => {
+        const lng = parseFloat(point.lng)
+        const lat = parseFloat(point.lat)
+        if (isNaN(lng) || isNaN(lat) || lng === 0 || lat === 0) {
+          return null
+        }
+        return [lng, lat]
+      }).filter(point => point !== null)
+
+      if (path.length < 2) {
+        return
+      }
+
+      const polyline = new AMap.Polyline({
+        path,
+        strokeColor: line.strokeColor || '#FF7A45',
+        strokeWeight: line.strokeWeight || 5,
+        strokeOpacity: line.strokeOpacity || 0.9,
+        strokeStyle: line.strokeStyle || 'solid',
+        lineJoin: 'round',
+        lineCap: 'round',
+        showDir: line.showDir || false,
+        zIndex: line.zIndex || 120
+      })
+
+      polyline.setMap(mapInstance.current)
+      polylineRefs.current.push(polyline)
+    })
+  }
+
   return (
     <div className="map-view-wrapper" style={{ width, height }}>
       {loading && (
@@ -385,4 +456,3 @@ const MapView = ({
 }
 
 export default MapView
-

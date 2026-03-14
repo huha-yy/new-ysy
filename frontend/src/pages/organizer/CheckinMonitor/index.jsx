@@ -17,7 +17,7 @@ import {
   SyncOutlined
 } from '@ant-design/icons'
 import { getActivityDetail } from '../../../api/activity'
-import { getParticipantsCheckin, getCheckpointStats } from '../../../api/checkin'
+import { getParticipantsCheckin, getCheckpointStats, getTrackMonitor } from '../../../api/checkin'
 import dayjs from 'dayjs'
 import MapView from '../../../components/MapView/MapView'
 import { DEFAULT_MAP_CENTER } from '../../../utils/constants'
@@ -31,16 +31,44 @@ function CheckinMonitor() {
   const [activity, setActivity] = useState(null)
   const [checkpointStats, setCheckpointStats] = useState([])
   const [participants, setParticipants] = useState([])
+  const [trackMonitor, setTrackMonitor] = useState([])
   const [refreshing, setRefreshing] = useState(false)
   const [mapCenter, setMapCenter] = useState(DEFAULT_MAP_CENTER)
-  const [isInitialLoad, setIsInitialLoad] = useState(true)
+  const [selectedParticipantId, setSelectedParticipantId] = useState(null)
 
   useEffect(() => {
     fetchData(true)
-    // 设置自动刷新
-    const interval = setInterval(() => fetchData(false), 30000) // 每30秒刷新，静默模式
+    const interval = setInterval(() => fetchData(false), 15000)
     return () => clearInterval(interval)
   }, [activityId])
+
+  useEffect(() => {
+    if (trackMonitor.length === 0) {
+      setSelectedParticipantId(null)
+      return
+    }
+
+    const selectedExists = trackMonitor.some(item => item.userId === selectedParticipantId)
+    if (selectedExists) {
+      return
+    }
+
+    const firstAvailable = trackMonitor.find(item => item.latestLatitude && item.latestLongitude) || trackMonitor[0]
+    if (firstAvailable) {
+      setSelectedParticipantId(firstAvailable.userId)
+    }
+  }, [trackMonitor, selectedParticipantId])
+
+  const selectedParticipant = trackMonitor.find(item => item.userId === selectedParticipantId) || null
+
+  useEffect(() => {
+    if (selectedParticipant?.latestLongitude && selectedParticipant?.latestLatitude) {
+      setMapCenter({
+        lng: selectedParticipant.latestLongitude,
+        lat: selectedParticipant.latestLatitude
+      })
+    }
+  }, [selectedParticipant])
 
   const fetchData = async (showErrors = true) => {
     setLoading(true)
@@ -48,9 +76,9 @@ function CheckinMonitor() {
       await Promise.all([
         fetchActivityInfo(showErrors),
         fetchCheckpointStats(showErrors),
-        fetchParticipants(showErrors)
+        fetchParticipants(showErrors),
+        fetchTrackMonitorData(showErrors)
       ])
-      setIsInitialLoad(false)
     } catch (error) {
     } finally {
       setLoading(false)
@@ -71,14 +99,13 @@ function CheckinMonitor() {
       const res = await getCheckpointStats(activityId)
       setCheckpointStats(res || [])
 
-      // 更新地图中心为第一个有效坐标的签到点
       if (res && res.length > 0) {
         const firstValidPoint = res.find(cp =>
           cp.longitude && cp.latitude &&
           !isNaN(cp.longitude) && !isNaN(cp.latitude) &&
           cp.longitude !== 0 && cp.latitude !== 0
         )
-        if (firstValidPoint) {
+        if (firstValidPoint && !selectedParticipantId) {
           setMapCenter({ lng: firstValidPoint.longitude, lat: firstValidPoint.latitude })
         }
       }
@@ -96,6 +123,15 @@ function CheckinMonitor() {
     }
   }
 
+  const fetchTrackMonitorData = async (showErrors = true) => {
+    try {
+      const res = await getTrackMonitor(activityId)
+      setTrackMonitor(res || [])
+    } catch (error) {
+      if (showErrors) message.error('获取轨迹监控数据失败')
+    }
+  }
+
   const handleRefresh = async () => {
     setRefreshing(true)
     await fetchData()
@@ -103,7 +139,6 @@ function CheckinMonitor() {
     message.success('数据已刷新')
   }
 
-  // 计算整体进度
   const getOverallProgress = () => {
     if (checkpointStats.length === 0) return 0
     const totalChecked = checkpointStats.reduce((sum, cp) => sum + (cp.checkedCount || 0), 0)
@@ -111,21 +146,16 @@ function CheckinMonitor() {
     return totalExpected > 0 ? Math.round((totalChecked / totalExpected) * 100) : 0
   }
 
-  // 计算完成签到的人数
   const getCompletedCount = () => {
     return participants.filter(p =>
       p.checkedInCount === p.totalCheckpoints && p.totalCheckpoints > 0
     ).length
   }
 
-  // 获取未签到的人数
-  const getNotStartedCount = () => {
-    return participants.filter(p =>
-      p.checkedInCount === 0
-    ).length
+  const getOnlineCount = () => {
+    return trackMonitor.filter(item => item.onlineStatus === 1).length
   }
 
-  // 表格列定义
   const columns = [
     {
       title: '参与者',
@@ -156,7 +186,7 @@ function CheckinMonitor() {
         </div>
       )
     },
-    ...checkpointStats.map((cp, index) => ({
+    ...checkpointStats.map(cp => ({
       title: (
         <div className="checkpoint-header">
           <span className="cp-order">{cp.sequence}</span>
@@ -167,7 +197,6 @@ function CheckinMonitor() {
       width: 120,
       align: 'center',
       render: (_, record) => {
-        // 从 checkpointStatusList 中找到对应签到点的状态
         const checkpointStatus = record.checkpointStatusList?.find(
           status => status.checkpointId === cp.checkpointId
         )
@@ -221,40 +250,73 @@ function CheckinMonitor() {
     }
   ]
 
-  // 生成地图标记点
-  const generateMapMarkers = () => {
+  const generateCheckpointMarkers = () => {
     return checkpointStats
       .filter(cp =>
         cp.longitude && cp.latitude &&
         !isNaN(cp.longitude) && !isNaN(cp.latitude) &&
         cp.longitude !== 0 && cp.latitude !== 0
       )
-      .map((cp, index) => {
+      .map(cp => {
         const checkedCount = cp.checkedCount || 0
         const totalCount = cp.totalCount || 0
         const isCompleted = checkedCount === totalCount && totalCount > 0
 
-        // 创建签到点标记内容
-        const markerContent = `
-          <div class="checkpoint-marker ${isCompleted ? 'completed' : ''}">
-            <div class="marker-order">${cp.sequence}</div>
-            <div class="marker-info">
-              <div class="marker-name">${cp.name}</div>
-              <div class="marker-count">${checkedCount}/${totalCount}人</div>
-            </div>
-          </div>
-        `
-
         return {
+          markerType: 'checkpoint',
           lng: cp.longitude,
           lat: cp.latitude,
           title: cp.name,
-          content: markerContent
+          content: `
+            <div class="checkpoint-marker ${isCompleted ? 'completed' : ''}">
+              <div class="marker-order">${cp.sequence}</div>
+              <div class="marker-info">
+                <div class="marker-name">${cp.name}</div>
+                <div class="marker-count">${checkedCount}/${totalCount}人</div>
+              </div>
+            </div>
+          `
         }
       })
   }
 
-  // 生成路线点（用于绘制签到点之间的连线）
+  const generateParticipantMarkers = () => {
+    return trackMonitor
+      .filter(item =>
+        item.latestLongitude && item.latestLatitude &&
+        !isNaN(item.latestLongitude) && !isNaN(item.latestLatitude)
+      )
+      .map(item => {
+        const markerClass = [
+          'participant-marker',
+          item.onlineStatus === 1 ? 'online' : 'offline',
+          item.warning === 1 ? 'warning' : '',
+          item.userId === selectedParticipantId ? 'selected' : ''
+        ].filter(Boolean).join(' ')
+
+        return {
+          markerType: 'participant',
+          userId: item.userId,
+          lng: item.latestLongitude,
+          lat: item.latestLatitude,
+          title: item.nickname,
+          offset: { x: -18, y: -18 },
+          content: `
+            <div class="${markerClass}">
+              <span class="participant-marker__initial">${(item.nickname || '?').slice(0, 1)}</span>
+            </div>
+          `
+        }
+      })
+  }
+
+  const generateMapMarkers = () => {
+    return [
+      ...generateCheckpointMarkers(),
+      ...generateParticipantMarkers()
+    ]
+  }
+
   const generateRoutePoints = () => {
     return checkpointStats
       .filter(cp =>
@@ -268,9 +330,33 @@ function CheckinMonitor() {
       }))
   }
 
+  const selectedTrackPolyline = selectedParticipant?.recentTracks?.length >= 2
+    ? [{
+        path: selectedParticipant.recentTracks.map(track => ({
+          lng: track.longitude,
+          lat: track.latitude
+        })),
+        strokeColor: selectedParticipant.warning === 1 ? '#FF4D4F' : '#FF7A45',
+        strokeWeight: 6,
+        strokeOpacity: 0.95,
+        zIndex: 150
+      }]
+    : []
+
+  const handleMarkerClick = (markerData) => {
+    if (markerData.markerType !== 'participant') {
+      return
+    }
+
+    setSelectedParticipantId(markerData.userId)
+    setMapCenter({
+      lng: markerData.lng,
+      lat: markerData.lat
+    })
+  }
+
   return (
     <div className="checkin-monitor-page">
-      {/* 页面头部 */}
       <div className="page-header">
         <div className="header-left">
           <Button
@@ -296,7 +382,7 @@ function CheckinMonitor() {
         </div>
         <Space>
           <span className="auto-refresh-tip">
-            <SyncOutlined spin={refreshing} /> 每30秒自动刷新
+            <SyncOutlined spin={refreshing} /> 每15秒自动刷新
           </span>
           <Button
             icon={<ReloadOutlined />}
@@ -308,7 +394,6 @@ function CheckinMonitor() {
         </Space>
       </div>
 
-      {/* 统计概览 */}
       <Row gutter={16} className="stats-row">
         <Col span={6}>
           <Card className="stat-card overview">
@@ -351,17 +436,67 @@ function CheckinMonitor() {
         <Col span={6}>
           <Card className="stat-card warning">
             <Statistic
-              title="未开始签到"
-              value={getNotStartedCount()}
-              prefix={<WarningOutlined />}
-              valueStyle={{ color: getNotStartedCount() > 0 ? 'var(--danger-color)' : 'var(--text-secondary)' }}
+              title="在线人数"
+              value={getOnlineCount()}
+              prefix={<SyncOutlined />}
+              valueStyle={{ color: getOnlineCount() > 0 ? 'var(--success-color)' : 'var(--text-secondary)' }}
             />
           </Card>
         </Col>
       </Row>
 
-      {/* 地图监控 */}
       <Card className="map-monitor-card" title="实时地图监控">
+        <div className="track-focus-panel">
+          {selectedParticipant ? (
+            <>
+              <div className="track-focus-main">
+                <Avatar src={selectedParticipant.avatar} icon={<UserOutlined />} />
+                <div>
+                  <div className="track-focus-name">
+                    {selectedParticipant.nickname}
+                    <Tag color={selectedParticipant.onlineStatus === 1 ? 'success' : 'default'}>
+                      {selectedParticipant.onlineStatusText}
+                    </Tag>
+                    {selectedParticipant.warning === 1 && (
+                      <Tag color="error">预警</Tag>
+                    )}
+                  </div>
+                  <div className="track-focus-meta">
+                    最近上报：
+                    {selectedParticipant.latestRecordTime
+                      ? dayjs(selectedParticipant.latestRecordTime).format('HH:mm:ss')
+                      : '暂无'}
+                    {selectedParticipant.warningReason ? ` · ${selectedParticipant.warningReason}` : ''}
+                  </div>
+                </div>
+              </div>
+              <div className="track-focus-actions">
+                {trackMonitor.map(item => (
+                  <Button
+                    key={item.userId}
+                    size="small"
+                    type={item.userId === selectedParticipantId ? 'primary' : 'default'}
+                    danger={item.warning === 1}
+                    onClick={() => {
+                      setSelectedParticipantId(item.userId)
+                      if (item.latestLongitude && item.latestLatitude) {
+                        setMapCenter({
+                          lng: item.latestLongitude,
+                          lat: item.latestLatitude
+                        })
+                      }
+                    }}
+                  >
+                    {item.nickname}
+                  </Button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="track-focus-empty">点击地图上的参与者标记查看最近轨迹</div>
+          )}
+        </div>
+
         <div className="map-monitor-content">
           <MapView
             center={mapCenter}
@@ -369,6 +504,8 @@ function CheckinMonitor() {
             height="500px"
             markers={generateMapMarkers()}
             routePoints={generateRoutePoints()}
+            polylines={selectedTrackPolyline}
+            onMarkerClick={handleMarkerClick}
           />
           <div className="map-legend">
             <div className="legend-item">
@@ -383,19 +520,26 @@ function CheckinMonitor() {
               <span className="legend-marker route"></span>
               <span>活动路线</span>
             </div>
+            <div className="legend-item">
+              <span className="legend-dot online"></span>
+              <span>参与者在线</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-dot offline"></span>
+              <span>参与者离线</span>
+            </div>
           </div>
         </div>
       </Card>
 
-      {/* 签到点进度 */}
       <Card className="checkpoints-card" title="签到点进度">
         <div className="checkpoints-timeline">
           <Timeline mode="left">
-            {checkpointStats.map((cp, index) => (
+            {checkpointStats.map(cp => (
               <Timeline.Item
                 key={cp.checkpointId}
                 color={cp.checkedCount === cp.totalCount && cp.totalCount > 0 ? 'green' :
-                       cp.checkedCount > 0 ? 'blue' : 'gray'}
+                  cp.checkedCount > 0 ? 'blue' : 'gray'}
                 label={
                   <div className="timeline-label">
                     <span className="cp-order-badge">{cp.sequence}</span>
@@ -424,7 +568,6 @@ function CheckinMonitor() {
         </div>
       </Card>
 
-      {/* 参与者签到状态 */}
       <Card className="participants-card" title="参与者签到状态">
         <Table
           columns={columns}

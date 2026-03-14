@@ -1,6 +1,7 @@
 package com.hiking.hikingbackend.module.checkin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.hiking.hikingbackend.common.constant.AlertConstants;
 import com.hiking.hikingbackend.common.exception.BusinessException;
 import com.hiking.hikingbackend.common.result.ResultCode;
 import com.hiking.hikingbackend.common.utils.GeoUtils;
@@ -8,8 +9,10 @@ import com.hiking.hikingbackend.module.activity.entity.Activity;
 import com.hiking.hikingbackend.module.activity.mapper.ActivityMapper;
 import com.hiking.hikingbackend.module.checkin.dto.CheckInDTO;
 import com.hiking.hikingbackend.module.checkin.dto.TrackRecordDTO;
+import com.hiking.hikingbackend.module.checkin.entity.AlertEvent;
 import com.hiking.hikingbackend.module.checkin.entity.CheckInRecord;
 import com.hiking.hikingbackend.module.checkin.entity.TrackRecord;
+import com.hiking.hikingbackend.module.checkin.mapper.AlertEventMapper;
 import com.hiking.hikingbackend.module.checkin.mapper.CheckInRecordMapper;
 import com.hiking.hikingbackend.module.checkin.mapper.TrackRecordMapper;
 import com.hiking.hikingbackend.module.checkin.service.AlertService;
@@ -19,6 +22,8 @@ import com.hiking.hikingbackend.module.checkin.vo.CheckInProgressVO;
 import com.hiking.hikingbackend.module.checkin.vo.CheckInStatusVO;
 import com.hiking.hikingbackend.module.checkin.vo.CheckpointStatsVO;
 import com.hiking.hikingbackend.module.checkin.vo.ParticipantCheckInVO;
+import com.hiking.hikingbackend.module.checkin.vo.ParticipantTrackMonitorVO;
+import com.hiking.hikingbackend.module.checkin.vo.TrackPointVO;
 import com.hiking.hikingbackend.module.registration.entity.Registration;
 import com.hiking.hikingbackend.module.registration.mapper.RegistrationMapper;
 import com.hiking.hikingbackend.module.user.entity.User;
@@ -31,7 +36,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 /**
@@ -49,6 +58,8 @@ public class CheckInServiceImpl implements CheckInService {
 
     private final TrackRecordMapper trackRecordMapper;
 
+    private final AlertEventMapper alertEventMapper;
+
     private final CheckpointMapper checkpointMapper;
 
     private final ActivityMapper activityMapper;
@@ -65,6 +76,8 @@ public class CheckInServiceImpl implements CheckInService {
     // 活动状态常量
     private static final int ACTIVITY_STATUS_ONGOING = 3;  // 进行中
     private static final int ACTIVITY_STATUS_ENDED = 4;    // 已结束
+    private static final long TRACK_ONLINE_WINDOW_MINUTES = 3L;
+    private static final int RECENT_TRACK_LIMIT = 20;
 
     // 签到记录状态常量
     private static final int CHECKIN_STATUS_NORMAL = 1;   // 正常
@@ -595,6 +608,68 @@ public class CheckInServiceImpl implements CheckInService {
     }
 
     /**
+     * 获取活动参与者轨迹监控数据（组织者）
+     *
+     * @param organizerId 组织者ID
+     * @param activityId 活动ID
+     * @return 参与者轨迹监控列表
+     */
+    @Override
+    public List<ParticipantTrackMonitorVO> getTrackMonitor(Long organizerId, Long activityId) {
+        log.info("获取参与者轨迹监控，组织者ID：{}，活动ID：{}", organizerId, activityId);
+
+        Activity activity = activityMapper.selectById(activityId);
+        if (activity == null) {
+            throw new BusinessException(ResultCode.ACTIVITY_NOT_FOUND);
+        }
+
+        if (!activity.getOrganizerId().equals(organizerId)) {
+            throw new BusinessException(ResultCode.NOT_ACTIVITY_ORGANIZER);
+        }
+
+        LambdaQueryWrapper<Registration> registrationWrapper = new LambdaQueryWrapper<>();
+        registrationWrapper.eq(Registration::getActivityId, activityId)
+                .eq(Registration::getStatus, REGISTRATION_STATUS_APPROVED);
+        List<Registration> registrations = registrationMapper.selectList(registrationWrapper);
+
+        if (registrations.isEmpty()) {
+            return List.of();
+        }
+
+        Map<Long, AlertEvent> activeAlertMap = buildActiveAlertMap(activityId);
+
+        return registrations.stream().map(registration -> {
+            User user = userMapper.selectById(registration.getUserId());
+            if (user == null) {
+                log.warn("用户不存在，用户ID：{}", registration.getUserId());
+                return null;
+            }
+
+            TrackRecord latestTrack = getLatestTrack(registration.getUserId(), activityId);
+            List<TrackPointVO> recentTracks = getRecentTracks(registration.getUserId(), activityId);
+            AlertEvent activeAlert = activeAlertMap.get(registration.getUserId());
+
+            Integer onlineStatus = isTrackOnline(latestTrack) ? 1 : 0;
+            String warningReason = activeAlert != null ? activeAlert.getDescription() : null;
+
+            return ParticipantTrackMonitorVO.builder()
+                    .userId(user.getId())
+                    .nickname(user.getNickname() != null ? user.getNickname() : user.getUsername())
+                    .avatar(user.getAvatar())
+                    .phone(maskPhoneNumber(user.getPhone()))
+                    .latestLatitude(latestTrack != null ? latestTrack.getLatitude() : null)
+                    .latestLongitude(latestTrack != null ? latestTrack.getLongitude() : null)
+                    .latestRecordTime(latestTrack != null ? latestTrack.getRecordTime() : null)
+                    .onlineStatus(onlineStatus)
+                    .onlineStatusText(onlineStatus == 1 ? "在线" : "离线")
+                    .warning(activeAlert != null ? 1 : 0)
+                    .warningReason(warningReason)
+                    .recentTracks(recentTracks)
+                    .build();
+        }).filter(obj -> obj != null).collect(Collectors.toList());
+    }
+
+    /**
      * 获取活动各签到点的统计信息
      *
      * @param organizerId 组织者ID
@@ -685,5 +760,56 @@ public class CheckInServiceImpl implements CheckInService {
         }
         return phone.substring(0, 3) + "****" + phone.substring(phone.length() - 4);
     }
-}
 
+    private Map<Long, AlertEvent> buildActiveAlertMap(Long activityId) {
+        LambdaQueryWrapper<AlertEvent> alertWrapper = new LambdaQueryWrapper<>();
+        alertWrapper.eq(AlertEvent::getActivityId, activityId)
+                .in(AlertEvent::getHandleStatus,
+                        AlertConstants.HANDLE_STATUS_PENDING,
+                        AlertConstants.HANDLE_STATUS_PROCESSING)
+                .orderByDesc(AlertEvent::getTriggerTime);
+
+        List<AlertEvent> alerts = alertEventMapper.selectList(alertWrapper);
+        Map<Long, AlertEvent> activeAlertMap = new HashMap<>();
+        for (AlertEvent alert : alerts) {
+            activeAlertMap.putIfAbsent(alert.getUserId(), alert);
+        }
+        return activeAlertMap;
+    }
+
+    private TrackRecord getLatestTrack(Long userId, Long activityId) {
+        LambdaQueryWrapper<TrackRecord> trackWrapper = new LambdaQueryWrapper<>();
+        trackWrapper.eq(TrackRecord::getUserId, userId)
+                .eq(TrackRecord::getActivityId, activityId)
+                .orderByDesc(TrackRecord::getRecordTime)
+                .last("LIMIT 1");
+        return trackRecordMapper.selectOne(trackWrapper);
+    }
+
+    private List<TrackPointVO> getRecentTracks(Long userId, Long activityId) {
+        LambdaQueryWrapper<TrackRecord> trackWrapper = new LambdaQueryWrapper<>();
+        trackWrapper.eq(TrackRecord::getUserId, userId)
+                .eq(TrackRecord::getActivityId, activityId)
+                .orderByDesc(TrackRecord::getRecordTime)
+                .last("LIMIT " + RECENT_TRACK_LIMIT);
+
+        List<TrackRecord> trackRecords = trackRecordMapper.selectList(trackWrapper);
+        return trackRecords.stream()
+                .sorted(Comparator.comparing(TrackRecord::getRecordTime))
+                .map(track -> TrackPointVO.builder()
+                        .latitude(track.getLatitude())
+                        .longitude(track.getLongitude())
+                        .recordTime(track.getRecordTime())
+                        .accuracy(track.getAccuracy())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    private boolean isTrackOnline(TrackRecord latestTrack) {
+        if (latestTrack == null || latestTrack.getRecordTime() == null) {
+            return false;
+        }
+        long minutes = ChronoUnit.MINUTES.between(latestTrack.getRecordTime(), LocalDateTime.now());
+        return minutes < TRACK_ONLINE_WINDOW_MINUTES;
+    }
+}

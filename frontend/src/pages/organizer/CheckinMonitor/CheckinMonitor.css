@@ -129,6 +129,53 @@
   position: relative;
 }
 
+.checkin-monitor-page .track-focus-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, #FFF7E6 0%, #ffffff 100%);
+  border: 1px solid #FFD8BF;
+  border-radius: 14px;
+}
+
+.checkin-monitor-page .track-focus-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+}
+
+.checkin-monitor-page .track-focus-name {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.checkin-monitor-page .track-focus-meta {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.checkin-monitor-page .track-focus-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.checkin-monitor-page .track-focus-empty {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
 .checkin-monitor-page .map-legend {
   position: absolute;
   bottom: 20px;
@@ -169,6 +216,21 @@
   height: 4px;
   margin-top: 10px;
   background: var(--primary-color);
+}
+
+.checkin-monitor-page .legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.checkin-monitor-page .legend-dot.online {
+  background: #52c41a;
+}
+
+.checkin-monitor-page .legend-dot.offline {
+  background: #8c8c8c;
 }
 
 /* 地图标记样式（由JS动态注入，渲染在页面根元素外，不加前缀） */
@@ -215,6 +277,41 @@
 .checkpoint-marker .marker-count {
   font-size: 11px;
   color: var(--text-secondary);
+}
+
+.participant-marker {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  border: 3px solid #fff;
+}
+
+.participant-marker.online {
+  background: linear-gradient(135deg, #52c41a 0%, #95de64 100%);
+}
+
+.participant-marker.offline {
+  background: linear-gradient(135deg, #8c8c8c 0%, #bfbfbf 100%);
+}
+
+.participant-marker.warning {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%);
+}
+
+.participant-marker.selected {
+  transform: scale(1.12);
+  box-shadow: 0 0 0 4px rgba(24, 144, 255, 0.18), 0 6px 18px rgba(0, 0, 0, 0.28);
+}
+
+.participant-marker__initial {
+  line-height: 1;
 }
 
 .checkin-monitor-page .checkpoints-card .ant-card-head {

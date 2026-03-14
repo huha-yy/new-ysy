@@ -11,6 +11,7 @@ import com.hiking.hikingbackend.module.checkin.vo.CheckInVO;
 import com.hiking.hikingbackend.module.checkin.vo.CheckInProgressVO;
 import com.hiking.hikingbackend.module.checkin.vo.CheckpointStatsVO;
 import com.hiking.hikingbackend.module.checkin.vo.ParticipantCheckInVO;
+import com.hiking.hikingbackend.module.checkin.vo.ParticipantTrackMonitorVO;
 import com.hiking.hikingbackend.module.route.entity.Checkpoint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -177,6 +178,27 @@ public class CheckInController {
     }
 
     /**
+     * 参与者轨迹监控（组织者）
+     *
+     * @param activityId 活动ID
+     * @return 参与者轨迹监控列表
+     */
+    @Operation(summary = "参与者轨迹监控", description = "查询活动参与者最近位置和轨迹片段，需要登录，仅限活动组织者")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @GetMapping("/activities/{activityId}/track-monitor")
+    public Result<List<ParticipantTrackMonitorVO>> getTrackMonitor(
+            @Parameter(description = "活动ID", required = true, example = "1")
+            @PathVariable("activityId") Long activityId) {
+        Long organizerId = SecurityUtils.getCurrentUserId();
+        if (organizerId == null) {
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
+        }
+
+        List<ParticipantTrackMonitorVO> monitorList = checkInService.getTrackMonitor(organizerId, activityId);
+        return Result.success(monitorList);
+    }
+
+    /**
      * 签到点统计信息（用于签到监控）
      * 需校验：当前用户是活动组织者
      *
@@ -199,4 +221,3 @@ public class CheckInController {
         return Result.success(checkpointStats);
     }
 }
-

@@ -42,10 +42,8 @@ function CheckIn() {
   useEffect(() => {
     fetchCheckinData()
     return () => {
-      // 停止轨迹记录
-      if (isRecording) {
-        trackRecorder.stop()
-      }
+      trackRecorder.stop()
+      setIsRecording(false)
     }
   }, [id])
 
@@ -245,16 +243,23 @@ function CheckIn() {
     setIsRecording(true)
     trackRecorder.start(
       (track) => {
-        // 上报轨迹到后端
-        reportTrack([{
+        setCurrentLocation(prev => ({
+          ...(prev || {}),
+          ...track,
+          method: 'track'
+        }))
+      },
+      (error) => {
+      },
+      async (tracks) => {
+        await reportTrack(tracks.map(track => ({
           activityId: Number(id),
           latitude: track.latitude,
           longitude: track.longitude,
+          accuracy: track.accuracy ? Math.round(track.accuracy) : undefined,
+          speed: typeof track.speed === 'number' ? track.speed : undefined,
           recordTime: new Date(track.timestamp).toISOString().slice(0, 19).replace('T', ' ')
-        }]).catch(error => {
-        })
-      },
-      (error) => {
+        })))
       }
     )
   }
@@ -752,4 +757,3 @@ function CheckIn() {
 }
 
 export default CheckIn
-

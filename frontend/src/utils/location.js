@@ -340,6 +340,7 @@ export class TrackRecorder {
     this.maxTracks = 1000 // 最多保留1000个轨迹点
     this.uploadInterval = 30000 // 每30秒上报一次
     this.uploadTimer = null
+    this.uploadCallback = null
   }
 
   /**
@@ -347,13 +348,14 @@ export class TrackRecorder {
    * @param {Function} onTrack - 轨迹回调函数
    * @param {Function} onError - 错误回调函数
    */
-  start(onTrack, onError) {
+  start(onTrack, onError, onUpload) {
     if (this.isRecording) {
       return
     }
 
     this.isRecording = true
     this.tracks = []
+    this.uploadCallback = onUpload || null
 
     this.watchId = navigator.geolocation.watchPosition(
       (position) => {
@@ -396,7 +398,7 @@ export class TrackRecorder {
 
     // 启动自动上传
     this.uploadTimer = setInterval(() => {
-      this.upload()
+      this.upload(this.uploadCallback)
     }, this.uploadInterval)
   }
 
@@ -421,7 +423,8 @@ export class TrackRecorder {
     }
 
     // 上传剩余轨迹
-    this.upload()
+    this.upload(this.uploadCallback)
+    this.uploadCallback = null
   }
 
   /**
@@ -494,4 +497,3 @@ export default {
   isInRadius,
   calculateDistance
 }
-
