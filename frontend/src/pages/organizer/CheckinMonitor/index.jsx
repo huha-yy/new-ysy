@@ -18,10 +18,24 @@ import {
 } from '@ant-design/icons'
 import { getActivityDetail } from '../../../api/activity'
 import { getParticipantsCheckin, getCheckpointStats, getTrackMonitor } from '../../../api/checkin'
+import { getRouteDetail } from '../../../api/route'
 import dayjs from 'dayjs'
 import MapView from '../../../components/MapView/MapView'
 import { DEFAULT_MAP_CENTER } from '../../../utils/constants'
 import './CheckinMonitor.css'
+
+const createMapBadge = (className, icon, text, extraText = '') => `
+  <div class="${className}">
+    <span class="${className}__icon">${icon}</span>
+    <span class="${className}__text">${text}</span>
+    ${extraText ? `<span class="${className}__extra">${extraText}</span>` : ''}
+  </div>
+`
+
+const parseCoordinate = (value) => {
+  const parsed = parseFloat(value)
+  return Number.isFinite(parsed) && parsed !== 0 ? parsed : null
+}
 
 function CheckinMonitor() {
   const navigate = useNavigate()
@@ -29,6 +43,7 @@ function CheckinMonitor() {
 
   const [loading, setLoading] = useState(false)
   const [activity, setActivity] = useState(null)
+  const [routeDetail, setRouteDetail] = useState(null)
   const [checkpointStats, setCheckpointStats] = useState([])
   const [participants, setParticipants] = useState([])
   const [trackMonitor, setTrackMonitor] = useState([])
@@ -41,6 +56,15 @@ function CheckinMonitor() {
     const interval = setInterval(() => fetchData(false), 15000)
     return () => clearInterval(interval)
   }, [activityId])
+
+  useEffect(() => {
+    if (!activity?.routeId) {
+      setRouteDetail(null)
+      return
+    }
+
+    fetchRouteInfo(activity.routeId)
+  }, [activity?.routeId])
 
   useEffect(() => {
     if (trackMonitor.length === 0) {
@@ -70,6 +94,21 @@ function CheckinMonitor() {
     }
   }, [selectedParticipant])
 
+  useEffect(() => {
+    if (selectedParticipantId) {
+      return
+    }
+
+    const startLng = parseCoordinate(routeDetail?.startPoint?.longitude)
+    const startLat = parseCoordinate(routeDetail?.startPoint?.latitude)
+    if (startLng && startLat) {
+      setMapCenter({
+        lng: startLng,
+        lat: startLat
+      })
+    }
+  }, [routeDetail, selectedParticipantId])
+
   const fetchData = async (showErrors = true) => {
     setLoading(true)
     try {
@@ -91,6 +130,15 @@ function CheckinMonitor() {
       setActivity(res)
     } catch (error) {
       if (showErrors) message.error('获取活动信息失败')
+    }
+  }
+
+  const fetchRouteInfo = async (routeId, showErrors = false) => {
+    try {
+      const res = await getRouteDetail(routeId)
+      setRouteDetail(res)
+    } catch (error) {
+      if (showErrors) message.error('获取路线详情失败')
     }
   }
 
@@ -280,6 +328,89 @@ function CheckinMonitor() {
       })
   }
 
+  const generateRouteMarkers = () => {
+    if (!routeDetail) {
+      return []
+    }
+
+    const markers = []
+
+    const startLng = parseCoordinate(routeDetail.startPoint?.longitude)
+    const startLat = parseCoordinate(routeDetail.startPoint?.latitude)
+    if (startLng && startLat) {
+      markers.push({
+        markerType: 'route-start',
+        lng: startLng,
+        lat: startLat,
+        title: routeDetail.startPoint?.name || routeDetail.startPointName || '起点',
+        offset: { x: -36, y: -42 },
+        content: createMapBadge('route-pill-marker route-pill-marker--start', '起', routeDetail.startPoint?.name || routeDetail.startPointName || '起点')
+      })
+    }
+
+    const endLng = parseCoordinate(routeDetail.endPoint?.longitude)
+    const endLat = parseCoordinate(routeDetail.endPoint?.latitude)
+    if (endLng && endLat) {
+      markers.push({
+        markerType: 'route-end',
+        lng: endLng,
+        lat: endLat,
+        title: routeDetail.endPoint?.name || routeDetail.endPointName || '终点',
+        offset: { x: -36, y: -42 },
+        content: createMapBadge('route-pill-marker route-pill-marker--end', '终', routeDetail.endPoint?.name || routeDetail.endPointName || '终点')
+      })
+    }
+
+    ;(routeDetail.routePoints || []).forEach(point => {
+      const lng = parseCoordinate(point.longitude)
+      const lat = parseCoordinate(point.latitude)
+
+      if (!lng || !lat) {
+        return
+      }
+
+      markers.push({
+        markerType: 'route-point',
+        lng,
+        lat,
+        title: point.name || `路线点${point.sequence || ''}`,
+        offset: { x: -14, y: -14 },
+        content: `
+          <div class="route-node-marker">
+            <span class="route-node-marker__seq">${point.sequence || ''}</span>
+          </div>
+        `
+      })
+    })
+
+    const appendRoutePointMarkers = (points, type, icon) => {
+      ;(points || []).forEach(point => {
+        const lng = parseCoordinate(point.longitude)
+        const lat = parseCoordinate(point.latitude)
+
+        if (!lng || !lat) {
+          return
+        }
+
+        markers.push({
+          markerType: type,
+          lng,
+          lat,
+          title: point.name,
+          offset: { x: -52, y: -40 },
+          content: createMapBadge(`route-pill-marker route-pill-marker--${type}`, icon, point.name, point.sequence ? `#${point.sequence}` : '')
+        })
+      })
+    }
+
+    appendRoutePointMarkers(routeDetail.waypoints, 'waypoint', '途')
+    appendRoutePointMarkers(routeDetail.riskPoints, 'risk', '险')
+    appendRoutePointMarkers(routeDetail.restPoints, 'rest', '休')
+    appendRoutePointMarkers(routeDetail.supplyPoints, 'supply', '补')
+
+    return markers
+  }
+
   const generateParticipantMarkers = () => {
     return trackMonitor
       .filter(item =>
@@ -312,22 +443,42 @@ function CheckinMonitor() {
 
   const generateMapMarkers = () => {
     return [
+      ...generateRouteMarkers(),
       ...generateCheckpointMarkers(),
       ...generateParticipantMarkers()
     ]
   }
 
   const generateRoutePoints = () => {
+    const routePoints = (routeDetail?.routePoints || [])
+      .map(point => {
+        const lng = parseCoordinate(point.longitude)
+        const lat = parseCoordinate(point.latitude)
+
+        if (!lng || !lat) {
+          return null
+        }
+
+        return { lng, lat }
+      })
+      .filter(Boolean)
+
+    if (routePoints.length >= 2) {
+      return routePoints
+    }
+
     return checkpointStats
-      .filter(cp =>
-        cp.longitude && cp.latitude &&
-        !isNaN(cp.longitude) && !isNaN(cp.latitude) &&
-        cp.longitude !== 0 && cp.latitude !== 0
-      )
-      .map(cp => ({
-        lng: cp.longitude,
-        lat: cp.latitude
-      }))
+      .map(cp => {
+        const lng = parseCoordinate(cp.longitude)
+        const lat = parseCoordinate(cp.latitude)
+
+        if (!lng || !lat) {
+          return null
+        }
+
+        return { lng, lat }
+      })
+      .filter(Boolean)
   }
 
   const selectedTrackPolyline = selectedParticipant?.recentTracks?.length >= 2
@@ -497,6 +648,17 @@ function CheckinMonitor() {
           )}
         </div>
 
+        {routeDetail && (
+          <div className="route-summary-panel">
+            <span className="route-summary-item">路线点 {routeDetail.routePoints?.length || 0}</span>
+            <span className="route-summary-item">签到点 {checkpointStats.length}</span>
+            <span className="route-summary-item">途经点 {routeDetail.waypoints?.length || 0}</span>
+            <span className="route-summary-item">风险点 {routeDetail.riskPoints?.length || 0}</span>
+            <span className="route-summary-item">休息点 {routeDetail.restPoints?.length || 0}</span>
+            <span className="route-summary-item">补给点 {routeDetail.supplyPoints?.length || 0}</span>
+          </div>
+        )}
+
         <div className="map-monitor-content">
           <MapView
             center={mapCenter}
@@ -509,12 +671,36 @@ function CheckinMonitor() {
           />
           <div className="map-legend">
             <div className="legend-item">
+              <span className="legend-marker start"></span>
+              <span>起终点</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-marker route-point"></span>
+              <span>路线点</span>
+            </div>
+            <div className="legend-item">
               <span className="legend-marker checkpoint"></span>
               <span>签到点</span>
             </div>
             <div className="legend-item">
               <span className="legend-marker completed"></span>
               <span>已完成签到点</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-marker waypoint"></span>
+              <span>途经点</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-marker risk"></span>
+              <span>风险点</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-marker rest"></span>
+              <span>休息点</span>
+            </div>
+            <div className="legend-item">
+              <span className="legend-marker supply"></span>
+              <span>补给点</span>
             </div>
             <div className="legend-item">
               <span className="legend-marker route"></span>

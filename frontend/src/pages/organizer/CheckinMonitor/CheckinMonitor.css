@@ -176,6 +176,23 @@
   font-size: 13px;
 }
 
+.checkin-monitor-page .route-summary-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.checkin-monitor-page .route-summary-item {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #fff7e6;
+  border: 1px solid #ffd591;
+  color: #ad6800;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .checkin-monitor-page .map-legend {
   position: absolute;
   bottom: 20px;
@@ -208,8 +225,33 @@
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
 }
 
+.checkin-monitor-page .legend-marker.start {
+  background: linear-gradient(135deg, #52c41a 0%, #ff4d4f 100%);
+}
+
+.checkin-monitor-page .legend-marker.route-point {
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1677ff 0%, #69b1ff 100%);
+}
+
 .checkin-monitor-page .legend-marker.completed {
   background: linear-gradient(135deg, var(--success-color) 0%, #95DE64 100%);
+}
+
+.checkin-monitor-page .legend-marker.waypoint {
+  background: linear-gradient(135deg, #13c2c2 0%, #36cfc9 100%);
+}
+
+.checkin-monitor-page .legend-marker.risk {
+  background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%);
+}
+
+.checkin-monitor-page .legend-marker.rest {
+  background: linear-gradient(135deg, #722ed1 0%, #b37feb 100%);
+}
+
+.checkin-monitor-page .legend-marker.supply {
+  background: linear-gradient(135deg, #389e0d 0%, #73d13d 100%);
 }
 
 .checkin-monitor-page .legend-marker.route {
@@ -277,6 +319,89 @@
 .checkpoint-marker .marker-count {
   font-size: 11px;
   color: var(--text-secondary);
+}
+
+.route-node-marker {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1677ff 0%, #69b1ff 100%);
+  border: 2px solid #fff;
+  box-shadow: 0 3px 10px rgba(22, 119, 255, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.route-node-marker__seq {
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.route-pill-marker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+
+.route-pill-marker__icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.route-pill-marker__text {
+  max-width: 86px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.route-pill-marker__extra {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.route-pill-marker--start {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+}
+
+.route-pill-marker--end {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%);
+}
+
+.route-pill-marker--waypoint {
+  background: linear-gradient(135deg, #13c2c2 0%, #36cfc9 100%);
+}
+
+.route-pill-marker--risk {
+  background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%);
+}
+
+.route-pill-marker--rest {
+  background: linear-gradient(135deg, #722ed1 0%, #b37feb 100%);
+}
+
+.route-pill-marker--supply {
+  background: linear-gradient(135deg, #389e0d 0%, #73d13d 100%);
 }
 
 .participant-marker {
@@ -513,6 +638,10 @@
 
   .checkin-monitor-page .participants-card .ant-table {
     min-width: 700px;
+  }
+
+  .checkin-monitor-page .route-summary-panel {
+    gap: 8px;
   }
 
   .checkin-monitor-page .map-legend {
