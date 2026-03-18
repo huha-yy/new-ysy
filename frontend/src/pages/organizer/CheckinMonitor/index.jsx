@@ -37,6 +37,11 @@ const parseCoordinate = (value) => {
   return Number.isFinite(parsed) && parsed !== 0 ? parsed : null
 }
 
+const truncateMarkerText = (text, maxLength = 4) => {
+  if (!text) return ''
+  return text.length > maxLength ? `${text.slice(0, maxLength)}…` : text
+}
+
 function CheckinMonitor() {
   const navigate = useNavigate()
   const { id: activityId } = useParams()
@@ -343,8 +348,12 @@ function CheckinMonitor() {
         lng: startLng,
         lat: startLat,
         title: routeDetail.startPoint?.name || routeDetail.startPointName || '起点',
-        offset: { x: -36, y: -42 },
-        content: createMapBadge('route-pill-marker route-pill-marker--start', '起', routeDetail.startPoint?.name || routeDetail.startPointName || '起点')
+        offset: { x: -30, y: -38 },
+        content: createMapBadge(
+          'route-pill-marker route-pill-marker--start route-pill-marker--key',
+          '起',
+          truncateMarkerText(routeDetail.startPoint?.name || routeDetail.startPointName || '起点', 4)
+        )
       })
     }
 
@@ -356,8 +365,12 @@ function CheckinMonitor() {
         lng: endLng,
         lat: endLat,
         title: routeDetail.endPoint?.name || routeDetail.endPointName || '终点',
-        offset: { x: -36, y: -42 },
-        content: createMapBadge('route-pill-marker route-pill-marker--end', '终', routeDetail.endPoint?.name || routeDetail.endPointName || '终点')
+        offset: { x: -30, y: -38 },
+        content: createMapBadge(
+          'route-pill-marker route-pill-marker--end route-pill-marker--key',
+          '终',
+          truncateMarkerText(routeDetail.endPoint?.name || routeDetail.endPointName || '终点', 4)
+        )
       })
     }
 
@@ -383,7 +396,7 @@ function CheckinMonitor() {
       })
     })
 
-    const appendRoutePointMarkers = (points, type, icon) => {
+    const appendRoutePointMarkers = (points, type, icon, options = {}) => {
       ;(points || []).forEach(point => {
         const lng = parseCoordinate(point.longitude)
         const lat = parseCoordinate(point.latitude)
@@ -397,16 +410,35 @@ function CheckinMonitor() {
           lng,
           lat,
           title: point.name,
-          offset: { x: -52, y: -40 },
-          content: createMapBadge(`route-pill-marker route-pill-marker--${type}`, icon, point.name, point.sequence ? `#${point.sequence}` : '')
+          offset: options.offset || { x: -42, y: -34 },
+          content: createMapBadge(
+            `route-pill-marker route-pill-marker--${type} ${options.className || 'route-pill-marker--minor'}`.trim(),
+            icon,
+            truncateMarkerText(point.name, options.maxLength || 4),
+            options.showSequence && point.sequence ? `#${point.sequence}` : ''
+          )
         })
       })
     }
 
-    appendRoutePointMarkers(routeDetail.waypoints, 'waypoint', '途')
-    appendRoutePointMarkers(routeDetail.riskPoints, 'risk', '险')
-    appendRoutePointMarkers(routeDetail.restPoints, 'rest', '休')
-    appendRoutePointMarkers(routeDetail.supplyPoints, 'supply', '补')
+    appendRoutePointMarkers(routeDetail.waypoints, 'waypoint', '途', {
+      className: 'route-pill-marker--minor',
+      maxLength: 3
+    })
+    appendRoutePointMarkers(routeDetail.riskPoints, 'risk', '险', {
+      className: 'route-pill-marker--alert',
+      maxLength: 4,
+      showSequence: true,
+      offset: { x: -46, y: -36 }
+    })
+    appendRoutePointMarkers(routeDetail.restPoints, 'rest', '休', {
+      className: 'route-pill-marker--minor',
+      maxLength: 3
+    })
+    appendRoutePointMarkers(routeDetail.supplyPoints, 'supply', '补', {
+      className: 'route-pill-marker--minor',
+      maxLength: 3
+    })
 
     return markers
   }
