@@ -96,8 +96,13 @@ function RouteEdit() {
       // 设置路线数据
       setRouteData(formData)
 
-      // 根据已保存的地区初始化地图中心
-      if (data.region && cityCoordinates[data.region]) {
+      // 根据实际路线位置初始化地图中心（优先起点 > 第一个路线点 > 城市坐标）
+      if (data.startPoint && data.startPoint.latitude && data.startPoint.longitude) {
+        setMapCenter({ lng: parseFloat(data.startPoint.longitude), lat: parseFloat(data.startPoint.latitude) })
+      } else if (data.routePoints && data.routePoints.length > 0) {
+        const first = data.routePoints[0]
+        setMapCenter({ lng: parseFloat(first.longitude), lat: parseFloat(first.latitude) })
+      } else if (data.region && cityCoordinates[data.region]) {
         setMapCenter(cityCoordinates[data.region])
       }
 
@@ -240,19 +245,15 @@ function RouteEdit() {
         ...routeData,
         ...await form.validateFields(),
         routePoints: routePoints.map(point => ({
-          latitude: point.lat,
-          longitude: point.lng
+          lat: point.lat,
+          lng: point.lng
         })),
-        startPoint: startPoint ? {
-          latitude: startPoint.lat,
-          longitude: startPoint.lng,
-          name: startPoint.name
-        } : null,
-        endPoint: endPoint ? {
-          latitude: endPoint.lat,
-          longitude: endPoint.lng,
-          name: endPoint.name
-        } : null,
+        startPointName: startPoint?.name || null,
+        startLatitude: startPoint?.lat || null,
+        startLongitude: startPoint?.lng || null,
+        endPointName: endPoint?.name || null,
+        endLatitude: endPoint?.lat || null,
+        endLongitude: endPoint?.lng || null,
         checkpoints: checkpoints.map((cp, index) => ({
           name: cp.name,
           latitude: cp.lat,

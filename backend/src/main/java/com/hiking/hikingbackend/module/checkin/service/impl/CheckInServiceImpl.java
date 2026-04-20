@@ -335,15 +335,11 @@ public class CheckInServiceImpl implements CheckInService {
             throw new BusinessException(ResultCode.ACTIVITY_ENDED);
         }
 
-        // 如果活动状态不是进行中，则判断当前时间是否在活动时间范围内
+        // 如果活动状态不是进行中，则判断当前时间是否已超过活动结束时间
         if (activity.getStatus() != ACTIVITY_STATUS_ONGOING) {
             LocalDateTime now = LocalDateTime.now();
-            LocalDateTime activityStart = LocalDateTime.of(activity.getActivityDate(), activity.getStartTime());
             LocalDateTime activityEnd = LocalDateTime.of(activity.getActivityDate(), activity.getEndTime());
 
-            if (now.isBefore(activityStart)) {
-                throw new BusinessException(ResultCode.ACTIVITY_NOT_STARTED);
-            }
             if (now.isAfter(activityEnd)) {
                 throw new BusinessException(ResultCode.ACTIVITY_ENDED);
             }

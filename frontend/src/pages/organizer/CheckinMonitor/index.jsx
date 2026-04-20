@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   Card, Row, Col, Progress, Table, Tag, Space, Button,
-  Avatar, Statistic, Timeline, Badge, Empty, Tooltip, message
+  Avatar, Statistic, Badge, Empty, Tooltip, message
 } from 'antd'
 import {
   LeftOutlined,
@@ -747,42 +747,6 @@ function CheckinMonitor() {
               <span>参与者离线</span>
             </div>
           </div>
-        </div>
-      </Card>
-
-      <Card className="checkpoints-card" title="签到点进度">
-        <div className="checkpoints-timeline">
-          <Timeline mode="left">
-            {checkpointStats.map(cp => (
-              <Timeline.Item
-                key={cp.checkpointId}
-                color={cp.checkedCount === cp.totalCount && cp.totalCount > 0 ? 'green' :
-                  cp.checkedCount > 0 ? 'blue' : 'gray'}
-                label={
-                  <div className="timeline-label">
-                    <span className="cp-order-badge">{cp.sequence}</span>
-                  </div>
-                }
-              >
-                <div className="checkpoint-progress-item">
-                  <div className="cp-info">
-                    <span className="cp-name">{cp.name}</span>
-                    <span className="cp-count">
-                      {cp.checkedCount} / {cp.totalCount} 人
-                    </span>
-                  </div>
-                  <Progress
-                    percent={cp.completionRate || 0}
-                    size="small"
-                    strokeColor={{
-                      '0%': 'var(--primary-color)',
-                      '100%': 'var(--success-color)'
-                    }}
-                  />
-                </div>
-              </Timeline.Item>
-            ))}
-          </Timeline>
         </div>
       </Card>
 

@@ -17,6 +17,7 @@ import './MapView.css'
  * @param {Array} props.polylines - 额外折线数组
  * @param {boolean} props.showCurrentLocation - 是否显示当前位置
  * @param {Function} props.onMarkerClick - 标记点击回调
+ * @param {Function} props.onMarkerDragEnd - 标记拖拽结束回调 (markerData, index, newLnglat)
  * @param {boolean} props.autoFitView - 是否在绘制路线时自动调整视野（默认false，避免打断用户操作）
  * @param {boolean} props.allowCenterChange - 是否允许动态改变地图中心（默认true）
  */
@@ -32,6 +33,7 @@ const MapView = ({
   showCurrentLocation = false,
   userLocation = null,
   onMarkerClick,
+  onMarkerDragEnd,
   onMapClick,
   autoFitView = false,
   allowCenterChange = true,
@@ -49,6 +51,7 @@ const MapView = ({
   const routePointsRef = useRef(routePoints)
   const polylinesRef = useRef(polylines)
   const onMarkerClickRef = useRef(onMarkerClick)
+  const onMarkerDragEndRef = useRef(onMarkerDragEnd)
   const onMapClickRef = useRef(onMapClick)
   const userLocationRef = useRef(userLocation)
 
@@ -65,6 +68,9 @@ const MapView = ({
   useEffect(() => {
     onMarkerClickRef.current = onMarkerClick
   }, [onMarkerClick])
+  useEffect(() => {
+    onMarkerDragEndRef.current = onMarkerDragEnd
+  }, [onMarkerDragEnd])
   useEffect(() => {
     onMapClickRef.current = onMapClick
   }, [onMapClick])
@@ -170,6 +176,17 @@ const MapView = ({
           onMapClickRef.current(e)
         }
       })
+
+      // 根据缩放等级动态调整标记点大小
+      const updateMarkerScale = () => {
+        if (!mapRef.current || !mapInstance.current) return
+        const currentZoom = mapInstance.current.getZoom()
+        // 基准缩放级别为15，低于15时标记缩小，高于15时略微放大
+        const scale = Math.min(1.15, Math.max(0.45, currentZoom / 15))
+        mapRef.current.style.setProperty('--marker-scale', scale)
+      }
+      mapInstance.current.on('zoomchange', updateMarkerScale)
+      updateMarkerScale() // 初始化
 
       setLoading(false)
 
@@ -305,7 +322,8 @@ const MapView = ({
           title: markerData.title || `标记${index + 1}`,
           offset: markerData.offset
             ? new AMap.Pixel(markerData.offset.x || 0, markerData.offset.y || 0)
-            : new AMap.Pixel(-10, -10)
+            : new AMap.Pixel(-10, -10),
+          draggable: !!markerData.draggable
         }
 
         // 如果有自定义content，使用content；否则使用icon
@@ -321,6 +339,15 @@ const MapView = ({
         if (clickHandler) {
           marker.on('click', () => {
             clickHandler(markerData, index)
+          })
+        }
+
+        if (markerData.draggable) {
+          marker.on('dragend', (e) => {
+            const dragEndHandler = onMarkerDragEndRef.current
+            if (dragEndHandler) {
+              dragEndHandler(markerData, index, e.lnglat)
+            }
           })
         }
 

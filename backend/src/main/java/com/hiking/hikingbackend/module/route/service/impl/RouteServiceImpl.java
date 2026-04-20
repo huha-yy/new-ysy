@@ -699,9 +699,10 @@ public class RouteServiceImpl implements RouteService {
             List<RoutePoint> routePoints = createDTO.getRoutePoints().stream()
                     .map(point -> RoutePoint.builder()
                             .routeId(routeId)
+                            .name("路线点" + (createDTO.getRoutePoints().indexOf(point) + 1))
                             .latitude(BigDecimal.valueOf(point.getLat()))
                             .longitude(BigDecimal.valueOf(point.getLng()))
-                            .pointType(1)
+                            .pointType(ROUTE_POINT_TYPE_TRACK)
                             .sequence(createDTO.getRoutePoints().indexOf(point) + 1)
                             .build())
                     .toList();
@@ -723,6 +724,71 @@ public class RouteServiceImpl implements RouteService {
                             .build())
                     .toList();
             checkpoints.forEach(checkpointMapper::insert);
+        }
+
+        // 10. 保存新的途经点
+        if (createDTO.getWaypoints() != null && !createDTO.getWaypoints().isEmpty()) {
+            List<RoutePoint> waypoints = createDTO.getWaypoints().stream()
+                    .map(wp -> RoutePoint.builder()
+                            .routeId(routeId)
+                            .name(wp.getName())
+                            .latitude(BigDecimal.valueOf(wp.getLatitude()))
+                            .longitude(BigDecimal.valueOf(wp.getLongitude()))
+                            .pointType(wp.getPointType() != null ? wp.getPointType() : 1)
+                            .sequence(wp.getSequence() != null ? wp.getSequence() : createDTO.getWaypoints().indexOf(wp) + 1)
+                            .build())
+                    .toList();
+            waypoints.forEach(routePointMapper::insert);
+        }
+
+        // 11. 保存新的风险点
+        if (createDTO.getRiskPoints() != null && !createDTO.getRiskPoints().isEmpty()) {
+            List<RoutePoint> riskPoints = createDTO.getRiskPoints().stream()
+                    .map(rp -> RoutePoint.builder()
+                            .routeId(routeId)
+                            .name(rp.getName())
+                            .description(rp.getDescription())
+                            .latitude(BigDecimal.valueOf(rp.getLatitude()))
+                            .longitude(BigDecimal.valueOf(rp.getLongitude()))
+                            .pointType(2)
+                            .riskLevel(rp.getRiskLevel())
+                            .riskTip(rp.getRiskTip())
+                            .sequence(rp.getSequence() != null ? rp.getSequence() : createDTO.getRiskPoints().indexOf(rp) + 1)
+                            .build())
+                    .toList();
+            riskPoints.forEach(routePointMapper::insert);
+        }
+
+        // 12. 保存新的休息点
+        if (createDTO.getRestPoints() != null && !createDTO.getRestPoints().isEmpty()) {
+            List<RoutePoint> restPoints = createDTO.getRestPoints().stream()
+                    .map(rp -> RoutePoint.builder()
+                            .routeId(routeId)
+                            .name(rp.getName())
+                            .description(rp.getDescription())
+                            .latitude(BigDecimal.valueOf(rp.getLatitude()))
+                            .longitude(BigDecimal.valueOf(rp.getLongitude()))
+                            .pointType(3)
+                            .sequence(rp.getSequence() != null ? rp.getSequence() : createDTO.getRestPoints().indexOf(rp) + 1)
+                            .build())
+                    .toList();
+            restPoints.forEach(routePointMapper::insert);
+        }
+
+        // 13. 保存新的补给点
+        if (createDTO.getSupplyPoints() != null && !createDTO.getSupplyPoints().isEmpty()) {
+            List<RoutePoint> supplyPoints = createDTO.getSupplyPoints().stream()
+                    .map(sp -> RoutePoint.builder()
+                            .routeId(routeId)
+                            .name(sp.getName())
+                            .description(sp.getDescription())
+                            .latitude(BigDecimal.valueOf(sp.getLatitude()))
+                            .longitude(BigDecimal.valueOf(sp.getLongitude()))
+                            .pointType(4)
+                            .sequence(sp.getSequence() != null ? sp.getSequence() : createDTO.getSupplyPoints().indexOf(sp) + 1)
+                            .build())
+                    .toList();
+            supplyPoints.forEach(routePointMapper::insert);
         }
     }
 

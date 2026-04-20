@@ -38,11 +38,11 @@ npm run preview            # 预览生产构建
 mysql -u root -p
 CREATE DATABASE hiking_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 # 从 sql/hiking_system0210.sql 导入数据库架构
-# 数据库凭据在 backend/src/main/resources/application.yml
+# 数据库凭据在 backend/src/main/resources/application.yml（root/123666888）
 ```
 
-- **MySQL 服务**：使用 Homebrew 安装的 MySQL 9.5.0（`brew services start mysql`）
-- **注意**：本机同时存在 `/usr/local/mysql`（官方 DMG 安装）和 Homebrew 两个 MySQL 实例，重启电脑后官方版可能自动启动并占用 3306 端口，导致 Homebrew 版无法连接。如遇 `Access denied` 错误，先确认 Homebrew MySQL 是否在运行：
+- **MySQL 8.0+**，端口 3306，数据库名 `hiking_system`
+- **macOS 注意**：本机同时存在 `/usr/local/mysql`（官方 DMG 安装）和 Homebrew 两个 MySQL 实例，重启电脑后官方版可能自动启动并占用 3306 端口。如遇 `Access denied` 错误，先确认 Homebrew MySQL 是否在运行：
   ```bash
   brew services list | grep mysql   # 检查状态
   brew services start mysql          # 启动 Homebrew MySQL
@@ -72,10 +72,12 @@ CREATE DATABASE hiking_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 **关键依赖版本**：MyBatis-Plus 3.5.5、JJWT 0.12.3、SpringDoc 2.3.0、Knife4j 4.3.0
 
-**安全机制**：基于 JWT 的 Spring Security 认证（无状态 Session）
-- Token 格式：`Authorization: Bearer <token>`，有效期 24 小时
+**安全机制**：基于 JWT 的 Spring Security 认证（无状态 Session，CSRF 已禁用）
+- Token 格式：`Authorization: Bearer <token>`，有效期 24 小时（86400000ms）
 - 公开端点：`/auth/**`、`/activities/**`、`/routes/**`、`/dict/data/**`、`/file/**`、`/uploads/**`
 - 角色：USER、ORGANIZER、ADMIN
+
+**CORS**（`CorsConfig.java`）：允许 `http://localhost:5173`（前端）和 `http://localhost:8080`，支持 GET/POST/PUT/DELETE/OPTIONS，允许 Credentials
 
 **异常处理**：`GlobalExceptionHandler` 统一捕获异常，返回 `Result` 格式
 - 业务异常使用 `throw new BusinessException("错误信息")` 或 `throw new BusinessException(code, "错误信息")`
@@ -150,6 +152,7 @@ const activities = await request.get('/activities')  // 响应拦截器自动提
 ### 状态常量 (`frontend/src/utils/constants.js`)
 - ACTIVITY_STATUS: DRAFT (0) → PENDING (1) → PUBLISHED (2) → IN_PROGRESS (3) → ENDED (4)，另有 CANCELLED (5)、REJECTED (6)
 - REGISTRATION_STATUS: PENDING (0)、APPROVED (1)、REJECTED (2)、WAITING (3)、CANCELLED (4)、ABSENT (5)
+- CHECKIN_STATUS: PENDING (0)、COMPLETED (1)
 - DIFFICULTY: EASY (1)、SIMPLE (2)、MEDIUM (3)、HARD (4)、EXTREME (5)
 
 ### 路线点位类型
@@ -165,7 +168,9 @@ START（起点）、END（终点）、WAYPOINT（路点）、REST_POINT（休息
 - 加载方式：`loadAmapScript()` 返回 `window.AMap`
 - 已加载插件：Geolocation、Marker、Polyline、Polygon、Scale、ToolBar、PlaceSearch、Geocoder
 - 坐标系转换：内置 WGS84 ↔ GCJ02 ↔ BD09 转换函数（GPS 原始坐标需转 GCJ02 后才能在高德地图上使用）
+- 默认地图中心：北京天安门（116.397428, 39.90923），定义在 `constants.js` 的 `DEFAULT_MAP_CENTER`
 - 地图组件：`src/components/MapView/MapView.jsx`，支持 `onMapClick` 回调
+- 常用工具函数：`getCurrentLocation()`、`getAmapLocation()`、`calculateDistance()`、`isInRadius()`、`formatDistance()`
 
 ## 数据库约定
 

@@ -35,11 +35,9 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // 2. 允许的域名（开发环境）
-        // 修改：前端通过 Vite 代理到后端，所以允许后端地址
-        // 开发环境允许所有来源，或者配置具体的后端地址
-        config.addAllowedOrigin("http://localhost:5173");  // Vite 开发服务器
-        config.addAllowedOrigin("http://localhost:8080");   // 后端服务地址（用于直接访问）
-        // config.addAllowedOrigin("*");  // 生产环境可使用通配符
+        // 使用 addAllowedOriginPattern 支持通配符，兼容 allowCredentials=true
+        // 允许所有来源，包括手机局域网访问（如 http://192.168.x.x:5173）
+        config.addAllowedOriginPattern("*");
 
         // 3. 允许的请求头（允许所有）
         config.addAllowedHeader("*");

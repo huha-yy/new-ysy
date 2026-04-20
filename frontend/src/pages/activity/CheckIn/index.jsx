@@ -14,6 +14,8 @@ import {
 } from '@ant-design/icons'
 import MapView from '../../../components/MapView/MapView'
 import { getCheckpoints, getCheckinStatus, checkin as checkinApi, reportTrack } from '../../../api/checkin'
+import { getActivityDetail } from '../../../api/activity'
+import { getRouteDetail } from '../../../api/route'
 import { getLocation, checkIn, TrackRecorder, checkLocationPermission, forceGpsLocation, locationDiagnostics } from '../../../utils/location'
 import { formatDistance, calculateDistance } from '../../../utils/map'
 import dayjs from 'dayjs'
@@ -32,6 +34,9 @@ function CheckIn() {
   const [checkinProgress, setCheckinProgress] = useState(0)
   const [nextCheckpoint, setNextCheckpoint] = useState(null)
   const [mapCenter, setMapCenter] = useState(null)
+
+  // 路线数据（用于地图展示路线轨迹和各类标记点）
+  const [routeData, setRouteData] = useState(null)
 
   const [trackRecorder] = useState(new TrackRecorder())
   const [isRecording, setIsRecording] = useState(false)
@@ -70,12 +75,12 @@ function CheckIn() {
   useEffect(() => {
     // 计算签到进度
     if (checkinStatus && checkpoints.length > 0) {
-      const completedCount = checkinStatus.checkInRecords?.length || 0
+      const completedCount = checkinStatus.checkpointStatusList?.filter(s => s.isCheckedIn === 1).length || 0
       const progress = Math.round((completedCount / checkpoints.length) * 100)
       setCheckinProgress(progress)
 
       // 找到下一个签到点
-      const completedIds = checkinStatus.checkInRecords?.map(r => r.checkpointId) || []
+      const completedIds = checkinStatus.checkpointStatusList?.filter(s => s.isCheckedIn === 1).map(s => s.checkpointId) || []
       const next = checkpoints.find(cp => !completedIds.includes(cp.id))
       setNextCheckpoint(next || null)
     }
@@ -104,6 +109,21 @@ function CheckIn() {
 
       setCheckinStatus(status)
       setCheckpoints(points)
+
+      // 获取活动关联的路线数据（轨迹、途经点、风险点等）
+      try {
+        const activity = await getActivityDetail(id)
+        if (activity.routeId) {
+          const route = await getRouteDetail(activity.routeId)
+          setRouteData(route)
+          // 以路线起点为地图中心
+          if (route.startPoint) {
+            setMapCenter({ lng: parseFloat(route.startPoint.longitude), lat: parseFloat(route.startPoint.latitude) })
+          }
+        }
+      } catch (e) {
+        // 路线数据加载失败不影响签到功能
+      }
 
       // 开始记录轨迹
       if (status.canCheckIn) {
@@ -289,11 +309,19 @@ function CheckIn() {
           } finally {
             setLocating(false)
           }
+        },
+        onCancel: () => {
+          // 用户选择继续签到，执行实际签到逻辑
+          doCheckIn(checkpointId)
         }
       })
       return
     }
 
+    doCheckIn(checkpointId)
+  }
+
+  const doCheckIn = async (checkpointId) => {
     try {
       setLoading(true)
 
@@ -329,17 +357,18 @@ function CheckIn() {
       // 重新获取签到状态
       await fetchCheckinData()
     } catch (error) {
-      message.error('签到失败，请重试')
+      message.error(error.message || '签到失败，请重试')
     } finally {
       setLoading(false)
     }
   }
 
   const getCheckpointStatus = (checkpointId) => {
-    const record = checkinStatus?.checkInRecords?.find(r => r.checkpointId === checkpointId)
-    if (!record) return 'pending'
+    const statusItem = checkinStatus?.checkpointStatusList?.find(s => s.checkpointId === checkpointId)
+    if (!statusItem || statusItem.isCheckedIn !== 1) return 'pending'
 
-    return record.status === 1 ? 'completed' : record.status === 2 ? 'late' : 'completed'
+    const record = statusItem.checkInRecord
+    return record?.status === 2 ? 'late' : 'completed'
   }
 
   const getDistanceToCheckpoint = (checkpoint) => {
@@ -470,7 +499,7 @@ function CheckIn() {
                 '0%': '#FFA726',
                 '100%': '#52c41a'
               }}
-              format={() => `${checkinStatus?.checkInRecords?.length || 0} / ${checkpoints.length}`}
+              format={() => `${checkinStatus?.checkpointStatusList?.filter(s => s.isCheckedIn === 1).length || 0} / ${checkpoints.length}`}
             />
           </div>
 
@@ -573,6 +602,10 @@ function CheckIn() {
               zoom={16}
               height="400px"
               showCurrentLocation={true}
+              routePoints={routeData?.routePoints?.map(p => ({
+                lng: parseFloat(p.longitude),
+                lat: parseFloat(p.latitude)
+              })) || []}
               markers={[
                 ...(currentLocation ? [{
                   lng: currentLocation.longitude,
@@ -581,11 +614,60 @@ function CheckIn() {
                   content: '<div class="user-location-marker"><div class="user-pulse"></div><div class="user-dot"></div></div>',
                   offset: { x: -28, y: -28 }
                 }] : []),
+                // 起点
+                ...(routeData?.startPoint ? [{
+                  lng: parseFloat(routeData.startPoint.longitude),
+                  lat: parseFloat(routeData.startPoint.latitude),
+                  title: '起点',
+                  content: '<div style="display:flex;align-items:center;padding:4px 10px;border-radius:12px;background:linear-gradient(135deg,#52c41a,#389e0d);color:#fff;font-size:12px;font-weight:bold;border:2px solid rgba(255,255,255,0.9);box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">🎯 起点</div>',
+                  offset: { x: -35, y: -15 }
+                }] : []),
+                // 终点
+                ...(routeData?.endPoint ? [{
+                  lng: parseFloat(routeData.endPoint.longitude),
+                  lat: parseFloat(routeData.endPoint.latitude),
+                  title: '终点',
+                  content: '<div style="display:flex;align-items:center;padding:4px 10px;border-radius:12px;background:linear-gradient(135deg,#f5222d,#cf1322);color:#fff;font-size:12px;font-weight:bold;border:2px solid rgba(255,255,255,0.9);box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">🏁 终点</div>',
+                  offset: { x: -35, y: -15 }
+                }] : []),
+                // 签到点
                 ...checkpoints.map((cp, index) => ({
                   lng: cp.longitude,
                   lat: cp.latitude,
                   title: cp.name,
                   content: `<div class="checkpoint-marker"><span class="checkpoint-seq">${cp.sequence || index + 1}</span><div class="checkpoint-label">${cp.name}</div></div>`
+                })),
+                // 途经点
+                ...(routeData?.waypoints || []).map(wp => ({
+                  lng: parseFloat(wp.longitude),
+                  lat: parseFloat(wp.latitude),
+                  title: wp.name,
+                  content: `<div style="display:flex;align-items:center;padding:3px 8px;border-radius:10px;background:linear-gradient(135deg,#13c2c2,#08979c);color:#fff;font-size:11px;font-weight:bold;border:2px solid rgba(255,255,255,0.9);box-shadow:0 2px 6px rgba(0,0,0,0.12);white-space:nowrap;">➕ ${wp.name}</div>`,
+                  offset: { x: -40, y: -15 }
+                })),
+                // 风险点
+                ...(routeData?.riskPoints || []).map(rp => ({
+                  lng: parseFloat(rp.longitude),
+                  lat: parseFloat(rp.latitude),
+                  title: rp.name,
+                  content: `<div style="display:flex;align-items:center;padding:3px 8px;border-radius:10px;background:linear-gradient(135deg,#faad14,#d48806);color:#fff;font-size:11px;font-weight:bold;border:2px solid rgba(255,255,255,0.9);box-shadow:0 2px 6px rgba(0,0,0,0.12);white-space:nowrap;">⚠️ ${rp.name}</div>`,
+                  offset: { x: -40, y: -15 }
+                })),
+                // 休息点
+                ...(routeData?.restPoints || []).map(rp => ({
+                  lng: parseFloat(rp.longitude),
+                  lat: parseFloat(rp.latitude),
+                  title: rp.name,
+                  content: `<div style="display:flex;align-items:center;padding:3px 8px;border-radius:10px;background:linear-gradient(135deg,#722ed1,#531dab);color:#fff;font-size:11px;font-weight:bold;border:2px solid rgba(255,255,255,0.9);box-shadow:0 2px 6px rgba(0,0,0,0.12);white-space:nowrap;">☕ ${rp.name}</div>`,
+                  offset: { x: -40, y: -15 }
+                })),
+                // 补给点
+                ...(routeData?.supplyPoints || []).map(sp => ({
+                  lng: parseFloat(sp.longitude),
+                  lat: parseFloat(sp.latitude),
+                  title: sp.name,
+                  content: `<div style="display:flex;align-items:center;padding:3px 8px;border-radius:10px;background:linear-gradient(135deg,#52c41a,#389e0d);color:#fff;font-size:11px;font-weight:bold;border:2px solid rgba(255,255,255,0.9);box-shadow:0 2px 6px rgba(0,0,0,0.12);white-space:nowrap;">🏪 ${sp.name}</div>`,
+                  offset: { x: -40, y: -15 }
                 }))
               ]}
             />
@@ -639,13 +721,15 @@ function CheckIn() {
 
                     {/* 操作区 */}
                     <div className="checkpoint-action">
-                      {status === 'completed' && (
-                        <Tag icon={<CheckCircleOutlined />} color="success" style={{ fontSize: '14px', padding: '4px 12px' }}>
-                          已签到 {checkinStatus?.checkInRecords?.find(r => r.checkpointId === checkpoint.id)?.checkInTime &&
-                            dayjs(checkinStatus.checkInRecords.find(r => r.checkpointId === checkpoint.id).checkInTime).format('HH:mm')
-                          }
-                        </Tag>
-                      )}
+                      {status === 'completed' && (() => {
+                        const statusItem = checkinStatus?.checkpointStatusList?.find(s => s.checkpointId === checkpoint.id)
+                        const checkInTime = statusItem?.checkInRecord?.checkInTime
+                        return (
+                          <Tag icon={<CheckCircleOutlined />} color="success" style={{ fontSize: '14px', padding: '4px 12px' }}>
+                            已签到 {checkInTime && dayjs(checkInTime).format('HH:mm:ss')}
+                          </Tag>
+                        )
+                      })()}
 
                       {status === 'pending' && (
                         <Button

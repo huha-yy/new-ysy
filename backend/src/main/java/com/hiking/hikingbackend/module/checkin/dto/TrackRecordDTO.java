@@ -1,5 +1,6 @@
 package com.hiking.hikingbackend.module.checkin.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -40,6 +41,7 @@ public class TrackRecordDTO {
 
     @Schema(description = "记录时间", example = "2024-12-23 10:30:00", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "记录时间不能为空")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime recordTime;
 }
 

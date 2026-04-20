@@ -47,3 +47,10 @@
   }
 }
 
+/* 标记点随地图缩放等级动态缩放 */
+.map-container .custom-marker {
+  transform: scale(var(--marker-scale, 1));
+  transform-origin: center bottom;
+  transition: transform 0.2s ease;
+}
+

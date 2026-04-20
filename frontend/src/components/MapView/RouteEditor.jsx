@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Card, Button, Space, Input, InputNumber, Tag, message, Modal, Popconfirm, Badge, Divider, Select } from 'antd'
-import { PlusOutlined, MinusCircleOutlined, EnvironmentOutlined, FlagOutlined, EyeOutlined, AimOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons'
+import { PlusOutlined, MinusCircleOutlined, EnvironmentOutlined, FlagOutlined, EyeOutlined, AimOutlined, DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
 import MapView from './MapView'
 import { calculateRouteDistance, formatDistance } from '../../utils/map'
 import { DEFAULT_MAP_CENTER } from '../../utils/constants'
@@ -117,6 +117,11 @@ const RouteEditor = ({
     description: '',
     sequence: 1
   })
+
+  // 地点搜索
+  const [searchKeyword, setSearchKeyword] = useState('')
+  const [searchResults, setSearchResults] = useState([])
+  const [searchLoading, setSearchLoading] = useState(false)
 
   // 使用 ref 存储初始值，避免空数组导致的无限循环
   const initialRouteRef = useRef(initialRoute)
@@ -471,6 +476,141 @@ const RouteEditor = ({
     setSupplyPoints(newPoints)
   }
 
+  // 拖拽结束处理：根据标记点的 _pointType 和 _pointIndex 更新对应状态
+  const handleMarkerDragEnd = useCallback((markerData, markerIndex, newLnglat) => {
+    const lng = newLnglat.getLng()
+    const lat = newLnglat.getLat()
+    const { _pointType, _pointIndex } = markerData
+
+    switch (_pointType) {
+      case 'start':
+        setStartPoint(prev => ({ ...prev, lng, lat }))
+        message.success('起点位置已更新')
+        break
+      case 'end':
+        setEndPoint(prev => ({ ...prev, lng, lat }))
+        message.success('终点位置已更新')
+        break
+      case 'route':
+        setRoutePoints(prev => {
+          const updated = [...prev]
+          updated[_pointIndex] = { ...updated[_pointIndex], lng, lat }
+          return updated
+        })
+        break
+      case 'checkpoint':
+        setCheckpoints(prev => {
+          const updated = [...prev]
+          updated[_pointIndex] = { ...updated[_pointIndex], lng, lat }
+          return updated
+        })
+        message.success('签到点位置已更新')
+        break
+      case 'waypoint':
+        setWaypoints(prev => {
+          const updated = [...prev]
+          updated[_pointIndex] = { ...updated[_pointIndex], lng, lat }
+          return updated
+        })
+        message.success('途经点位置已更新')
+        break
+      case 'riskPoint':
+        setRiskPoints(prev => {
+          const updated = [...prev]
+          updated[_pointIndex] = { ...updated[_pointIndex], lng, lat }
+          return updated
+        })
+        message.success('风险点位置已更新')
+        break
+      case 'restPoint':
+        setRestPoints(prev => {
+          const updated = [...prev]
+          updated[_pointIndex] = { ...updated[_pointIndex], lng, lat }
+          return updated
+        })
+        message.success('休息点位置已更新')
+        break
+      case 'supplyPoint':
+        setSupplyPoints(prev => {
+          const updated = [...prev]
+          updated[_pointIndex] = { ...updated[_pointIndex], lng, lat }
+          return updated
+        })
+        message.success('补给点位置已更新')
+        break
+    }
+  }, [])
+
+  // 地点搜索
+  const handleSearch = useCallback((keyword) => {
+    if (!keyword || !keyword.trim()) {
+      setSearchResults([])
+      return
+    }
+    setSearchLoading(true)
+    const AMap = window.AMap
+    if (!AMap) {
+      setSearchLoading(false)
+      return
+    }
+    const placeSearch = new AMap.PlaceSearch({
+      pageSize: 6,
+      pageIndex: 1
+    })
+    placeSearch.search(keyword.trim(), (status, result) => {
+      setSearchLoading(false)
+      if (status === 'complete' && result.poiList) {
+        setSearchResults(result.poiList.pois.map(poi => ({
+          name: poi.name,
+          address: poi.address || '',
+          lng: poi.location.getLng(),
+          lat: poi.location.getLat()
+        })))
+      } else {
+        setSearchResults([])
+      }
+    })
+  }, [])
+
+  // 选中搜索结果：移动地图到该位置，如果有编辑模式则在该位置添加点
+  const handleSelectSearchResult = useCallback((result) => {
+    // 移动地图到搜索结果位置
+    if (map) {
+      map.setCenter([result.lng, result.lat])
+      map.setZoom(16)
+    }
+
+    // 如果当前有编辑模式，模拟在该位置点击
+    const currentMode = editingModeRef.current
+    if (currentMode) {
+      const fakeLnglat = {
+        getLng: () => result.lng,
+        getLat: () => result.lat
+      }
+      if (currentMode === 'route') {
+        addRoutePoint(fakeLnglat)
+      } else if (currentMode === 'checkpoint') {
+        showCheckpointModal(fakeLnglat)
+      } else if (currentMode === 'waypoint') {
+        addWaypoint(fakeLnglat)
+      } else if (currentMode === 'riskPoint') {
+        showRiskPointModal(fakeLnglat)
+      } else if (currentMode === 'restPoint') {
+        showRestPointModal(fakeLnglat)
+      } else if (currentMode === 'supplyPoint') {
+        showSupplyPointModal(fakeLnglat)
+      } else if (currentMode === 'setStart') {
+        setStartPointHandler(fakeLnglat)
+      } else if (currentMode === 'setEnd') {
+        setEndPointHandler(fakeLnglat)
+      }
+    }
+
+    // 清空搜索
+    setSearchKeyword('')
+    setSearchResults([])
+  }, [map])
+
   const clearStartPoint = () => {
     setStartPoint(null)
     message.success('已清空起点')
@@ -693,7 +833,10 @@ const RouteEditor = ({
         title: '起点',
         content: createCustomMarkerContent('start', startPoint),
         offset: new window.AMap.Pixel(-35, -40),
-        anchor: 'bottom-center'
+        anchor: 'bottom-center',
+        draggable: !readOnly,
+        _pointType: 'start',
+        _pointIndex: 0
       })
     }
 
@@ -704,7 +847,10 @@ const RouteEditor = ({
         title: '终点',
         content: createCustomMarkerContent('end', endPoint),
         offset: new window.AMap.Pixel(-35, -40),
-        anchor: 'bottom-center'
+        anchor: 'bottom-center',
+        draggable: !readOnly,
+        _pointType: 'end',
+        _pointIndex: 0
       })
     }
 
@@ -716,7 +862,10 @@ const RouteEditor = ({
           title: `路线点${index + 1}`,
           content: createCustomMarkerContent('route', point, index),
           offset: new window.AMap.Pixel(-25, -40),
-          anchor: 'bottom-center'
+          anchor: 'bottom-center',
+          draggable: !readOnly,
+          _pointType: 'route',
+          _pointIndex: index
         })
       }
     })
@@ -729,7 +878,10 @@ const RouteEditor = ({
           title: cp.name,
           content: createCustomMarkerContent('checkpoint', cp, index),
           offset: new window.AMap.Pixel(-60, -40),
-          anchor: 'bottom-center'
+          anchor: 'bottom-center',
+          draggable: !readOnly,
+          _pointType: 'checkpoint',
+          _pointIndex: index
         })
       }
     })
@@ -742,7 +894,10 @@ const RouteEditor = ({
           title: wp.name,
           content: createCustomMarkerContent('waypoint', wp, index),
           offset: new window.AMap.Pixel(-50, -40),
-          anchor: 'bottom-center'
+          anchor: 'bottom-center',
+          draggable: !readOnly,
+          _pointType: 'waypoint',
+          _pointIndex: index
         })
       }
     })
@@ -755,7 +910,10 @@ const RouteEditor = ({
           title: rp.name,
           content: createCustomMarkerContent('riskPoint', rp, index),
           offset: new window.AMap.Pixel(-60, -40),
-          anchor: 'bottom-center'
+          anchor: 'bottom-center',
+          draggable: !readOnly,
+          _pointType: 'riskPoint',
+          _pointIndex: index
         })
       }
     })
@@ -768,7 +926,10 @@ const RouteEditor = ({
           title: rp.name,
           content: createCustomMarkerContent('restPoint', rp, index),
           offset: new window.AMap.Pixel(-60, -40),
-          anchor: 'bottom-center'
+          anchor: 'bottom-center',
+          draggable: !readOnly,
+          _pointType: 'restPoint',
+          _pointIndex: index
         })
       }
     })
@@ -781,18 +942,56 @@ const RouteEditor = ({
           title: sp.name,
           content: createCustomMarkerContent('supplyPoint', sp, index),
           offset: new window.AMap.Pixel(-60, -40),
-          anchor: 'bottom-center'
+          anchor: 'bottom-center',
+          draggable: !readOnly,
+          _pointType: 'supplyPoint',
+          _pointIndex: index
         })
       }
     })
 
     return markers
-  }, [startPoint, endPoint, routePoints, checkpoints, waypoints, riskPoints, restPoints, supplyPoints, map])
+  }, [startPoint, endPoint, routePoints, checkpoints, waypoints, riskPoints, restPoints, supplyPoints, map, readOnly])
 
   return (
     <div className="route-editor">
       <Card className="editor-controls">
         <Space direction="vertical" style={{ width: '100%' }}>
+          {/* 地点搜索 */}
+          {!readOnly && (
+            <div className="place-search-wrapper">
+              <Input.Search
+                placeholder="搜索地点名称，如：天安门、西湖"
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                onSearch={handleSearch}
+                enterButton={<><SearchOutlined /> 搜索</>}
+                loading={searchLoading}
+                allowClear
+                onClear={() => setSearchResults([])}
+              />
+              {searchResults.length > 0 && (
+                <div className="search-results-dropdown">
+                  {searchResults.map((result, index) => (
+                    <div
+                      key={index}
+                      className="search-result-item"
+                      onClick={() => handleSelectSearchResult(result)}
+                    >
+                      <div className="search-result-name">
+                        <EnvironmentOutlined style={{ color: '#1890ff', marginRight: 6 }} />
+                        {result.name}
+                      </div>
+                      {result.address && (
+                        <div className="search-result-address">{result.address}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="edit-mode-buttons">
             <Button
               type={editingMode === 'route' ? 'primary' : 'default'}
@@ -924,14 +1123,14 @@ const RouteEditor = ({
           {editingMode && (
             <div className="edit-tip">
               <Tag color="blue">
-                {editingMode === 'route' && '点击地图连续添加路线点，完成后点击"完成编辑"'}
-                {editingMode === 'setStart' && '点击地图设置起点'}
-                {editingMode === 'setEnd' && '点击地图设置终点'}
-                {editingMode === 'checkpoint' && '点击地图连续添加签到点，完成后点击"完成编辑"'}
-                {editingMode === 'waypoint' && '点击地图连续添加途经点，完成后点击"完成编辑"'}
-                {editingMode === 'riskPoint' && '点击地图连续添加风险点，完成后点击"完成编辑"'}
-                {editingMode === 'restPoint' && '点击地图连续添加休息点，完成后点击"完成编辑"'}
-                {editingMode === 'supplyPoint' && '点击地图连续添加补给点，完成后点击"完成编辑"'}
+                {editingMode === 'route' && '点击地图或搜索地点添加路线点，拖拽标记可调整位置'}
+                {editingMode === 'setStart' && '点击地图或搜索地点设置起点'}
+                {editingMode === 'setEnd' && '点击地图或搜索地点设置终点'}
+                {editingMode === 'checkpoint' && '点击地图或搜索地点添加签到点，拖拽标记可调整位置'}
+                {editingMode === 'waypoint' && '点击地图或搜索地点添加途经点，拖拽标记可调整位置'}
+                {editingMode === 'riskPoint' && '点击地图或搜索地点添加风险点，拖拽标记可调整位置'}
+                {editingMode === 'restPoint' && '点击地图或搜索地点添加休息点，拖拽标记可调整位置'}
+                {editingMode === 'supplyPoint' && '点击地图或搜索地点添加补给点，拖拽标记可调整位置'}
               </Tag>
             </div>
           )}
@@ -1323,6 +1522,7 @@ const RouteEditor = ({
         markers={allMarkers}
         routePoints={routePoints}
         onMapLoad={handleMapLoad}
+        onMarkerDragEnd={handleMarkerDragEnd}
         allowCenterChange={true}
       />
 
